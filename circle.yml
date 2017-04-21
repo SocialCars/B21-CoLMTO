@@ -34,7 +34,7 @@ dependencies:
         - sudo add-apt-repository -y ppa:sumo/stable
         - sudo apt-get update
         - sudo apt-get install sumo libhdf5-dev pandoc tk-dev python-tk
-        - if [ ! -d /tmp/doxygen/ ]; then wget -O /tmp/doxygen.tar.gz http://ftp.stack.nl/pub/users/dimitri/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && tar xf /tmp/doxygen.tar.gz --strip 1 -C /tmp; fi
+        - if [ ! -d /tmp/doxygen/ ]; then wget -O /tmp/doxygen.tar.gz http://ftp.stack.nl/pub/users/dimitri/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && mkdir /tmp/doxygen && tar xf /tmp/doxygen.tar.gz --strip 1 -C /tmp/doxygen; fi
         - pip install pylint radon codecov doxypy
         - if [ ! -d /tmp/texlive/ ]; then curl -L https://tesseract.in.tu-clausthal.de:8443/index.php/s/3ZKzReAc69yBNou/download | sudo tar xJp --strip 2 -C /tmp; fi
         - sudo /tmp/texlive/bin/x86_64-linux/tlmgr update --self --all --reinstall-forcibly-removed
