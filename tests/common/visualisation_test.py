@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @package tests
+# @package tests.common
 # @cond LICENSE
 # #############################################################################
 # # LGPL License                                                              #
