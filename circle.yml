@@ -61,8 +61,8 @@ test:
         - rm -Rf *
         - rm .pre-commit-config.yaml
         - mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/run.py /tmp/site /tmp/README.md /tmp/LICENSE.md .
-        - sh site/pylint.sh > pylint.html || true
-        - pandoc --from html --to markdown_github pylint.html -o pylint.md
+        - sh site/pylint.sh > pylint.md || true
+        # - pandoc --from html --to markdown_github pylint.html -o pylint.md
         - echo -e "\n## Import Graph\n" >> pylint.md
         - cp pylint.md pylint_doc.md
         - echo -e "\n![ImportGraph](https://github.com/masc/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
