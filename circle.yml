@@ -77,7 +77,7 @@ test:
         - cd docs/latex/ && make && cd ..
         - mv docs/latex/refman.pdf docs/$DOCUMENT.pdf
         - rm -Rf docs/latex
-        - mv colmto-imports.png docs/sources
+        # - mv colmto-imports.png docs/sources
         - rm -Rf colmto tests site run.py README_doc.md pylint.html pylint.md pylint_doc.md radon.md
         # add & commit
         - git add --all .
