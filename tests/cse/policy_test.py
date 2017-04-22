@@ -160,7 +160,9 @@ def test_sumo_vtype_policy():
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="passenger",
             behaviour=colmto.cse.policy.BEHAVIOUR.deny
-        ).apply([colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")])[0].vehicle_class,
+        ).apply(
+            [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
+        )[0].vehicle_class,
         "custom1"
     )
 
@@ -168,7 +170,9 @@ def test_sumo_vtype_policy():
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="passenger",
             behaviour=colmto.cse.policy.BEHAVIOUR.allow
-        ).apply([colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")])[0].vehicle_class,
+        ).apply(
+            [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
+        )[0].vehicle_class,
         "custom2"
     )
 
@@ -176,7 +180,9 @@ def test_sumo_vtype_policy():
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="truck",
             behaviour=colmto.cse.policy.BEHAVIOUR.deny
-        ).apply([colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")])[0].vehicle_class,
+        ).apply(
+            [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
+        )[0].vehicle_class,
         "custom2"
     )
 
@@ -368,7 +374,7 @@ def test_sumo_position_policy():
                 )
             )
         ),
-        "<class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1.0), (100.0, 1.0))"
-        ", behaviour = 0, subpolicies: []: <class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_range "
-        "= [  0.  60.], behaviour = 0, subpolicies: []: "
+        "<class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)"
+        "), behaviour = 0, subpolicies: []: <class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_rang"
+        "e = [  0.  60.], behaviour = 0, subpolicies: []: "
     )

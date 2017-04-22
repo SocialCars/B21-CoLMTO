@@ -145,4 +145,7 @@ def test_sumo_cse():
 
     assert_is_instance(l_sumo_cse.policies[0], colmto.cse.policy.SUMOSpeedPolicy)
     assert_is_instance(l_sumo_cse.policies[1], colmto.cse.policy.SUMOPositionPolicy)
-    assert_is_instance(l_sumo_cse.policies[1].vehicle_policies[0], colmto.cse.policy.SUMOSpeedPolicy)
+    assert_is_instance(
+        l_sumo_cse.policies[1].vehicle_policies[0],
+        colmto.cse.policy.SUMOSpeedPolicy
+    )

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @package tests
+# @package colmto.sumo
 # @cond LICENSE
 # #############################################################################
 # # LGPL License                                                              #
@@ -180,7 +180,8 @@ class Runtime(object):
                         i_vehicle_id,
                         l_vehicle.vehicle_class
                     )
-                    if l_vehicle.vehicle_class == colmto.cse.policy.SUMOPolicy.to_disallowed_class():
+                    if l_vehicle.vehicle_class \
+                            == colmto.cse.policy.SUMOPolicy.to_disallowed_class():
                         traci.vehicle.setColor(
                             i_vehicle_id,
                             (255, 0, 0, 255)

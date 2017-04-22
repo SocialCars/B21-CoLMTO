@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# @package tests
 # @cond LICENSE
 # #############################################################################
 # # LGPL License                                                              #
@@ -21,6 +20,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
+"""Runner"""
 import colmto.main as colmto
 
 if __name__ == "__main__":
