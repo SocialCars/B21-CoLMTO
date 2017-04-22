@@ -18,9 +18,8 @@ machine:
         GIT_COMMITTER_NAME: CircleCI
         GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
         SUMO_HOME: /usr/share/sumo
-        TEXINSTALL: minimal
-        DOCUMENT: CoLMTO-doc
         DOXYGEN_VERSION: 1.8.13
+        DOCUMENT: CoLMTO-doc
         PATH: /tmp/texlive/bin/x86_64-linux:/tmp/doxygen/bin/:$PATH
     python:
         version: 2.7.12
