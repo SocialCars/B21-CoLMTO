@@ -61,17 +61,16 @@ test:
         - rm -Rf *
         - rm .pre-commit-config.yaml
         - mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/run.py /tmp/site /tmp/README.md /tmp/LICENSE.md .
-        # - sh site/pylint.sh > pylint.md || true
-        # - pandoc --from html --to markdown_github pylint.html -o pylint.md
-        # - echo -e "\n## Import Graph\n" >> pylint.md
-        # - cp pylint.md pylint_doc.md
-        # - echo -e "\n![ImportGraph](https://github.com/masc/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
+        - sh site/pylint.sh > pylint.md || true
+        - echo -e "\n## Import Graph\n" >> pylint.md
+        - cp pylint.md pylint_doc.md
+        - echo -e "\n![ImportGraph](https://github.com/masc/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
         - echo -e "\n# Code Statistics\n\n" > REPORT.md
         - echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > README_doc.md
         - sh site/radon.sh > radon.md
         - cat radon.md >> REPORT.md
-        # - echo -e "\n# Pylint\n\n" >> REPORT.md
-        # - cat pylint.md >> REPORT.md
+        - echo -e "\n# Pylint\n\n" >> REPORT.md
+        - cat pylint.md >> REPORT.md
         - doxygen site/configuration.doxyfile
         # build latex
         - cd docs/latex/ && make && cd ..
