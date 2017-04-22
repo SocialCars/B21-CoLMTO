@@ -1,5 +1,5 @@
 """
-ooperative Lane Management and Traffic flow Optimisation
+Cooperative Lane Management and Traffic flow Optimisation
 
 Copyright 2017, Malte Aschermann.
 Licensed under LGPL.
