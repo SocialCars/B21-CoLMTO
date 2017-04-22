@@ -31,7 +31,6 @@ import logging
 import gzip
 
 import colmto.common.io
-import colmto.common.helper
 
 import h5py
 # pylint: disable=no-name-in-module
@@ -42,6 +41,14 @@ import yaml
 from nose.tools import assert_equals
 from nose.tools import assert_true
 from nose.tools import assert_raises
+
+
+class Namespace(object):
+    """Namespace similar to argparse"""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, **kwargs):
+        """C'tor."""
+        self.__dict__.update(kwargs)
 
 
 def test_xslt():
@@ -167,7 +174,7 @@ def test_reader_read_json():
     f_temp_test.write(json.dumps(l_json_gold))
     f_temp_test.seek(0)
 
-    args = colmto.common.helper.Namespace(
+    args = Namespace(
         loglevel=logging.DEBUG, quiet=False, logfile="foo.log"
     )
 
@@ -334,7 +341,7 @@ def test_write_yaml():
 
     f_temp_test = tempfile.NamedTemporaryFile()
 
-    args = colmto.common.helper.Namespace(
+    args = Namespace(
         loglevel="debug", quiet=False, logfile="foo.log"
     )
     colmto.common.io.Writer(args).write_yaml(l_yaml_gold, f_temp_test.name)
@@ -416,7 +423,7 @@ def test_write_json():
         }
     }
 
-    args = colmto.common.helper.Namespace(
+    args = Namespace(
         loglevel=logging.DEBUG, quiet=False, logfile="foo.log"
     )
     f_temp_test = tempfile.NamedTemporaryFile()

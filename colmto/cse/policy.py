@@ -23,16 +23,14 @@
 # @endcond
 # pylint: disable=too-few-public-methods
 """Policy related classes"""
+import enum
 import numpy
 
-import colmto.common.helper
 
-BEHAVIOUR = colmto.common.helper.Enum(["deny", "allow"])
-
-SUMO_VCLASS = {
-    BEHAVIOUR.allow: "custom2",
-    BEHAVIOUR.deny: "custom1"
-}
+class BEHAVIOUR(enum.Enum):
+    """Behaviour enum for enumerating allow/deny states and corresponding vehicle classes."""
+    allow = "custom2"
+    deny = "custom1"
 
 
 class BasePolicy(object):
@@ -83,12 +81,12 @@ class SUMOPolicy(BasePolicy):
     @staticmethod
     def to_allowed_class():
         """Get the SUMO class for allowed vehicles"""
-        return SUMO_VCLASS.get(BEHAVIOUR.allow)
+        return BEHAVIOUR.allow.value
 
     @staticmethod
     def to_disallowed_class():
         """Get the SUMO class for disallowed vehicles"""
-        return SUMO_VCLASS.get(BEHAVIOUR.deny)
+        return BEHAVIOUR.deny.value
 
 
 class SUMOExtendablePolicy(object):
@@ -197,15 +195,13 @@ class SUMOUniversalPolicy(SUMOPolicy):
         super(SUMOUniversalPolicy, self).__init__(behaviour)
 
     @staticmethod
+    # pylint: disable=unused-argument
     def applies_to(vehicle):
         """
         Test whether this policy applies to given vehicle
         @param vehicle Vehicle
         @retval boolean
         """
-        if not isinstance(vehicle, colmto.environment.vehicle.BaseVehicle):
-            raise TypeError
-
         return True
 
     def apply(self, vehicles):
@@ -232,15 +228,13 @@ class SUMONullPolicy(SUMOPolicy):
         super(SUMONullPolicy, self).__init__(behaviour)
 
     @staticmethod
+    # pylint: disable=unused-argument
     def applies_to(vehicle):
         """
         Test whether this policy applies to given vehicle
         @param vehicle Vehicle
         @retval boolean
         """
-        if not isinstance(vehicle, colmto.environment.vehicle.BaseVehicle):
-            raise TypeError
-
         return False
 
     @staticmethod
@@ -273,7 +267,7 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
 
     def __str__(self):
         return "{}: vehicle_type = {}, behaviour = {}, subpolicies: {}: {}".format(
-            self.__class__, self._vehicle_type, self._behaviour,
+            self.__class__, self._vehicle_type, self._behaviour.value,
             self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
         )
 
@@ -297,7 +291,7 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
 
         return [
             i_vehicle.change_vehicle_class(
-                SUMO_VCLASS.get(self._behaviour)
+                self._behaviour.value
             ) if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         ]
@@ -313,7 +307,7 @@ class SUMOSpeedPolicy(SUMOVehiclePolicy):
 
     def __str__(self):
         return "{}: speed_range = {}, behaviour = {}, subpolicies: {}: {}".format(
-            self.__class__, self._speed_range, self._behaviour,
+            self.__class__, self._speed_range, self._behaviour.name,
             self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
         )
 
@@ -337,7 +331,7 @@ class SUMOSpeedPolicy(SUMOVehiclePolicy):
 
         return [
             i_vehicle.change_vehicle_class(
-                SUMO_VCLASS.get(self._behaviour)
+                self._behaviour.value
             ) if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         ]
@@ -357,7 +351,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
 
     def __str__(self):
         return "{}: position_bbox = {}, behaviour = {}, subpolicies: {}: {}".format(
-            self.__class__, self._position_bbox, self._behaviour,
+            self.__class__, self._position_bbox, self._behaviour.value,
             self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
         )
 
@@ -392,7 +386,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
 
         return [
             i_vehicle.change_vehicle_class(
-                SUMO_VCLASS.get(self._behaviour)
+                self._behaviour.value
             ) if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         ]

@@ -34,8 +34,15 @@ from nose.tools import assert_in
 
 import colmto.cse.cse
 import colmto.cse.policy
-import colmto.common.helper
 import colmto.environment.vehicle
+
+
+class Namespace(object):
+    """Namespace similar to argparse"""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, **kwargs):
+        """C'tor."""
+        self.__dict__.update(kwargs)
 
 
 def test_base_cse():
@@ -45,7 +52,7 @@ def test_base_cse():
     assert_is_instance(colmto.cse.cse.BaseCSE(), colmto.cse.cse.BaseCSE)
     assert_is_instance(
         colmto.cse.cse.BaseCSE(
-            colmto.common.helper.Namespace(
+            Namespace(
                 loglevel="debug", quiet=False, logfile="foo.log"
             )
         ),
@@ -59,7 +66,7 @@ def test_sumo_cse():
     """
     assert_is_instance(
         colmto.cse.cse.SumoCSE(
-            colmto.common.helper.Namespace(
+            Namespace(
                 loglevel="debug", quiet=False, logfile="foo.log"
             )
         ),

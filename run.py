@@ -21,7 +21,7 @@
 # #############################################################################
 # @endcond
 """Runner"""
-import colmto.main as colmto
+import colmto.main
 
 if __name__ == "__main__":
-    colmto.Colmto().run()
+    colmto.main.Colmto().run()

@@ -26,13 +26,20 @@ colmto: Test module for common.statistics.
 """
 import colmto.common.statistics
 import colmto.environment.vehicle
-import colmto.common.helper
 import colmto.common.io
 
 from nose.tools import assert_equal
 from nose.tools import assert_is_instance
 from nose.tools import assert_not_is_instance
 from nose.tools import assert_raises
+
+
+class Namespace(object):
+    """Namespace similar to argparse"""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, **kwargs):
+        """C'tor."""
+        self.__dict__.update(kwargs)
 
 
 def test_statistics():
@@ -43,7 +50,7 @@ def test_statistics():
     )
     assert_is_instance(
         colmto.common.statistics.Statistics(
-            colmto.common.helper.Namespace(
+            Namespace(
                 loglevel="debug", quiet=False, logfile="foo.log"
             )
         ),

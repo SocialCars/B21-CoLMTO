@@ -26,6 +26,9 @@ colmto: Test module for environment.policy.
 """
 import random
 
+import colmto.cse.policy
+import colmto.environment.vehicle
+
 import numpy
 
 from nose.tools import assert_equal
@@ -34,9 +37,6 @@ from nose.tools import assert_is_instance
 from nose.tools import assert_raises
 from nose.tools import assert_true
 from nose.tools import assert_tuple_equal
-
-import colmto.cse.policy
-import colmto.environment.vehicle
 
 
 def test_base_policy():
@@ -110,9 +110,6 @@ def test_sumo_null_policy():
         assert_equal(l_vehicles[i].vehicle_class, l_results[i].vehicle_class)
         assert_false(l_sumo_policy.applies_to(l_vehicles[i]))
 
-    with assert_raises(TypeError):
-        l_sumo_policy.applies_to("foo")
-
 
 def test_sumo_vtype_policy():
     """Test SUMOVTypePolicy class"""
@@ -129,9 +126,9 @@ def test_sumo_vtype_policy():
                 )
             )
         ),
-        "<class 'colmto.cse.policy.SUMOVTypePolicy'>: vehicle_type = passenger, behaviour = 0, "
-        "subpolicies: []: <class 'colmto.cse.policy.SUMOPositionPolicy'>: "
-        "position_bbox = ((0.0, -1.0), (100.0, 1.0)), behaviour = 0, subpolicies: []: "
+        "<class 'colmto.cse.policy.SUMOVTypePolicy'>: vehicle_type = passenger, behaviour = custom1"
+        ", subpolicies: []: <class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, "
+        "-1.0), (100.0, 1.0)), behaviour = custom1, subpolicies: []: "
     )
 
     assert_true(
@@ -163,7 +160,7 @@ def test_sumo_vtype_policy():
         ).apply(
             [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
         )[0].vehicle_class,
-        "custom1"
+        colmto.cse.policy.BEHAVIOUR.deny.value
     )
 
     assert_equal(
@@ -173,7 +170,7 @@ def test_sumo_vtype_policy():
         ).apply(
             [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
         )[0].vehicle_class,
-        "custom2"
+        colmto.cse.policy.BEHAVIOUR.allow.value
     )
 
     assert_equal(
@@ -183,7 +180,7 @@ def test_sumo_vtype_policy():
         ).apply(
             [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
         )[0].vehicle_class,
-        "custom2"
+        colmto.cse.policy.BEHAVIOUR.allow.value
     )
 
 
@@ -261,9 +258,6 @@ def test_sumo_extendable_policy():
 def test_sumo_universal_policy():
     """Test SUMOUniversalPolicy class"""
 
-    with assert_raises(TypeError):
-        colmto.cse.policy.SUMOUniversalPolicy().applies_to("foo")
-
     assert_true(
         colmto.cse.policy.SUMOUniversalPolicy().applies_to(
             colmto.environment.vehicle.SUMOVehicle()
@@ -316,9 +310,9 @@ def test_sumo_speed_policy():
                 )
             )
         ),
-        "<class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_range = [  0.  60.], behaviour = 0, "
-        "subpolicies: []: <class 'colmto.cse.policy.SUMOPositionPolicy'>: "
-        "position_bbox = ((0.0, -1.0), (100.0, 1.0)), behaviour = 0, subpolicies: []: "
+        "<class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_range = [  0.  60.], behaviour = deny, "
+        "subpolicies: []: <class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1"
+        ".0), (100.0, 1.0)), behaviour = custom1, subpolicies: []: "
     )
 
 
@@ -375,6 +369,6 @@ def test_sumo_position_policy():
             )
         ),
         "<class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)"
-        "), behaviour = 0, subpolicies: []: <class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_rang"
-        "e = [  0.  60.], behaviour = 0, subpolicies: []: "
+        "), behaviour = custom1, subpolicies: []: <class 'colmto.cse.policy.SUMOSpeedPolicy'>: spee"
+        "d_range = [  0.  60.], behaviour = deny, subpolicies: []: "
     )
