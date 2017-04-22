@@ -1,3 +1,4 @@
+# pragma: no cover
 # -*- coding: utf-8 -*-
 # @package colmto.common
 # @cond LICENSE
@@ -21,7 +22,6 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-# pragma: no cover
 """Helper module"""
 
 
