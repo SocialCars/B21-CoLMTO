@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 echo "# Radon\n"
 echo "## Cyclomatic Complexity\n"
 echo "| File | Type | R:C | Module | CC  |\n|:---- |:---- |:---:|:------ |:--- |"
