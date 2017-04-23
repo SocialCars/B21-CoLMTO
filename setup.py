@@ -68,7 +68,8 @@ setup(name="colmto",
           "PyYAML",
           "python-cjson",
           "progressbar",
-          "doxypy"
+          "doxypy",
+          "enum34"
       ],
 
       # TODO: List executable scripts, provided by the package (this is just an example)
