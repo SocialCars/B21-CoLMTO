@@ -566,8 +566,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
             return prev_start_time + random.expovariate(lamb)
         elif distribution == "linear":
             return prev_start_time + 1 / lamb
-        else:
-            return prev_start_time
+
+        return prev_start_time
 
     def _create_vehicle_distribution(self, vtype_list, aadt, initialsorting, scenario_name):
         """

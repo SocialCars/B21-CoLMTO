@@ -121,8 +121,8 @@ class Reader(object):
 
         if filename.endswith(".gz"):
             return yaml.load(gzip.GzipFile(filename, "r"), Loader=SafeLoader)
-        else:
-            return yaml.load(open(filename), Loader=SafeLoader)
+
+        return yaml.load(open(filename), Loader=SafeLoader)
 
 
 class Writer(object):

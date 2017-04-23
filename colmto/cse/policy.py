@@ -181,8 +181,8 @@ class SUMOExtendablePolicy(object):
             return all(
                 [i_subpolicy.applies_to(vehicle) for i_subpolicy in self._vehicle_policies]
             )
-        else:
-            return False
+
+        return False
 
 
 class SUMOUniversalPolicy(SUMOPolicy):

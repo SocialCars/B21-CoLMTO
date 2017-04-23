@@ -796,5 +796,5 @@ class Statistics(object):
         if vehicle_positions[l_index] - detector_position \
                 < detector_position - vehicle_positions[l_index-1]:
             return l_index
-        else:
-            return l_index-1
+
+        return l_index-1
