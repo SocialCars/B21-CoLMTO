@@ -15,8 +15,11 @@ radon cc --show-closures -x F --total-average -s colmto | sed \
 -e '/^||/ s/|`|/`|/' \
 -e '/|`Average[[:print:]]*`|/ s/|//g'
 echo "\n## Maintainability Index\n"
-echo "| Module | MI  |\n|:------ |:--- |"
-radon mi -x F -s colmto | sed \
--e 's/ - /`|/g' \
--e '/^[a-zA-Z]/ s/^/|`/' \
--e '/^|`[a-zA-Z]/ s/$/|/'
+# echo "| Module | MI  |\n|:------ |:--- |"
+echo '```'
+radon mi -x F -s colmto
+echo '```'
+# | sed \
+# -e 's/ - /`|/g' \
+# -e '/^[a-zA-Z]/ s/^/|`/' \
+# -e '/^|`[a-zA-Z]/ s/$/|/'
