@@ -74,10 +74,6 @@ class SUMOPolicy(BasePolicy):
     for allowing/disallowing access to overtaking lane (OTL)
     """
 
-    def __init__(self, behaviour=BEHAVIOUR.deny):
-        """C'tor."""
-        super(SUMOPolicy, self).__init__(behaviour)
-
     @staticmethod
     def to_allowed_class():
         """Get the SUMO class for allowed vehicles"""
@@ -190,10 +186,6 @@ class SUMOUniversalPolicy(SUMOPolicy):
     Universal policy, i.e. always applies to any vehicle
     """
 
-    def __init__(self, behaviour=BEHAVIOUR.deny):
-        """C'tor."""
-        super(SUMOUniversalPolicy, self).__init__(behaviour)
-
     @staticmethod
     # pylint: disable=unused-argument
     def applies_to(vehicle):
@@ -222,10 +214,6 @@ class SUMONullPolicy(SUMOPolicy):
     """
     Null policy, i.e. no restrictions: Applies to no vehicle
     """
-
-    def __init__(self, behaviour=BEHAVIOUR.deny):
-        """C'tor."""
-        super(SUMONullPolicy, self).__init__(behaviour)
 
     @staticmethod
     # pylint: disable=unused-argument
