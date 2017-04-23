@@ -67,7 +67,6 @@ setup(name="colmto",
           "h5py",
           "PyYAML",
           "python-cjson",
-          "progressbar",
           "doxypy",
           "enum34"
       ],
