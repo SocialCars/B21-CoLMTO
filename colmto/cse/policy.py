@@ -266,7 +266,7 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
         @retval boolean
         """
         if (self._vehicle_type == vehicle.vehicle_type) and \
-                (self.subpolicies_apply_to(vehicle) if len(self._vehicle_policies) > 0 else True):
+                (self.subpolicies_apply_to(vehicle) if self._vehicle_policies else True):
             return True
         return False
 
@@ -306,7 +306,7 @@ class SUMOSpeedPolicy(SUMOVehiclePolicy):
         @retval boolean
         """
         if (self._speed_range[0] <= vehicle.speed_max <= self._speed_range[1]) and \
-                (self.subpolicies_apply_to(vehicle) if len(self._vehicle_policies) > 0 else True):
+                (self.subpolicies_apply_to(vehicle) if self._vehicle_policies else True):
             return True
         return False
 
@@ -360,7 +360,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
         # pylint: disable=no-member
         if numpy.all(numpy.logical_and(self._position_bbox[0] <= vehicle.position,
                                        vehicle.position <= self._position_bbox[1])) and \
-                (self.subpolicies_apply_to(vehicle) if len(self._vehicle_policies) > 0 else True):
+                (self.subpolicies_apply_to(vehicle) if self._vehicle_policies else True):
             return True
         return False
         # pylint: enable=no-member

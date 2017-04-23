@@ -218,7 +218,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         l_runcfgfiles = [l_tripfile, l_routefile, l_configfile]
 
-        if len([fname for fname in l_runcfgfiles if not os.path.isfile(fname)]) > 0:
+        if [fname for fname in l_runcfgfiles if not os.path.isfile(fname)]:
             self._log.debug(
                 "Incomplete/non-existing SUMO run configuration for %s, %s, %d -> (re)building",
                 scenario_run_config.get("scenarioname"), initial_sorting, run_number
