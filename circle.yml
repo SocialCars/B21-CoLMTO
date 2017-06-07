@@ -50,6 +50,7 @@ test:
         - SUMO_HOME=/usr/share/sumo python -m run --fresh-configs --cse --scenarios NI-B210 --runs 1
         # codecov
         - nosetests -w tests --with-coverage
+        - bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
         - bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
         - mv -f colmto tests site run.py README.md LICENSE.md /tmp
         - git checkout gh-pages
@@ -64,7 +65,7 @@ test:
         - sh site/pylint.sh > pylint.md || true
         - echo -e "\n## Import Graph\n" >> pylint.md
         - cp pylint.md pylint_doc.md
-        - echo -e "\n![ImportGraph](https://github.com/SocialCars/B21-CoLMTO/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
+        - echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
         - echo -e "\n# Code Statistics\n\n" > REPORT.md
         - echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > README_doc.md
         - sh site/radon.sh > radon.md
@@ -80,5 +81,5 @@ test:
         - rm -Rf colmto tests site run.py README_doc.md pylint.html pylint.md pylint_doc.md radon.md
         # add & commit
         - git add --all .
-        - git commit -m "CircleCI run complete. Report https://github.com/SocialCars/B21-CoLMTO/blob/gh-pages/REPORT.md , Doku http://socialcars.github.io/B21-CoLMTO/docs/sources/index.html"
+        - git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/REPORT.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
         - git push origin gh-pages
