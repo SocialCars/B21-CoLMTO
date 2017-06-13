@@ -112,8 +112,8 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = colmto \
                          tests \
-                         README_doc.md \
-                         LICENSE.md
+                         readme_doc.md \
+                         license.md
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.py \
                          *.md
@@ -130,7 +130,7 @@ INPUT_FILTER           =
 FILTER_PATTERNS        = *.py=doxypy.py
 FILTER_SOURCE_FILES    = YES
 FILTER_SOURCE_PATTERNS =
-USE_MDFILE_AS_MAINPAGE = README_doc.md
+USE_MDFILE_AS_MAINPAGE = readme_doc.md
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
 #---------------------------------------------------------------------------
