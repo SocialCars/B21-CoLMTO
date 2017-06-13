@@ -13,7 +13,7 @@
 * Python 2.7
 * libhdf5
 * libyaml
-* SUMO build dependencies (see build instructions for [MacOS](http://sumo.dlr.de/wiki/Installing/MacOS_Build_w_Homebrew), [Linux](http://sumo.dlr.de/wiki/Installing/Linux_Build), [Windows](http://sumo.dlr.de/wiki/Installing/Windows_Build) to requirements.)
+* SUMO build dependencies (see build instructions for [MacOS](http://sumo.dlr.de/wiki/Installing/MacOS_Build_w_Homebrew), [Linux](http://sumo.dlr.de/wiki/Installing/Linux_Build), [Windows](http://sumo.dlr.de/wiki/Installing/Windows_Build) for requirements).
 
 ### Checkout Code
 
