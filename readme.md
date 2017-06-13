@@ -8,39 +8,39 @@
 
 ## Build Instructions
 
-### Prerequisites
+### 0. Prerequisites
 
 * Python 2.7
 * libhdf5
 * libyaml
 * SUMO build dependencies (see build instructions for [MacOS](http://sumo.dlr.de/wiki/Installing/MacOS_Build_w_Homebrew), [Linux](http://sumo.dlr.de/wiki/Installing/Linux_Build), [Windows](http://sumo.dlr.de/wiki/Installing/Windows_Build) for requirements).
 
-### Checkout Code
+### 1. Checkout Code
 
 ```zsh
 git clone --recursive https://github.com/SocialCars/colmto.git
-cd colmto
 ```
 
-### Build SUMO
+### 2. Build SUMO Submodule
 
 #### MacOS
 
 ```zsh
 export CPPFLAGS="$CPPFLAGS -I/opt/X11/include/"
 export LDFLAGS="-L/opt/X11/lib"
-cd sumo/sumo
+cd colmto/sumo/sumo
 make -f Makefile.cvs
 ./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local
 make -jN
 ```
 
-### Linux/FreeBSD
+#### Linux/FreeBSD
 
-### Windows
+#### Windows
 
 
-### Install CoLMTO (including dependencies)
+
+### 3. Install CoLMTO (including dependencies)
 
 ```zsh
 python setup.py install --user
