@@ -43,7 +43,7 @@ version = "0.1.1"
 setup(name="colmto",
       version=version,
       description="Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)",
-      long_description=open("README.md").read(),
+      long_description=open("readme.md").read(),
       classifiers=[  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Programming Language :: Python"
       ],
