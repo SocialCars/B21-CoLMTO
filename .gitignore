@@ -1,8 +1,6 @@
 *.*
 !.gitignore
 !.gitmodules
-!buildout.cfg
-!colmto.iml
 !circle.yml
 !codecov.yml
 !setup.cfg
