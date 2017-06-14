@@ -104,9 +104,7 @@ Basically it boils down to the following:
 
 ```python
 import colmto.main
-
-if __name__ == "__main__":
-    colmto.main.Colmto().run()
+colmto.main.Colmto().run()
 ```
 
 Upon first start it creates YAML formatted default configurations and its log file in `~/.colmto/`:
