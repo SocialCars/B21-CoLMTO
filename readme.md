@@ -58,6 +58,10 @@ make -jN
 
 #### MacOS
 
+```zsh
+brew install libxml2 homebrew/science/hdf5 libyaml
+```
+
 #### Ubuntu Yakkety
 
 ```zsh
