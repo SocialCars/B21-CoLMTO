@@ -6,6 +6,11 @@
   * [Source Code Documentation (HTML)](http://socialcars.github.io/colmto/docs/sources/index.html)
   * [Source Code Documentation (PDF)](http://socialcars.github.io/colmto/docs/CoLMTO-doc.pdf)
 
+
+## Architecture
+
+![CoLMTO Architecture](architecture.png)
+
 ## Build Instructions
 
 ### Prerequisites
@@ -29,6 +34,14 @@ The version of SUMO currently used for my research is referenced as a submodule 
 Feel free to use any other version, but make sure to set the `SUMO_HOME` environment variable correctly.
 
 #### FreeBSD
+
+```zsh
+sudo portmaster devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
+cd colmto/sumo/sumo
+make -f Makefile.cvs
+./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local
+make -jN
+```
 
 #### MacOS
 
