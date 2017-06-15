@@ -1,3 +1,26 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)](#cooperative-lane-management-and-traffic-flow-optimisation-colmto)
+  - [Architecture](#architecture)
+  - [Build Instructions](#build-instructions)
+    - [Prerequisites](#prerequisites)
+    - [Checkout CoLMTO](#checkout-colmto)
+    - [Build SUMO Submodule (optional)](#build-sumo-submodule-optional)
+      - [FreeBSD](#freebsd)
+      - [MacOS](#macos)
+      - [Ubuntu (Yakkety)](#ubuntu-yakkety)
+    - [Install Required System Packages](#install-required-system-packages)
+      - [FreeBSD](#freebsd-1)
+      - [MacOS](#macos-1)
+      - [Ubuntu Yakkety](#ubuntu-yakkety)
+    - [Build and Install CoLMTO](#build-and-install-colmto)
+  - [Run CoLMTO](#run-colmto)
+  - [Copyright & License](#copyright--license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
 
 [![CircleCI](https://circleci.com/gh/SocialCars/colmto.svg?style=shield)](https://circleci.com/gh/SocialCars/colmto)
@@ -15,7 +38,16 @@
 
 ### Prerequisites
 
-* Python 2.7
+* [Python 2.7](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
+  * [doxypy](https://pypi.python.org/pypi/doxypy)
+  * [enum34](https://pypi.python.org/pypi/enum34)
+  * [h5py](https://pypi.python.org/pypi/h5py)
+  * [lxml](https://pypi.python.org/pypi/lxml)
+  * [nose](https://pypi.python.org/pypi/nose)
+  * [matplotlib](https://pypi.python.org/pypi/matplotlib)
+  * [python-cjson](https://pypi.python.org/pypi/python-cjson)
+  * [PyYAML](https://pypi.python.org/pypi/PyYAML)
+  * [sh](https://pypi.python.org/pypi/sh)
 * libhdf5
 * libxml
 * libyaml
@@ -65,9 +97,13 @@ make -f Makefile.cvs
 make -jN
 ```
 
-### Install CoLMTO Dependencies
+### Install Required System Packages
 
 #### FreeBSD
+
+```zsh
+sudo portmaster textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2
+```
 
 #### MacOS
 
@@ -85,9 +121,16 @@ sudo apt-get install libyaml-dev libxslt1-dev
 
 ```zsh
 cd colmto
+
+# FreeBSD and OSes with include path other than /usr/include
+setenv CPPFLAGS "-I/usr/local/include"
+
+# install dependencies and build package
+python setup.py build
+
 # run unit tests
 python setup.py test
-# install
+# install (local)
 python setup.py install --user
 ```
 
