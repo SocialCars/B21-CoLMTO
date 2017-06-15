@@ -67,7 +67,6 @@ test:
         - cp pylint.md pylint_doc.md
         - echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
         - echo -e "\n# Code Statistics\n\n" > report.md
-        - echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > readme_doc.md
         - sh site/radon.sh > radon.md
         - cat radon.md >> report.md
         - echo -e "\n# Pylint\n\n" >> report.md
@@ -78,7 +77,7 @@ test:
         - mv docs/latex/refman.pdf docs/$DOCUMENT.pdf
         - rm -Rf docs/latex
         - mv colmto-imports.png docs/sources
-        - rm -Rf colmto tests site run.py readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
+        - rm -Rf colmto tests site run.py pylint.html pylint.md pylint_doc.md radon.md
         # add & commit
         - git add --all .
         - git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
