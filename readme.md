@@ -124,6 +124,7 @@ python setup.py build
 
 # run unit tests
 python setup.py test
+
 # install (local)
 python setup.py install --user
 ```
