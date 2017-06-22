@@ -160,7 +160,7 @@ def test_dissatisfaction():
         9.998323e-01, 9.999383e-01, 9.999773e-01, 9.999916e-01, 9.999969e-01, 9.999989e-01,
         9.999996e-01, 9.999998e-01, 9.999999e-01, 1.000000e+00, 1.000000e+00, 1.000000e+00
     )
-    for i_time_loss in xrange(30):
+    for i_time_loss in range(30):
         assert_almost_equal(
             # pylint: disable=protected-access
             l_sumovehicle._dissatisfaction(

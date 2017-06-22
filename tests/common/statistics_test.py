@@ -125,7 +125,7 @@ def test_h_spread():
     )
 
     assert_equal(
-        colmto.common.statistics.Statistics.h_spread(xrange(10 ** 6)),
+        colmto.common.statistics.Statistics.h_spread(range(10 ** 6)),
         499999.5
     )
 
@@ -146,7 +146,7 @@ def test_aggregate_hdf5():
             position=(0, 0),
             lane_index=0,
             speed=10.
-        ) for i_vid in xrange(2)
+        ) for i_vid in range(2)
     }
     l_vehicles.update(
         {
@@ -158,7 +158,7 @@ def test_aggregate_hdf5():
                 position=(0, 0),
                 lane_index=0,
                 speed=10.
-            ) for i_vid in xrange(2, 4)
+            ) for i_vid in range(2, 4)
         }
     )
     l_vehicles.update(
@@ -171,15 +171,15 @@ def test_aggregate_hdf5():
                 position=(0, 0),
                 lane_index=0,
                 speed=10.
-            ) for i_vid in xrange(4, 6)
+            ) for i_vid in range(4, 6)
         }
     )
 
-    for i_vehicle in l_vehicles.itervalues():
+    for i_vehicle in l_vehicles.values():
         i_vehicle.properties["dsat_threshold"] = 0.0
 
-    for i_step in xrange(1, 3):
-        for i_vehicle in l_vehicles.itervalues():
+    for i_step in range(1, 3):
+        for i_vehicle in l_vehicles.values():
             i_vehicle.record_travel_stats(i_step)
             i_vehicle.update(
                 position=(i_vehicle.position[0]+10., 0),
@@ -189,7 +189,7 @@ def test_aggregate_hdf5():
 
     l_statistics.aggregate_vehicle_grid_stats(l_vehicles)
 
-    for i_vehicle in l_vehicles.itervalues():
+    for i_vehicle in l_vehicles.values():
         for i_element in i_vehicle.travel_stats.get("grid").get("pos_x"):
             assert_not_is_instance(i_element, list)
         for i_element in i_vehicle.travel_stats.get("grid").get("pos_y"):

@@ -141,7 +141,7 @@ def test_mapped_cmap():
     ]
 
     l_colors = [
-        [colmto.common.visualisation.mapped_cmap(i_cmap, 10)(i) for i in xrange(10)]
+        [colmto.common.visualisation.mapped_cmap(i_cmap, 10)(i) for i in range(10)]
         for i_cmap in colmto.common.visualisation.cmap_names()
         ]
 

@@ -92,7 +92,7 @@ def test_sumo_null_policy():
     assert_is_instance(l_sumo_policy, colmto.cse.policy.SUMONullPolicy)
 
     l_vehicles = [
-        colmto.environment.vehicle.SUMOVehicle() for _ in xrange(23)
+        colmto.environment.vehicle.SUMOVehicle() for _ in range(23)
         ]
     for i_vehicle in l_vehicles:
         i_vehicle.change_vehicle_class(
@@ -106,9 +106,9 @@ def test_sumo_null_policy():
 
     l_results = l_sumo_policy.apply(l_vehicles)
 
-    for i in xrange(len(l_vehicles)):
-        assert_equal(l_vehicles[i].vehicle_class, l_results[i].vehicle_class)
-        assert_false(l_sumo_policy.applies_to(l_vehicles[i]))
+    for i, i_vehicle in enumerate(l_vehicles):
+        assert_equal(i_vehicle.vehicle_class, l_results[i].vehicle_class)
+        assert_false(l_sumo_policy.applies_to(i_vehicle))
 
 
 def test_sumo_vtype_policy():
@@ -282,20 +282,20 @@ def test_sumo_speed_policy():
     l_vehicles = [
         colmto.environment.vehicle.SUMOVehicle(
             speed_max=random.randrange(0, 120)
-        ) for _ in xrange(4711)
+        ) for _ in range(4711)
         ]
 
     l_results = l_sumo_policy.apply(l_vehicles)
 
-    for i in xrange(len(l_results)):
+    for i, i_results in enumerate(l_results):
         if 0. <= l_vehicles[i].speed_max <= 60.0:
             assert_equal(
-                l_results[i].vehicle_class,
+                i_results.vehicle_class,
                 colmto.cse.policy.SUMOPolicy.to_disallowed_class()
             )
         else:
             assert_equal(
-                l_results[i].vehicle_class,
+                i_results.vehicle_class,
                 colmto.cse.policy.SUMOPolicy.to_allowed_class()
             )
 
@@ -324,20 +324,20 @@ def test_sumo_position_policy():
     assert_is_instance(l_sumo_policy, colmto.cse.policy.SUMOPositionPolicy)
 
     l_vehicles = [
-        colmto.environment.vehicle.SUMOVehicle() for _ in xrange(4711)
+        colmto.environment.vehicle.SUMOVehicle() for _ in range(4711)
         ]
     for i_vehicle in l_vehicles:
         i_vehicle.position = (random.randrange(0, 200), 0.)
 
     l_results = l_sumo_policy.apply(l_vehicles)
 
-    for i in xrange(len(l_results)):
+    for i, i_results in enumerate(l_results):
         if 0. <= l_vehicles[i].position[0] <= 100.0:
             assert_true(
                 l_sumo_policy.applies_to(l_vehicles[i])
             )
             assert_equal(
-                l_results[i].vehicle_class,
+                i_results.vehicle_class,
                 colmto.cse.policy.SUMOPolicy.to_disallowed_class()
             )
         else:
@@ -345,7 +345,7 @@ def test_sumo_position_policy():
                 l_sumo_policy.applies_to(l_vehicles[i])
             )
             assert_equal(
-                l_results[i].vehicle_class,
+                i_results.vehicle_class,
                 colmto.cse.policy.SUMOPolicy.to_allowed_class()
             )
 
