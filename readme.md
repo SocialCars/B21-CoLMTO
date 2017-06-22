@@ -135,7 +135,7 @@ cd colmto
 python3 -m colmto --runs 1
 ```
 
-Upon first start it creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
+Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
 
 ```
 ~/.colmto/
