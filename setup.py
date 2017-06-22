@@ -73,6 +73,6 @@ setup(name="colmto",
       # TODO: List executable scripts, provided by the package (this is just an example)
       entry_points={
         "console_scripts":
-        ["colmto=run"]
+        ["colmto = colmto"]
       }
 )

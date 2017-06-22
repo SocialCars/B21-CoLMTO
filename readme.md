@@ -32,14 +32,12 @@
 
 ### Prerequisites
 
-* [Python 2.7](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
+* [Python 3.6](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
   * [doxypy](https://pypi.python.org/pypi/doxypy)
-  * [enum34](https://pypi.python.org/pypi/enum34)
   * [h5py](https://pypi.python.org/pypi/h5py)
   * [lxml](https://pypi.python.org/pypi/lxml)
-  * [nose](https://pypi.python.org/pypi/nose)
   * [matplotlib](https://pypi.python.org/pypi/matplotlib)
-  * [python-cjson](https://pypi.python.org/pypi/python-cjson)
+  * [nose](https://pypi.python.org/pypi/nose)
   * [PyYAML](https://pypi.python.org/pypi/PyYAML)
   * [sh](https://pypi.python.org/pypi/sh)
 * libhdf5
@@ -120,13 +118,13 @@ cd colmto
 setenv CPPFLAGS "-I/usr/local/include"
 
 # install dependencies and build package
-python setup.py build
+python3 setup.py build
 
 # run unit tests
-python setup.py test
+python3 setup.py test
 
 # install (local)
-python setup.py install --user
+python3 setup.py install --user
 ```
 
 ## Run CoLMTO
@@ -134,15 +132,7 @@ python setup.py install --user
 ```zsh
 export SUMO_HOME=~/colmto/sumo/sumo # adjust accordingly
 cd colmto
-python -m run --runs 1
-```
-
-CoLMTO provides a runner in the parent directory of the project (`run.py`) to start the simulation.
-Basically it boils down to the following:
-
-```python
-import colmto.main
-colmto.main.Colmto().run()
+python3 -m colmto --runs 1
 ```
 
 Upon first start it creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
@@ -158,7 +148,7 @@ Upon first start it creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted
 Further help on command line options can be obtained by running
 
 ```zsh
-python -m run --help
+python3 -m colmto --help
 ```
 
 ## Copyright & License
