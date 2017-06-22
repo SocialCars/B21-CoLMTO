@@ -22,8 +22,6 @@
 # #############################################################################
 # @endcond
 """This module generates static sumo configuration files for later execution."""
-from __future__ import division
-from __future__ import print_function
 
 import copy
 import os
@@ -74,7 +72,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_global_maxspeed = max(
             [
                 i_scenario.get("parameters").get("speedlimit")
-                for i_scenario in self.scenario_config.itervalues()
+                for i_scenario in self.scenario_config.values()
                 ]
         )
         self._speed_colormap = colmto.common.visualisation.mapped_cmap(
@@ -241,7 +239,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # update baseline_relative_time_loss for each vehicle according to scenario
-        for i_vehicle in l_vehicles.itervalues():
+        for i_vehicle in l_vehicles.values():
             i_vehicle.properties["baseline_relative_time_loss"] = self.scenario_config.get(
                 scenario_run_config.get("scenarioname")
             ).get("baseline_relative_time_loss").get(i_vehicle.properties.get("vType"))
@@ -317,7 +315,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         with open(nodefile, "w") as f_nodesxml:
-            f_nodesxml.write(colmto.common.io.etree.tostring(l_nodes, pretty_print=True))
+            f_nodesxml.write(
+                colmto.common.io.etree.tostring(l_nodes, pretty_print=True, encoding="unicode")
+            )
 
     def _generate_edge_xml(
             self, scenario_name, scenario_config, edgefile, forcerebuildscenarios=False):
@@ -409,7 +409,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         with open(edgefile, "w") as f_edgexml:
-            f_edgexml.write(colmto.common.io.etree.tostring(l_edges, pretty_print=True))
+            f_edgexml.write(
+                colmto.common.io.etree.tostring(l_edges, pretty_print=True, encoding="unicode")
+            )
 
     def _generate_switches(self, edge, scenario_config):
         """
@@ -445,9 +447,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
             scenario_config.get("parameters")["switchpositions"] = []
             # compute and add splits and joins
             l_add_otl_lane = True
-            for i_segmentpos in xrange(0, int(l_length), int(l_segmentlength)) \
+            for i_segmentpos in range(0, int(l_length), int(l_segmentlength)) \
                     if not self._args.onlyoneotlsegment \
-                    else xrange(0, int(2 * l_segmentlength - 1), int(l_segmentlength)):
+                    else range(0, int(2 * l_segmentlength - 1), int(l_segmentlength)):
                 colmto.common.io.etree.SubElement(
                     edge,
                     "split",
@@ -511,7 +513,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         with open(config_files.get("configfile"), "w") as f_configxml:
-            f_configxml.write(colmto.common.io.etree.tostring(l_configuration, pretty_print=True))
+            f_configxml.write(
+                colmto.common.io.etree.tostring(
+                    l_configuration,
+                    pretty_print=True,
+                    encoding="unicode"
+                )
+            )
 
     @staticmethod
     def _generate_settings_xml(
@@ -540,7 +548,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         with open(settingsfile, "w") as f_configxml:
-            f_configxml.write(colmto.common.io.etree.tostring(l_viewsettings, pretty_print=True))
+            f_configxml.write(
+                colmto.common.io.etree.tostring(
+                    l_viewsettings,
+                    pretty_print=True,
+                    encoding="unicode"
+                )
+            )
 
     @staticmethod
     def _next_timestep(lamb, prev_start_time, distribution="poisson"):
@@ -681,10 +695,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_trips = colmto.common.io.etree.Element("trips")
 
         # create a sumo vehicle_type for each vehicle
-        for i_vid, i_vehicle in l_vehicles.iteritems():
+        for i_vid, i_vehicle in l_vehicles.items():
 
             # filter for relevant attributes and transform to string
-            l_vattr = {k: str(v) for k, v in i_vehicle.properties.iteritems()}
+            l_vattr = {k: str(v) for k, v in i_vehicle.properties.items()}
             l_vattr.update({
                 "id": str(i_vid),
                 "color": "{},{},{},{}".format(*i_vehicle.color/255.)
@@ -718,7 +732,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             colmto.common.io.etree.SubElement(l_trips, "vType", attrib=l_vattr)
 
         # add trip for each vehicle
-        for i_vid, i_vehicle in l_vehicles.iteritems():
+        for i_vid, i_vehicle in l_vehicles.items():
             colmto.common.io.etree.SubElement(l_trips, "trip", attrib={
                 "id": i_vid,
                 "depart": str(i_vehicle.start_time),
@@ -729,7 +743,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
             })
 
         with open(tripfile, "w") as f_tripxml:
-            f_tripxml.write(colmto.common.io.etree.tostring(l_trips, pretty_print=True))
+            f_tripxml.write(
+                colmto.common.io.etree.tostring(l_trips, pretty_print=True, encoding="unicode")
+            )
 
         return l_vehicles
 
@@ -760,7 +776,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
             close_fds=True
         )
         self._log.debug(
-            "%s: %s", self._binaries.get("netconvert"), l_netconvertprocess.replace("\n", "")
+            "%s: %s",
+            self._binaries.get("netconvert"),
+            l_netconvertprocess.decode("utf8").replace("\n", "")
         )
 
     def _generate_route_xml(
@@ -789,5 +807,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             close_fds=True
         )
         self._log.debug(
-            "%s: %s", self._binaries.get("duarouter"), l_duarouterprocess.replace("\n", "")
+            "%s: %s",
+            self._binaries.get("duarouter"),
+            l_duarouterprocess.decode("utf8").replace("\n", "")
         )

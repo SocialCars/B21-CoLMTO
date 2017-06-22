@@ -22,7 +22,7 @@
 # #############################################################################
 # @endcond
 """Vehicle classes for storing vehicle data/attributes/states."""
-from __future__ import division
+
 import numpy
 
 import colmto.cse.policy

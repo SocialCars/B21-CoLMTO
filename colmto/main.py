@@ -37,21 +37,21 @@ class Colmto(object):
 
     def __init__(self):
         """C'tor."""
-        l_config_dir = os.path.expanduser(u"~/.colmto")
+        l_config_dir = os.path.expanduser("~/.colmto")
 
         l_parser = argparse.ArgumentParser(description="Process parameters for CoLMTO.")
 
         l_parser.add_argument(
             "--runconfigfile", dest="runconfigfile", type=str,
-            default=os.path.join(l_config_dir, u"runconfig.yaml")
+            default=os.path.join(l_config_dir, "runconfig.yaml")
         )
         l_parser.add_argument(
             "--scenarioconfigfile", dest="scenarioconfigfile", type=str,
-            default=os.path.join(l_config_dir, u"scenarioconfig.yaml")
+            default=os.path.join(l_config_dir, "scenarioconfig.yaml")
         )
         l_parser.add_argument(
             "--vtypesconfigfile", dest="vtypesconfigfile", type=str,
-            default=os.path.join(l_config_dir, u"vtypesconfig.yaml")
+            default=os.path.join(l_config_dir, "vtypesconfig.yaml")
         )
         l_parser.add_argument(
             "--fresh-configs",
@@ -91,7 +91,7 @@ class Colmto(object):
         )
         l_parser.add_argument(
             "--logfile", dest="logfile", type=str,
-            default=os.path.join(l_config_dir, u"colmto.log")
+            default=os.path.join(l_config_dir, "colmto.log")
         )
         l_parser.add_argument(
             "--loglevel", dest="loglevel", type=str,

@@ -22,8 +22,6 @@
 # #############################################################################
 # @endcond
 """Statistics module"""
-from __future__ import division
-from __future__ import print_function
 
 import bisect
 
@@ -148,41 +146,41 @@ class Statistics(object):
         @param vehicles dictionary vID -> vObj from vehicle object
         @retval vehicles with travel_stats median aggregated
         """
-        for i_vehicle in vehicles.itervalues():
+        for i_vehicle in vehicles.values():
 
             l_travel_stats = i_vehicle.travel_stats.get("grid")
 
-            for i_idx in xrange(len(l_travel_stats.get("pos_x"))):
+            for i_idx in range(len(l_travel_stats.get("pos_x"))):
                 l_travel_stats.get("pos_x")[i_idx] = numpy.median(
                     l_travel_stats.get("pos_x")[i_idx]
                 ) if len(l_travel_stats.get("pos_x")[i_idx]) > 1 \
                     else l_travel_stats.get("pos_x")[i_idx][0]
 
-            for i_idx in xrange(len(l_travel_stats.get("pos_y"))):
+            for i_idx in range(len(l_travel_stats.get("pos_y"))):
                 l_travel_stats.get("pos_y")[i_idx] = numpy.median(
                     l_travel_stats.get("pos_y")[i_idx]
                 ) if len(l_travel_stats.get("pos_y")[i_idx]) > 1 \
                     else l_travel_stats.get("pos_y")[i_idx][0]
 
-            for i_idx in xrange(len(l_travel_stats.get("speed"))):
+            for i_idx in range(len(l_travel_stats.get("speed"))):
                 l_travel_stats.get("speed")[i_idx] = numpy.median(
                     l_travel_stats.get("speed")[i_idx]
                 ) if len(l_travel_stats.get("speed")[i_idx]) > 1 \
                     else l_travel_stats.get("speed")[i_idx][0]
 
-            for i_idx in xrange(len(l_travel_stats.get("time_loss"))):
+            for i_idx in range(len(l_travel_stats.get("time_loss"))):
                 l_travel_stats.get("time_loss")[i_idx] = numpy.median(
                     l_travel_stats.get("time_loss")[i_idx]
                 ) if len(l_travel_stats.get("time_loss")[i_idx]) > 1 \
                     else l_travel_stats.get("time_loss")[i_idx][0]
 
-            for i_idx in xrange(len(l_travel_stats.get("relative_time_loss"))):
+            for i_idx in range(len(l_travel_stats.get("relative_time_loss"))):
                 l_travel_stats.get("relative_time_loss")[i_idx] = numpy.median(
                     l_travel_stats.get("relative_time_loss")[i_idx]
                 ) if len(l_travel_stats.get("relative_time_loss")[i_idx]) > 1 \
                     else l_travel_stats.get("relative_time_loss")[i_idx][0]
 
-            for i_idx in xrange(len(l_travel_stats.get("dissatisfaction"))):
+            for i_idx in range(len(l_travel_stats.get("dissatisfaction"))):
                 l_travel_stats.get("dissatisfaction")[i_idx] = numpy.median(
                     l_travel_stats.get("dissatisfaction")[i_idx]
                 ) if len(l_travel_stats.get("dissatisfaction")[i_idx]) > 1 \
@@ -239,7 +237,7 @@ class Statistics(object):
                                         )
                                         # pylint: enable=no-member
                                         for i_vehicle in [
-                                            v for v in vehicles.itervalues()
+                                            v for v in vehicles.values()
                                             if i_vtype in ["alltypes", v.vehicle_type]
                                         ]
                                     ]
@@ -271,7 +269,7 @@ class Statistics(object):
                                         i_vehicle.travel_stats.get("grid")
                                         .get(i_stat)[0]
                                         for i_vehicle in [
-                                            v for v in vehicles.itervalues()
+                                            v for v in vehicles.values()
                                             if i_vtype in ["alltypes", v.vehicle_type]
                                         ]
                                     ]
@@ -305,7 +303,7 @@ class Statistics(object):
                                         i_vehicle.travel_stats.get("grid")
                                         .get(i_stat)[-1]
                                         for i_vehicle in [
-                                            v for v in vehicles.itervalues()
+                                            v for v in vehicles.values()
                                             if i_vtype in ["alltypes", v.vehicle_type]
                                         ]
                                     ]
@@ -317,7 +315,9 @@ class Statistics(object):
                         "description": "{} {} vehicles\n{}\n{}\n{}".format(
                             "fairness of run {} at position {} for".format(
                                 run_number,
-                                len(vehicles.values()[0].travel_stats.get("grid").get(i_stat))-1
+                                len(
+                                    list(vehicles.values())[0].travel_stats.get("grid").get(i_stat)
+                                )-1
                             ),
                             i_vtype,
                             "calculated by using the H-Spread, i.e. interquartile distance",
@@ -342,7 +342,7 @@ class Statistics(object):
                             )
                             # pylint: enable=no-member
                             for i_vehicle in [
-                                v for v in vehicles.itervalues()
+                                v for v in vehicles.values()
                                 if i_vtype in ["alltypes", v.vehicle_type]
                             ]
                         ]
@@ -371,7 +371,7 @@ class Statistics(object):
                         [
                             i_vehicle.travel_stats.get("grid").get(i_stat)[0]
                             for i_vehicle in [
-                                v for v in vehicles.itervalues()
+                                v for v in vehicles.values()
                                 if i_vtype in ["alltypes", v.vehicle_type]
                             ]
                         ]
@@ -400,7 +400,7 @@ class Statistics(object):
                         [
                             i_vehicle.travel_stats.get("grid").get(i_stat)[-1]
                             for i_vehicle in [
-                                v for v in vehicles.itervalues()
+                                v for v in vehicles.values()
                                 if i_vtype in ["alltypes", v.vehicle_type]
                                 ]
                             ]
@@ -468,7 +468,7 @@ class Statistics(object):
                                             )
                                             # pylint: enable=no-member
                                             for i_vehicle in [
-                                                v for v in vehicles.itervalues()
+                                                v for v in vehicles.values()
                                                 if i_vtype in ["alltypes", v.vehicle_type]
                                             ]
                                         ]
@@ -506,7 +506,7 @@ class Statistics(object):
                                                 )
                                             ]
                                             for i_vehicle in [
-                                                v for v in vehicles.itervalues()
+                                                v for v in vehicles.values()
                                                 if i_vtype in ["alltypes", v.vehicle_type]
                                             ]
                                         ]
@@ -544,7 +544,7 @@ class Statistics(object):
                                                 )
                                             ]
                                             for i_vehicle in [
-                                                v for v in vehicles.itervalues()
+                                                v for v in vehicles.values()
                                                 if i_vtype in ["alltypes", v.vehicle_type]
                                             ]
                                         ]
@@ -697,7 +697,7 @@ class Statistics(object):
                             "- 3: speed\n- 4: time loss",
                     "columns": "time step of vehicle",
                 }
-            } for i_vehicle_id, i_vehicle in sorted(vehicles.iteritems())
+            } for i_vehicle_id, i_vehicle in sorted(vehicles.items())
         }
 
         l_hdf5structure["grid-based"] = {
@@ -721,15 +721,11 @@ class Statistics(object):
                             "- 3: speed\n- 4: time loss",
                     "columns": "travelled cells during route in step increments",
                 }
-            } for i_vehicle_id, i_vehicle in sorted(vehicles.iteritems())
+            } for i_vehicle_id, i_vehicle in sorted(vehicles.items())
         }
 
         l_hdf5structure["vehicle-stats"] = {
             i_vehicle_id: {
-                "start_time": {
-                    "value": i_vehicle.travel_stats.get("start_time"),
-                    "attr": "{}'s start time".format(i_vehicle_id)
-                },
                 "travel_time": {
                     "value": i_vehicle.travel_stats.get("travel_time"),
                     "attr": "{}'s travel time".format(i_vehicle_id)
@@ -738,7 +734,7 @@ class Statistics(object):
                     "value": i_vehicle.travel_stats.get("vehicle_type"),
                     "attr": "{}'s vehicle type".format(i_vehicle_id)
                 }
-            } for i_vehicle_id, i_vehicle in sorted(vehicles.iteritems())
+            } for i_vehicle_id, i_vehicle in sorted(vehicles.items())
         }
 
         del vehicles

@@ -22,8 +22,8 @@
 # #############################################################################
 # @endcond
 """Configuration super class."""
-from __future__ import division
-from __future__ import print_function
+
+
 import os
 import sys
 import h5py
@@ -206,16 +206,16 @@ def main(argv):
         i_filename: h5py.File(i_filename, "r") for i_filename in argv[1:-1]
     }
 
-    if len(f_hdf5_input.values()[0].keys()) == 0:
+    if len(list(f_hdf5_input.values())[0].keys()) == 0:
         print("No scenario dirs found!")
         return
 
     print("aggregating data...")
 
-    for i_scenario in f_hdf5_input.values()[0].keys():
+    for i_scenario in list(f_hdf5_input.values())[0].keys():
         print("|-- {}".format(i_scenario))
 
-        l_aadts = f_hdf5_input.values()[0][i_scenario].keys()
+        l_aadts = list(f_hdf5_input.values())[0][i_scenario].keys()
         if len(l_aadts) == 0:
             print("No aadt dirs found!")
             return
@@ -223,16 +223,16 @@ def main(argv):
         for i_aadt in l_aadts:
             print("|   |-- {}".format(i_aadt))
 
-            l_orderings = f_hdf5_input.values()[0][os.path.join(i_scenario, i_aadt)].keys()
+            l_orderings = list(f_hdf5_input.values())[0][os.path.join(i_scenario, i_aadt)].keys()
             if len(l_orderings) == 0:
                 print("No ordering dirs found!")
                 return
 
             for i_ordering in l_orderings:
-                l_runs = f_hdf5_input.values()[0][
+                l_runs = list(f_hdf5_input.values())[0][
                     os.path.join(i_scenario, i_aadt, i_ordering)
                 ].keys()
-                l_intervals = f_hdf5_input.values()[0][os.path.join(
+                l_intervals = list(f_hdf5_input.values())[0][os.path.join(
                     i_scenario,
                     i_aadt,
                     i_ordering,
@@ -254,7 +254,7 @@ def main(argv):
                     aggregate_run_stats_to_hdf5(
                         [
                             i_hdf5_input[os.path.join(i_scenario, i_aadt, i_ordering)]
-                            for i_hdf5_input in f_hdf5_input.itervalues()
+                            for i_hdf5_input in f_hdf5_input.values()
                         ],
                         l_detector_positions
                     ),
@@ -265,7 +265,7 @@ def main(argv):
                     fletcher32=True
                 )
 
-    for i_hdf5_input in f_hdf5_input.values():
+    for i_hdf5_input in list(f_hdf5_input.values()):
         i_hdf5_input.close()
 
 if __name__ == "__main__":

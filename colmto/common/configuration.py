@@ -22,8 +22,6 @@
 # #############################################################################
 # @endcond
 """Configuration super class."""
-from __future__ import division
-from __future__ import print_function
 
 import copy
 import os
@@ -408,7 +406,7 @@ class Configuration(object):
             if self._args.scenarios != ["all"]:
                 self._run_config["scenarios"] = self._args.scenarios
             else:
-                self._run_config["scenarios"] = self._scenario_config.keys()
+                self._run_config["scenarios"] = list(self._scenario_config.keys())
 
     @property
     def run_config(self):

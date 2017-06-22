@@ -22,8 +22,8 @@
 # #############################################################################
 # @endcond
 """Runtime to control SUMO."""
-from __future__ import division
-from __future__ import print_function
+
+
 
 import subprocess
 
@@ -33,9 +33,7 @@ import colmto.cse.cse
 try:
     import traci
 except ImportError:  # pragma: no cover
-    raise ("please declare environment variable 'SUMO_HOME' as the root"
-           "directory of your sumo installation (it should contain folders 'bin',"
-           "'tools' and 'docs')")
+    raise ImportError("please declare environment variable 'SUMO_HOME' as the root")
 
 
 class Runtime(object):
@@ -74,7 +72,11 @@ class Runtime(object):
             bufsize=-1
         )
 
-        self._log.debug("%s : %s", self._sumo_binary, l_sumoprocess.replace("\n", ""))
+        self._log.debug(
+            "%s : %s",
+            self._sumo_binary,
+            l_sumoprocess.decode("utf8").replace("\n", "")
+        )
 
     def run_traci(self, run_config, cse):
         """
@@ -156,7 +158,7 @@ class Runtime(object):
                 )
 
             # retrieve results, update vehicle objects, apply cse policies
-            for i_vehicle_id, i_results in traci.vehicle.getSubscriptionResults().iteritems():
+            for i_vehicle_id, i_results in traci.vehicle.getSubscriptionResults().items():
 
                 # vehicle object corresponding to current vehicle fetched from traci
                 l_vehicle = run_config.get("vehicles").get(i_vehicle_id)
