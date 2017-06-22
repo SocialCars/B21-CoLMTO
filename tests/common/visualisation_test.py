@@ -24,14 +24,14 @@
 """
 colmto: Test module for common.colormaps.
 """
-from nose.tools import assert_equal
+from nose.tools import assert_list_equal
 
 import colmto.common.visualisation
 
 
 def test_cmap_names():
     """Test case for cmap_names function."""
-    assert_equal(
+    assert_list_equal(
         sorted(colmto.common.visualisation.cmap_names()),
         sorted(["magma", "magma_r", "inferno", "inferno_r",
                 "plasma", "plasma_r", "viridis", "viridis_r"])
@@ -141,8 +141,9 @@ def test_mapped_cmap():
     ]
 
     l_colors = [
-        [colmto.common.visualisation.mapped_cmap(i_cmap, 10)(i) for i in range(10)]
-        for i_cmap in colmto.common.visualisation.cmap_names()
-        ]
+        [
+            colmto.common.visualisation.mapped_cmap(i_cmap, 10)(i) for i in range(10)
+        ] for i_cmap in colmto.common.visualisation.cmap_names()
+    ]
 
-    assert_equal(l_colors, l_results)
+    assert_list_equal(sorted(l_colors), sorted(l_results))

@@ -27,8 +27,6 @@ import csv
 import gzip
 import os
 
-from json import loads as jsonloads, dumps as jsondumps
-
 import json
 import numpy
 
@@ -104,8 +102,7 @@ class Reader(object):
         with gzip.GzipFile(filename, "r") \
                 if filename.endswith(".gz") \
                 else open(filename, mode="r") as f_json:
-            l_file = f_json.read()
-        return jsonloads(l_file)
+            return json.loads(f_json.read())
 
     def read_yaml(self, filename):
         """
@@ -133,30 +130,25 @@ class Writer(object):
         """Write json in human readable form (slow!). If filename ends with .gz, compress file."""
 
         self._log.debug("Writing %s", filename)
-        f_json = gzip.GzipFile(filename, "w") \
-            if filename.endswith(".gz") \
-            else open(filename, mode="w")
-        json.dump(obj, f_json, sort_keys=True, indent=4, separators=(", ", " : "))
-        f_json.close()
+        with gzip.open(filename, "wt") if filename.endswith(".gz") \
+                else open(filename, mode="w") as f_json:
+            json.dump(obj, f_json, sort_keys=True, indent=4, separators=(", ", " : "))
 
     def write_json(self, obj, filename):
         """Write json in compact form, compress file with gzip if filename ends with .gz."""
 
         self._log.debug("Writing %s", filename)
-        with gzip.GzipFile(filename, "w") \
-                if filename.endswith(".gz") \
+        with gzip.open(filename, "wt") if filename.endswith(".gz") \
                 else open(filename, mode="w") as f_json:
-            f_json.write(jsondumps(obj))
+            json.dump(obj, f_json)
 
     def write_yaml(self, obj, filename, default_flow_style=False):
         """Write yaml, compress file with gzip if filename ends with .gz."""
 
         self._log.debug("Writing %s", filename)
-        f_yaml = gzip.GzipFile(filename, "w") \
-            if filename.endswith(".gz") \
-            else open(filename, mode="w")
-        yaml.dump(obj, f_yaml, Dumper=SafeDumper, default_flow_style=default_flow_style)
-        f_yaml.close()
+        with gzip.open(filename, "wt") if filename.endswith(".gz") \
+                else open(filename, mode="w") as f_yaml:
+            yaml.dump(data=obj, stream=f_yaml, Dumper=SafeDumper, default_flow_style=default_flow_style)
 
     def write_csv(self, fieldnames, rowdict, filename):
         """Write row dictionary with provided fieldnames as csv with headers."""

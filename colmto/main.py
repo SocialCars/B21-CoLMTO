@@ -156,3 +156,6 @@ class Colmto(object):
         if l_configuration.run_config.get("sumo").get("enabled") or self._args.runsumo:
             self._log.info("---- Starting SUMO Baseline Simulation ----")
             colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
+
+if __name__ == "__main__":
+    Colmto().run()
