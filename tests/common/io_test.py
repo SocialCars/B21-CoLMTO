@@ -529,7 +529,7 @@ def test_write_csv():
 
     with f_temp_test as csv_file:
         assert_equals(
-            "".join(csv_file.readlines()),
+            "".encode("utf8").join(csv_file.readlines()).decode("utf8"),
             "foo,bar\r\n1,1\r\n2,2\r\n"
         )
 
