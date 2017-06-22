@@ -52,7 +52,7 @@ test:
         - nosetests -w tests --with-coverage
         - bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
         - bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
-        - mv -f colmto tests site run.py readme.md license.md architecture.png /tmp
+        - mv -f colmto tests site readme.md license.md architecture.png /tmp
         - git checkout gh-pages
         - mv -f circle.yml .gitignore /tmp
         - git checkout master
@@ -61,7 +61,7 @@ test:
         - git checkout --orphan gh-pages
         - rm -Rf *
         - rm .pre-commit-config.yaml
-        - mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/run.py /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png .
+        - mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png .
         - sh site/pylint.sh > pylint.md || true
         - echo -e "\n## Import Graph\n" >> pylint.md
         - cp pylint.md pylint_doc.md
@@ -78,7 +78,7 @@ test:
         - mv docs/latex/refman.pdf docs/$DOCUMENT.pdf
         - rm -Rf docs/latex
         - mv colmto-imports.png docs/sources
-        - rm -Rf colmto tests site run.py readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
+        - rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
         # add & commit
         - git add --all .
         - git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
