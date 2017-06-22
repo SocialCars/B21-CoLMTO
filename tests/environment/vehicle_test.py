@@ -206,6 +206,7 @@ def test_record_travel_stats():
         speed_deviation=0.0,
         speed_max=100.,
     )
+    l_sumovehicle.position = (1.0, 1.0)
     l_sumovehicle.properties["dsat_threshold"] = 0.
     l_sumovehicle.record_travel_stats(1)
     l_sumovehicle.record_travel_stats(2)
@@ -219,19 +220,19 @@ def test_record_travel_stats():
     )
     assert_list_equal(
         l_sumovehicle.travel_stats.get("step").get("pos_x"),
-        [0.0, 0.0]
+        [1, 1]
     )
     assert_list_equal(
         l_sumovehicle.travel_stats.get("step").get("pos_y"),
-        [0.0, 0.0]
+        [1, 1]
     )
     assert_list_equal(
         l_sumovehicle.travel_stats.get("step").get("time_loss"),
-        [0.0, 2.0]
+        [0.0, 1.99]
     )
     assert_list_equal(
         l_sumovehicle.travel_stats.get("step").get("relative_time_loss"),
-        [0.0, float('inf')]
+        [0.0, 199.0]
     )
     assert_almost_equal(
         l_sumovehicle.travel_stats.get("step").get("dissatisfaction")[0],
@@ -239,7 +240,7 @@ def test_record_travel_stats():
     )
     assert_almost_equal(
         l_sumovehicle.travel_stats.get("step").get("dissatisfaction")[1],
-        0.93662106166696235
+        0.93602484293379284
     )
     assert_list_equal(
         l_sumovehicle.travel_stats.get("grid").get("dissatisfaction"),

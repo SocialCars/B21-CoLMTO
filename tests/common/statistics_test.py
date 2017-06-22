@@ -143,7 +143,7 @@ def test_aggregate_hdf5():
             speed_deviation=0.0,
             speed_max=100.,
         ).update(
-            position=(0, 0),
+            position=(1, 1),
             lane_index=0,
             speed=10.
         ) for i_vid in range(2)
@@ -155,7 +155,7 @@ def test_aggregate_hdf5():
                 speed_deviation=0.0,
                 speed_max=100.,
             ).update(
-                position=(0, 0),
+                position=(1, 1),
                 lane_index=0,
                 speed=10.
             ) for i_vid in range(2, 4)
@@ -168,7 +168,7 @@ def test_aggregate_hdf5():
                 speed_deviation=0.0,
                 speed_max=100.,
             ).update(
-                position=(0, 0),
+                position=(1, 1),
                 lane_index=0,
                 speed=10.
             ) for i_vid in range(4, 6)
