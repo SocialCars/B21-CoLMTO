@@ -148,7 +148,12 @@ class Writer(object):
         self._log.debug("Writing %s", filename)
         with gzip.open(filename, "wt") if filename.endswith(".gz") \
                 else open(filename, mode="w") as f_yaml:
-            yaml.dump(data=obj, stream=f_yaml, Dumper=SafeDumper, default_flow_style=default_flow_style)
+            yaml.dump(
+                data=obj,
+                stream=f_yaml,
+                Dumper=SafeDumper,
+                default_flow_style=default_flow_style
+            )
 
     def write_csv(self, fieldnames, rowdict, filename):
         """Write row dictionary with provided fieldnames as csv with headers."""
