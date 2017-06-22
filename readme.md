@@ -145,7 +145,7 @@ import colmto.main
 colmto.main.Colmto().run()
 ```
 
-Upon first start it creates YAML formatted default configurations and its log file in `~/.colmto/`:
+Upon first start it creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
 
 ```
 ~/.colmto/
