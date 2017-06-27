@@ -32,14 +32,12 @@
 
 ### Prerequisites
 
-* [Python 2.7](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
+* [Python 3.6](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
   * [doxypy](https://pypi.python.org/pypi/doxypy)
-  * [enum34](https://pypi.python.org/pypi/enum34)
   * [h5py](https://pypi.python.org/pypi/h5py)
   * [lxml](https://pypi.python.org/pypi/lxml)
-  * [nose](https://pypi.python.org/pypi/nose)
   * [matplotlib](https://pypi.python.org/pypi/matplotlib)
-  * [python-cjson](https://pypi.python.org/pypi/python-cjson)
+  * [nose](https://pypi.python.org/pypi/nose)
   * [PyYAML](https://pypi.python.org/pypi/PyYAML)
   * [sh](https://pypi.python.org/pypi/sh)
 * libhdf5
@@ -120,13 +118,13 @@ cd colmto
 export CPPFLAGS="-I/usr/local/include"
 
 # install dependencies and build package
-python setup.py build
+python3 setup.py build
 
 # run unit tests
-python setup.py test
+python3 setup.py test
 
 # install (local)
-python setup.py install --user
+python3 setup.py install --user
 ```
 
 ## Run CoLMTO
@@ -137,10 +135,10 @@ Keep in mind to set `SUMO_HOME` accordingly.
 ```sh
 export SUMO_HOME=~/colmto/sumo/sumo # adjust accordingly
 cd colmto
-python -m colmto --runs 1
+python3 -m colmto --runs 1
 ```
 
-Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and a log file in `~/.colmto/`:
+Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
 
 ```
 ~/.colmto/
@@ -152,8 +150,8 @@ Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) forma
 
 Further help on command line options can be obtained by running
 
-```sh
-python -m colmto --help
+```zsh
+python3 -m colmto --help
 ```
 
 ## Copyright & License

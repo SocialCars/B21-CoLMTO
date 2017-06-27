@@ -57,7 +57,7 @@ class BaseCSE(object):
         @param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
         @retval self
         """
-        for i_vehicle in vehicles.itervalues() if isinstance(vehicles, dict) else vehicles:
+        for i_vehicle in iter(vehicles.values()) if isinstance(vehicles, dict) else vehicles:
             self.apply_one(i_vehicle)
 
         return self

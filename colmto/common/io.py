@@ -22,17 +22,10 @@
 # #############################################################################
 # @endcond
 """I/O module"""
-from __future__ import division
-from __future__ import print_function
 
 import csv
 import gzip
 import os
-
-try:
-    from cjson import encode as jsondumps, decode as jsonloads
-except ImportError:  # pragma: no cover
-    from json import loads as jsonloads, dumps as jsondumps
 
 import json
 import numpy
@@ -109,8 +102,7 @@ class Reader(object):
         with gzip.GzipFile(filename, "r") \
                 if filename.endswith(".gz") \
                 else open(filename, mode="r") as f_json:
-            l_file = f_json.read()
-        return jsonloads(l_file)
+            return json.loads(f_json.read())
 
     def read_yaml(self, filename):
         """
@@ -138,30 +130,30 @@ class Writer(object):
         """Write json in human readable form (slow!). If filename ends with .gz, compress file."""
 
         self._log.debug("Writing %s", filename)
-        f_json = gzip.GzipFile(filename, "w") \
-            if filename.endswith(".gz") \
-            else open(filename, mode="w")
-        json.dump(obj, f_json, sort_keys=True, indent=4, separators=(", ", " : "))
-        f_json.close()
+        with gzip.open(filename, "wt") if filename.endswith(".gz") \
+                else open(filename, mode="w") as f_json:
+            json.dump(obj, f_json, sort_keys=True, indent=4, separators=(", ", " : "))
 
     def write_json(self, obj, filename):
         """Write json in compact form, compress file with gzip if filename ends with .gz."""
 
         self._log.debug("Writing %s", filename)
-        with gzip.GzipFile(filename, "w") \
-                if filename.endswith(".gz") \
+        with gzip.open(filename, "wt") if filename.endswith(".gz") \
                 else open(filename, mode="w") as f_json:
-            f_json.write(jsondumps(obj))
+            json.dump(obj, f_json)
 
     def write_yaml(self, obj, filename, default_flow_style=False):
         """Write yaml, compress file with gzip if filename ends with .gz."""
 
         self._log.debug("Writing %s", filename)
-        f_yaml = gzip.GzipFile(filename, "w") \
-            if filename.endswith(".gz") \
-            else open(filename, mode="w")
-        yaml.dump(obj, f_yaml, Dumper=SafeDumper, default_flow_style=default_flow_style)
-        f_yaml.close()
+        with gzip.open(filename, "wt") if filename.endswith(".gz") \
+                else open(filename, mode="w") as f_yaml:
+            yaml.dump(
+                data=obj,
+                stream=f_yaml,
+                Dumper=SafeDumper,
+                default_flow_style=default_flow_style
+            )
 
     def write_csv(self, fieldnames, rowdict, filename):
         """Write row dictionary with provided fieldnames as csv with headers."""
@@ -185,51 +177,50 @@ class Writer(object):
 
         # verify whether arguments are sane
         if not isinstance(object_dict, dict):
-            raise TypeError(u"objectdict is not a dictionary")
+            raise TypeError("objectdict is not a dictionary")
 
-        try:
-            f_hdf5 = h5py.File(hdf5_file, mode="a", libver="latest")
-        except IOError as error:
-            self._log.error("write_hdf5: %s", error.message)
-            raise IOError(error)
+        with h5py.File(hdf5_file, mode="a") as f_hdf5:
 
-        # create group if it doesn't exist
-        l_group = f_hdf5[hdf5_base_path] \
-            if hdf5_base_path in f_hdf5 else f_hdf5.create_group(hdf5_base_path)
+            # create group if it doesn't exist
+            l_group = f_hdf5[hdf5_base_path] \
+                if hdf5_base_path in f_hdf5 else f_hdf5.create_group(hdf5_base_path)
 
-        # add datasets for each element of objectdict,
-        # if they already exist by name, overwrite them
-        for i_path, i_object_value in Writer._flatten_object_dict(object_dict).iteritems():
+            # add datasets for each element of objectdict,
+            # if they already exist by name, overwrite them
+            for i_path, i_object_value in Writer._flatten_object_dict(object_dict).items():
 
-            # remove filters if we have a scalar object, i.e. string, int, float
-            if isinstance(i_object_value.get("value"), (str, int, float)):
-                kwargs.pop("compression", None)
-                kwargs.pop("compression_opts", None)
-                kwargs.pop("fletcher32", None)
-                kwargs.pop("chunks", None)
+                # remove filters if we have a scalar object, i.e. string, int, float
+                if isinstance(i_object_value.get("value"), (str, int, float)):
+                    kwargs.pop("compression", None)
+                    kwargs.pop("compression_opts", None)
+                    kwargs.pop("fletcher32", None)
+                    kwargs.pop("chunks", None)
 
-            if i_path in l_group:
-                # remove previous object by i_path id and add the new one
-                del l_group[i_path]
+                if i_path in l_group:
+                    # remove previous object by i_path id and add the new one
+                    del l_group[i_path]
 
-            if i_object_value.get("value") is not None and i_object_value.get("attr") is not None:
-                try:
-                    l_group.create_dataset(
-                        name=i_path, data=numpy.asarray(i_object_value.get("value")), **kwargs
-                    ).attrs.update(
-                        i_object_value.get("attr")
-                        if isinstance(i_object_value.get("attr"), dict) else {}
-                    )
-                except TypeError as error:
-                    self._log.error(
-                        "error writing %s: %s (%s)",
-                        i_path,
-                        i_object_value.get("value"),
-                        error.message
-                    )
-                    raise TypeError
-
-        f_hdf5.close()
+                if i_object_value.get("value") is not None \
+                        and i_object_value.get("attr") is not None:
+                    try:
+                        l_group.create_dataset(
+                            name=i_path,
+                            data=numpy.asarray(i_object_value.get("value"))
+                            if not isinstance(i_object_value.get("value"), str)
+                            else i_object_value.get("value"),
+                            **kwargs
+                        ).attrs.update(
+                            i_object_value.get("attr")
+                            if isinstance(i_object_value.get("attr"), dict) else {}
+                        )
+                    except TypeError as error:
+                        self._log.error(
+                            "error writing %s: %s (%s)",
+                            i_path,
+                            i_object_value.get("value"),
+                            error
+                        )
+                        raise TypeError(error)
 
     @staticmethod
     def _flatten_object_dict(dictionary):
@@ -245,9 +236,9 @@ class Writer(object):
             yields (key, value) pairs of sub-dictionaries
             @retval: (key, value) pairs
             """
-            for i_k, i_v in dictionary.items():
-                if isinstance(i_v, dict) and "value" not in i_v.keys():
-                    for i_sk, i_sv in Writer._flatten_object_dict(i_v).items():
+            for i_k, i_v in list(dictionary.items()):
+                if isinstance(i_v, dict) and "value" not in list(i_v.keys()):
+                    for i_sk, i_sv in list(Writer._flatten_object_dict(i_v).items()):
                         yield os.path.join(str(i_k), str(i_sk)), i_sv
                 else:
                     yield i_k, i_v

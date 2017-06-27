@@ -50,7 +50,7 @@ setup(name="colmto",
       keywords="",  # Separate with spaces
       author="Malte Aschermann",
       author_email="masc@tu-clausthal.de",
-      url="",
+      url="https://github.com/SocialCars/colmto",
       license="LGPL",
       packages=find_packages(exclude=["examples", "tests", "sumo"]),
       include_package_data=True,
@@ -60,20 +60,19 @@ setup(name="colmto",
 
       # TODO: List of packages that this one depends upon:
       install_requires=[
-          "nose",
-          "matplotlib",
-          "sh",
-          "lxml",
-          "h5py",
-          "PyYAML",
-          "python-cjson",
           "doxypy",
-          "enum34"
+          "h5py",
+          "lxml",
+          "matplotlib",
+          "nose",
+          "pytest",
+          "PyYAML",
+          "sh",
       ],
 
       # TODO: List executable scripts, provided by the package (this is just an example)
       entry_points={
         "console_scripts":
-        ["colmto=run"]
+        ["colmto = colmto"]
       }
 )

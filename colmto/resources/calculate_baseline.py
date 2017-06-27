@@ -22,8 +22,8 @@
 # #############################################################################
 # @endcond
 """Configuration super class."""
-from __future__ import division
-from __future__ import print_function
+
+
 import os
 import numpy as np
 import h5py
@@ -56,7 +56,7 @@ def main():
                                     .get("driver").get(i_type).get("{}_end".format(i_stat))
                                 ).T[i]
                             )
-                            for i in xrange(len(f_hdf5.get(i_scenario).get("8640").get("best")
+                            for i in range(len(f_hdf5.get(i_scenario).get("8640").get("best")
                                                 .get("global").get("driver").get(i_type)
                                                 .get("{}_end".format(i_stat))[0]))]),
                     compression="gzip",

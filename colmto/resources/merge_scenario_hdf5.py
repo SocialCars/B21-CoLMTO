@@ -22,8 +22,8 @@
 # #############################################################################
 # @endcond
 """Configuration super class."""
-from __future__ import division
-from __future__ import print_function
+
+
 
 import sys
 import h5py
@@ -40,7 +40,7 @@ def main(argv):
 
     f_src = h5py.File(argv[1], "r")
     f_destination = h5py.File(argv[2], "a", libver="latest")
-    for i_key in f_src.keys():
+    for i_key in list(f_src.keys()):
         f_src.copy(source=i_key, dest=f_destination)
     f_destination.close()
     f_src.close()

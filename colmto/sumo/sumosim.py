@@ -22,7 +22,7 @@
 # #############################################################################
 # @endcond
 """Main module to run/initialise SUMO scenarios."""
-from __future__ import division
+
 
 import os
 import sys
@@ -34,9 +34,7 @@ try:
     sys.path.append(os.path.join(os.environ.get("SUMO_HOME", os.path.join("..", "..")), "tools"))
     import sumolib
 except ImportError:  # pragma: no cover
-    raise ("please declare environment variable 'SUMO_HOME' as the root"
-           "directory of your sumo installation (it should contain folders 'bin',"
-           "'tools' and 'docs')")
+    raise ImportError("please declare environment variable 'SUMO_HOME' as the root")
 
 import colmto.common.io
 import colmto.common.statistics
@@ -91,7 +89,7 @@ class SumoSim(object):
                 itertools.chain.from_iterable(
                     [
                         [k] * int(round(100 * v.get("fraction")))
-                        for (k, v) in self._sumocfg.run_config.get("vtypedistribution").iteritems()
+                        for (k, v) in self._sumocfg.run_config.get("vtypedistribution").items()
                     ]
                 )
             )
@@ -104,14 +102,14 @@ class SumoSim(object):
                 else self._sumocfg.run_config.get("nbvehicles").get("value")
 
             l_vtype_list[scenario_name] = [
-                random.choice(l_vtypedistribution) for _ in xrange(l_numberofvehicles)
+                random.choice(l_vtypedistribution) for _ in range(l_numberofvehicles)
             ]
         else:
             self._log.debug("Using pre-configured vtype_list")
 
         for i_initial_sorting in self._sumocfg.run_config.get("initialsortings"):
 
-            for i_run in xrange(self._sumocfg.run_config.get("runs")):
+            for i_run in range(self._sumocfg.run_config.get("runs")):
 
                 if self._sumocfg.run_config.get("cse-enabled"):
                     # cse mode: apply cse policies to vehicles and run with TraCI

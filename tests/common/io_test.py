@@ -90,7 +90,7 @@ def test_reader_read_etree():
                 speed="26.75" pos="57.63" lane="enter_21start_0" slope="0.00"/>
             </timestep>
         </fcd-export>
-        """
+        """.encode("utf8")
 
     f_temp_gold = tempfile.NamedTemporaryFile()
     f_temp_gold.write(l_xml_string)
@@ -104,8 +104,8 @@ def test_reader_read_etree():
             colmto.common.io.Reader(None).read_etree(f_temp_test.name).iter(),
             colmto.common.io.etree.parse(f_temp_gold.name).iter()):
         assert_equals(
-            i_elements[0].items(),
-            i_elements[1].items()
+            list(i_elements[0].items()),
+            list(i_elements[1].items())
         )
 
     f_temp_gold.close()
@@ -171,7 +171,7 @@ def test_reader_read_json():
     }
 
     f_temp_test = tempfile.NamedTemporaryFile()
-    f_temp_test.write(json.dumps(l_json_gold))
+    f_temp_test.write(json.dumps(l_json_gold).encode("utf8"))
     f_temp_test.seek(0)
 
     args = Namespace(
@@ -188,7 +188,7 @@ def test_reader_read_json():
     # gzip
     f_temp_test = tempfile.NamedTemporaryFile(suffix=".gz")
     f_gz = gzip.GzipFile(f_temp_test.name, "a")
-    f_gz.write(yaml.dump(l_json_gold))
+    f_gz.write(yaml.dump(l_json_gold).encode("utf8"))
     f_gz.close()
     f_temp_test.seek(0)
 
@@ -258,7 +258,7 @@ def test_reader_read_yaml():
     }
 
     f_temp_test = tempfile.NamedTemporaryFile()
-    f_temp_test.write(yaml.dump(l_yaml_gold))
+    f_temp_test.write(yaml.dump(l_yaml_gold).encode("utf8"))
     f_temp_test.seek(0)
 
     assert_equals(
@@ -271,7 +271,7 @@ def test_reader_read_yaml():
     # gzip
     f_temp_test = tempfile.NamedTemporaryFile(suffix=".gz")
     f_gz = gzip.GzipFile(f_temp_test.name, "a")
-    f_gz.write(yaml.dump(l_yaml_gold))
+    f_gz.write(yaml.dump(l_yaml_gold).encode("utf8"))
     f_gz.close()
     f_temp_test.seek(0)
 
@@ -529,7 +529,7 @@ def test_write_csv():
 
     with f_temp_test as csv_file:
         assert_equals(
-            "".join(csv_file.readlines()),
+            "".encode("utf8").join(csv_file.readlines()).decode("utf8"),
             "foo,bar\r\n1,1\r\n2,2\r\n"
         )
 
@@ -574,7 +574,7 @@ def test_write_hdf5():
     l_hdf.close()
     assert_equals(
         l_test_dict,
-        {u'bar/bar': 42, u'baz/foo': 21, u'foo/baz': 23}
+        {'bar/bar': 42, 'baz/foo': 21, 'foo/baz': 23}
     )
 
     colmto.common.io.Writer(None).write_hdf5(

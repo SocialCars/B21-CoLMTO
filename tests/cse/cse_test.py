@@ -93,7 +93,7 @@ def test_sumo_cse():
     l_vehicles = [
         colmto.environment.vehicle.SUMOVehicle(
             speed_max=random.randrange(0, 250)
-        ) for _ in xrange(2342)
+        ) for _ in range(2342)
         ]
     for i_vehicle in l_vehicles:
         i_vehicle.position = numpy.array((random.randrange(0, 120), random.randint(0, 1)))

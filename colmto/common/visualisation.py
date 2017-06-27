@@ -578,7 +578,7 @@ _COLORMAP = dict(
 
 def cmap_names():
     """Returns valid colormap names."""
-    return _COLORMAP.keys()
+    return list(_COLORMAP.keys())
 
 
 def mapped_cmap(cmap_name, range_max):

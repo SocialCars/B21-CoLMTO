@@ -69,7 +69,7 @@ def test_logger():
     for i_logger in l_logs:
         i_logger.info("foo")
 
-    for i_level in colmto.common.log.LOGLEVEL.iterkeys():
+    for i_level in colmto.common.log.LOGLEVEL:
         l_log = colmto.common.log.logger(
             name="foo{}".format(i_level),
             logfile=f_temp_log.name,
