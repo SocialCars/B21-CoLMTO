@@ -135,7 +135,7 @@ Keep in mind to set `SUMO_HOME` accordingly.
 
 ```sh
 export SUMO_HOME=~/colmto/sumo/sumo # adjust accordingly
-cd colmto
+cd colmto  # if not installed
 python3 -m colmto --runs 1
 ```
 
