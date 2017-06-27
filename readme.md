@@ -27,6 +27,7 @@
 ## Architecture
 
 ![CoLMTO Architecture](architecture.png)
+The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/SocialCars/colmto/releases/tag/v0.1.1)
 
 ## Build Instructions
 
