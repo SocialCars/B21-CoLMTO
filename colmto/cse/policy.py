@@ -23,8 +23,13 @@
 # @endcond
 # pylint: disable=too-few-public-methods
 """Policy related classes"""
+
+import typing
+
 import enum
 import numpy
+
+import colmto.environment.vehicle
 
 
 class BEHAVIOUR(enum.Enum):
@@ -351,7 +356,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
         """
         return self._position_bbox
 
-    def applies_to(self, vehicle):
+    def applies_to(self, vehicle: colmto.environment.vehicle.BaseVehicle):
         """
         Test whether this (and sub)policies apply to given vehicle
         @param vehicle Vehicle
@@ -365,7 +370,8 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
         return False
         # pylint: enable=no-member
 
-    def apply(self, vehicles):
+    def apply(self, vehicles: typing.Iterable[colmto.environment.vehicle.SUMOVehicle]) \
+            -> typing.List[colmto.environment.vehicle.SUMOVehicle]:
         """
         apply policy to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects

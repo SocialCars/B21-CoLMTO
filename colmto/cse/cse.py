@@ -24,8 +24,11 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=no-self-use
 """CSE classes"""
+import typing
+
 import colmto.common.log
 import colmto.cse.policy
+import colmto.environment.vehicle
 
 
 class BaseCSE(object):
@@ -43,7 +46,7 @@ class BaseCSE(object):
         self._policies = []
 
     @property
-    def policies(self):
+    def policies(self) -> tuple:
         """
         Policies of CSE
         Returns:
@@ -51,7 +54,7 @@ class BaseCSE(object):
         """
         return tuple(self._policies)
 
-    def apply(self, vehicles):
+    def apply(self, vehicles: typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]):
         """
         Apply policies to vehicles
         @param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
@@ -62,7 +65,7 @@ class BaseCSE(object):
 
         return self
 
-    def apply_one(self, vehicle):
+    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle):
         """
         Apply policies to one vehicles
         @param vehicle: Vehicle
@@ -95,7 +98,7 @@ class SumoCSE(BaseCSE):
         "SUMOVTypePolicy": colmto.cse.policy.SUMOVTypePolicy
     }
 
-    def add_policy(self, policy, policy_cfg=None):
+    def add_policy(self, policy: colmto.cse.policy.SUMOVehiclePolicy, policy_cfg=None):
         """
         Add policy to SumoCSE.
         @param policy: policy object
@@ -127,7 +130,7 @@ class SumoCSE(BaseCSE):
 
         return self
 
-    def add_policies_from_cfg(self, policies_config):
+    def add_policies_from_cfg(self, policies_config: typing.Dict[dict, typing.Any]):
         """
         Add policies to SumoCSE based on run config's "policies" section.
         @param policies_config: run config's "policies" section
