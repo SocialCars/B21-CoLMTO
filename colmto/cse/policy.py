@@ -29,7 +29,7 @@ import typing
 import enum
 import numpy
 
-import colmto.environment.vehicle
+import colmto.environment
 
 
 class BEHAVIOUR(enum.Enum):
@@ -356,7 +356,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
         """
         return self._position_bbox
 
-    def applies_to(self, vehicle: colmto.environment.vehicle.BaseVehicle):
+    def applies_to(self, vehicle: colmto.environment.vehicle.SUMOVehicle):
         """
         Test whether this (and sub)policies apply to given vehicle
         @param vehicle Vehicle
