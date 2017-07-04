@@ -762,7 +762,7 @@ class Statistics(object):
             otherwise raises ArithmeticError
         """
         # pylint: disable=no-member
-        return numpy.subtract(*numpy.percentile(data, [75, 25])) if len(data) > 0 else 0.0
+        return numpy.subtract(*numpy.percentile(data, [75, 25])) if len(data) else 0.0
         # pylint: enable=no-member
 
     @staticmethod
