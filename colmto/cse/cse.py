@@ -49,8 +49,7 @@ class BaseCSE(object):
     def policies(self) -> tuple:
         """
         Policies of CSE
-        Returns:
-            policies tuple
+        @retval policies tuple
         """
         return tuple(self._policies)
 
