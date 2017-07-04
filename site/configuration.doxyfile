@@ -128,7 +128,8 @@ EXAMPLE_RECURSIVE      = YES
 IMAGE_PATH             = .
 INPUT_FILTER           =
 # FILTER_PATTERNS        = *.py=doxypy.py
-FILTER_SOURCE_FILES    = YES
+FILTER_PATTERNS        = *.py=doxypypy -c -a
+FILTER_SOURCE_FILES    =
 FILTER_SOURCE_PATTERNS =
 USE_MDFILE_AS_MAINPAGE = readme_doc.md
 #---------------------------------------------------------------------------
