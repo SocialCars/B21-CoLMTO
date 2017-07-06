@@ -742,7 +742,7 @@ class Statistics(object):
         return l_hdf5structure
 
     @staticmethod
-    def h_spread(data):
+    def h_spread(data: numpy.ndarray) -> numpy.float64:
         """
         Calculate H-Spread of Hinge for given data points.
         \f{eqnarray*}{
@@ -756,14 +756,13 @@ class Statistics(object):
         http://mathworld.wolfram.com/H-Spread.html
         @see Weisstein, Eric W. Hinge. From MathWorld--A Wolfram Web Resource.
         http://mathworld.wolfram.com/Hinge.html
-        @param data: Iterable set of data elements of (preferably) \f$4n+5\f$ for \f$n=0,1,...,N\f$,
+        @param data: Numpy ndarray of data elements (preferably) \f$4n+5\f$ for \f$n=0,1,...,N\f$,
             i.e. minimum length is \f$5\f$
-        @retval Hinge if data contains at least 5 elements,
-            otherwise raises ArithmeticError
+        @retval Hinge of type numpy.float64
         """
-        # pylint: disable=no-member
-        return numpy.subtract(*numpy.percentile(data, [75, 25]))
-        # pylint: enable=no-member
+        # pylint: disable=no-member,len-as-condition
+        return numpy.subtract(*numpy.percentile(data, [75, 25])) if len(data) else numpy.float64(0)
+        # pylint: enable=no-member,len-as-condition
 
     @staticmethod
     def _closest_position_to_detector(vehicle_positions, detector_position):

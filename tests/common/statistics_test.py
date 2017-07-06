@@ -24,9 +24,14 @@
 """
 colmto: Test module for common.statistics.
 """
+import numpy
+
 import colmto.common.statistics
-import colmto.environment.vehicle
 import colmto.common.io
+try:
+    import colmto.environment
+except ImportError:
+    print("Error importing colmto.environment, tests probably still run")
 
 from nose.tools import assert_equal
 from nose.tools import assert_is_instance
@@ -116,16 +121,24 @@ def test_h_spread():
     Example data taken from http://mathworld.wolfram.com/Hinge.html
     """
 
-    l_data = (150, 250, 688, 795, 795, 795, 895, 895, 895,
-              1099, 1166, 1333, 1499, 1693, 1699, 1775, 1895)
-
     assert_equal(
-        colmto.common.statistics.Statistics.h_spread(l_data),
+        colmto.common.statistics.Statistics.h_spread(
+            numpy.array(
+                (
+                    150, 250, 688, 795, 795, 795, 895, 895, 895,
+                    1099, 1166, 1333, 1499, 1693, 1699, 1775, 1895
+                )
+            )
+        ),
         704
     )
 
     assert_equal(
-        colmto.common.statistics.Statistics.h_spread(range(10 ** 6)),
+        colmto.common.statistics.Statistics.h_spread(
+            numpy.array(
+                range(10 ** 6)
+            )
+        ),
         499999.5
     )
 

@@ -47,8 +47,12 @@ setup(
     version=VERSION,
     description="Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)",
     long_description=open("readme.md").read(),
-    classifiers=[  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        "Programming Language :: Python"
+    # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+    classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3 :: Only",
+        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)"
     ],
     keywords="",  # Separate with spaces
     author="Malte Aschermann",
@@ -62,7 +66,7 @@ setup(
     cmdclass={"test": PyTest},
 
     install_requires=[
-        "doxypy",
+        "doxypypy",
         "h5py",
         "lxml",
         "matplotlib",
