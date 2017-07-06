@@ -47,7 +47,7 @@
 
 ### Checkout CoLMTO
 
-```zsh
+```sh
 git clone --recursive https://github.com/SocialCars/colmto.git
 ```
 
@@ -59,7 +59,7 @@ Feel free to use any other version, but make sure to set the `SUMO_HOME` environ
 
 #### FreeBSD
 
-```zsh
+```sh
 sudo portmaster devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
 cd colmto/sumo/sumo
 make -f Makefile.cvs
@@ -69,7 +69,7 @@ make -jN
 
 #### MacOS
 
-```zsh
+```sh
 brew install Caskroom/cask/xquartz autoconf automake gdal proj xerces-c fox
 export CPPFLAGS="$CPPFLAGS -I/opt/X11/include/"
 export LDFLAGS="-L/opt/X11/lib"
@@ -81,7 +81,7 @@ make -jN
 
 #### Ubuntu (Yakkety)
 
-```zsh
+```sh
 sudo apt-get install autoconf libproj-dev proj-bin proj-data libtool libgdal-dev libxerces-c-dev libfox-1.6-0 libfox-1.6-dev
 cd colmto/sumo/sumo
 make -f Makefile.cvs
@@ -93,25 +93,25 @@ make -jN
 
 #### FreeBSD
 
-```zsh
+```sh
 sudo portmaster textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2
 ```
 
 #### MacOS
 
-```zsh
+```sh
 brew install libxml2 homebrew/science/hdf5 libyaml
 ```
 
 #### Ubuntu Yakkety
 
-```zsh
+```sh
 sudo apt-get install libyaml-dev libxslt1-dev
 ```
 
 ### Build and Install CoLMTO
 
-```zsh
+```sh
 cd colmto
 
 # FreeBSD and OSes with include path other than /usr/include
@@ -129,10 +129,11 @@ python3 setup.py install --user
 
 ## Run CoLMTO
 
-```zsh
+```sh
 export SUMO_HOME=~/colmto/sumo/sumo # adjust accordingly
-cd colmto
 python3 -m colmto --runs 1
+# or provided your local python install dir is in $PATH, simply 
+colmto --runs 1
 ```
 
 Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
@@ -147,8 +148,8 @@ Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) forma
 
 Further help on command line options can be obtained by running
 
-```zsh
-python3 -m colmto --help
+```sh
+colmto --help
 ```
 
 ## Copyright & License

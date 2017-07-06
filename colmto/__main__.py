@@ -39,7 +39,10 @@ class Colmto(object):
         """C'tor."""
         l_config_dir = os.path.expanduser("~/.colmto")
 
-        l_parser = argparse.ArgumentParser(description="Process parameters for CoLMTO.")
+        l_parser = argparse.ArgumentParser(
+            prog="colmto",
+            description="Process parameters for CoLMTO."
+        )
 
         l_parser.add_argument(
             "--runconfigfile", dest="runconfigfile", type=str,
@@ -157,5 +160,10 @@ class Colmto(object):
             self._log.info("---- Starting SUMO Baseline Simulation ----")
             colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
 
-if __name__ == "__main__":
+
+def main():
+    """main entry point"""
     Colmto().run()
+
+if __name__ == "__main__":
+    main()

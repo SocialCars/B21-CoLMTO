@@ -20,6 +20,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
+"""setup.py"""
 import sys
 
 from setuptools import find_packages
@@ -28,51 +29,50 @@ from setuptools.command.test import test as TestCommand
 
 
 class PyTest(TestCommand):
+    """pytest class"""
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = ["tests"]
-        self.test_suite = True
+        self.test_suite = True  # pylint: disable=attribute-defined-outside-init
 
     def run_tests(self):
         import pytest
         sys.exit(pytest.main(self.test_args))
 
 
-version = "0.1.1"
+VERSION = "0.1.1"
 
-setup(name="colmto",
-      version=version,
-      description="Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)",
-      long_description=open("readme.md").read(),
-      classifiers=[  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+setup(
+    name="colmto",
+    version=VERSION,
+    description="Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)",
+    long_description=open("readme.md").read(),
+    classifiers=[  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Programming Language :: Python"
-      ],
-      keywords="",  # Separate with spaces
-      author="Malte Aschermann",
-      author_email="masc@tu-clausthal.de",
-      url="https://github.com/SocialCars/colmto",
-      license="LGPL",
-      packages=find_packages(exclude=["examples", "tests", "sumo"]),
-      include_package_data=True,
-      zip_safe=False,
-      tests_require=["pytest"],
-      cmdclass={"test": PyTest},
+    ],
+    keywords="",  # Separate with spaces
+    author="Malte Aschermann",
+    author_email="masc@tu-clausthal.de",
+    url="https://github.com/SocialCars/colmto",
+    license="LGPL",
+    packages=find_packages(exclude=["examples", "tests", "sumo"]),
+    include_package_data=True,
+    zip_safe=False,
+    tests_require=["pytest"],
+    cmdclass={"test": PyTest},
 
-      # TODO: List of packages that this one depends upon:
-      install_requires=[
-          "doxypy",
-          "h5py",
-          "lxml",
-          "matplotlib",
-          "nose",
-          "pytest",
-          "PyYAML",
-          "sh",
-      ],
+    install_requires=[
+        "doxypy",
+        "h5py",
+        "lxml",
+        "matplotlib",
+        "nose",
+        "pytest",
+        "PyYAML",
+        "sh",
+    ],
 
-      # TODO: List executable scripts, provided by the package (this is just an example)
-      entry_points={
-        "console_scripts":
-        ["colmto = colmto"]
-      }
+    entry_points={
+        "console_scripts": ["colmto=colmto.__main__:main"]
+    }
 )
