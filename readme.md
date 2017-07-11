@@ -113,33 +113,46 @@ sudo apt-get install libyaml-dev libxslt1-dev
 
 ### Build and Install CoLMTO
 
+On OSes with include paths other than /usr/include,
+e.g., FreeBSD, MacOS export `CPPFLAGS` (adjust accordingly):
 ```sh
-cd colmto
-
-# FreeBSD and OSes with include path other than /usr/include (adjust accordingly)
 export CPPFLAGS="-I/usr/local/include"
+```
 
-# install dependencies and build package
+Install dependencies via pip3 (append `--prefix=` on MacOS)
+```sh
+pip3 install -r requirements.txt --user
+```
+
+Build package
+```sh
 python3 setup.py build
+```
 
-# run unit tests
+Run unit tests
+```sh
 python3 setup.py test
+```
 
-# install (local)
+Install (local)
+```sh
 python3 setup.py install --user
 ```
 
 ## Run CoLMTO
 
-You can run the CoLMTO library module directly as a script.
-Keep in mind to set `SUMO_HOME` accordingly.
+You can run CoLMTO directly as a script, providing your local python install directory is in your `$PATH`:
+Keep in mind to set `SUMO_HOME` accordingly:
 
 ```sh
 export SUMO_HOME=~/colmto/sumo/sumo # adjust accordingly
-cd colmto  # if not installed
-python3 -m colmto --runs 1
-# or provided your local python install dir is in $PATH, simply 
 colmto --runs 1
+```
+
+If you have not installed CoLMTO in the previous section, run it inside the project directory as module.
+```sh
+cd colmto
+python3 -m colmto --runs 1
 ```
 
 Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:

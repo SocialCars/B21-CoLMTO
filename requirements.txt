@@ -1,0 +1,8 @@
+doxypypy
+h5py
+lxml
+matplotlib
+nose
+pytest
+PyYAML
+sh
