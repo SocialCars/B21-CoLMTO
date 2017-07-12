@@ -104,6 +104,13 @@ class Colmto(object):
             "-q", "--quiet", dest="quiet", action="store_true",
             default=False, help="suppress log info output to stdout"
         )
+        l_parser.add_argument(
+            "--debug",
+            dest="loglevel",
+            action="store_const",
+            const="DEBUG",
+            help="Equivalent to '--loglevel DEBUG'"
+        )
 
         l_mutex_group_run_choice = l_parser.add_mutually_exclusive_group(required=False)
         l_mutex_group_run_choice.add_argument(
