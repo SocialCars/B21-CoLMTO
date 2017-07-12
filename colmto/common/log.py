@@ -37,8 +37,8 @@ LOGLEVEL = {
 }
 
 
-def logger(name, loglevel=logging.NOTSET, quiet=False,
-           logfile=os.path.expanduser("~/.colmto/colmto.log")):
+def logger(name: str, loglevel=logging.NOTSET, quiet=False,
+           logfile=os.path.expanduser("~/.colmto/colmto.log")) -> logging.Logger:
     """Create a logger instance."""
 
     if os.path.dirname(logfile) != "" and not os.path.exists(os.path.dirname(logfile)):
