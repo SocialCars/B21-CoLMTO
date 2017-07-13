@@ -78,7 +78,7 @@ def test_sumo_cse():
         position_bbox=numpy.array(((0., 0), (64.0, 1)))
     )
     l_subpolicy_speed = colmto.cse.policy.SUMOSpeedPolicy(speed_range=numpy.array((0., 60.)))
-    l_policy_position.add_vehicle_policy(l_subpolicy_speed)
+    l_policy_position.add_policy(l_subpolicy_speed)
 
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_policy(l_policy_speed).add_policy(l_policy_position)
 

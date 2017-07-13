@@ -120,7 +120,7 @@ def test_sumo_vtype_policy():
             colmto.cse.policy.SUMOVTypePolicy(
                 vehicle_type="passenger",
                 behaviour=colmto.cse.policy.Behaviour.DENY
-            ).add_vehicle_policy(
+            ).add_policy(
                 colmto.cse.policy.SUMOPositionPolicy(
                     position_bbox=((0., -1.), (100., 1.))
                 )
@@ -188,18 +188,18 @@ def test_sumo_extendable_policy():
     """Test SUMOExtendablePolicy class"""
     with assert_raises(TypeError):
         colmto.cse.policy.SUMOExtendablePolicy(
-            vehicle_policies=[colmto.cse.policy.SUMONullPolicy()],
+            policies=[colmto.cse.policy.SUMONullPolicy()],
             rule="any"
         )
 
     with assert_raises(ValueError):
         colmto.cse.policy.SUMOExtendablePolicy(
-            vehicle_policies=[colmto.cse.policy.SUMOSpeedPolicy()],
+            policies=[colmto.cse.policy.SUMOSpeedPolicy()],
             rule="foo"
         )
 
     l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(
-        vehicle_policies=[colmto.cse.policy.SUMOSpeedPolicy()],
+        policies=[colmto.cse.policy.SUMOSpeedPolicy()],
         rule="any"
     )
 
@@ -210,14 +210,14 @@ def test_sumo_extendable_policy():
     with assert_raises(ValueError):
         l_sumo_policy.rule = "foo"
 
-    l_sumo_policy.add_vehicle_policy(colmto.cse.policy.SUMOPositionPolicy())
+    l_sumo_policy.add_policy(colmto.cse.policy.SUMOPositionPolicy())
 
     with assert_raises(TypeError):
-        l_sumo_policy.add_vehicle_policy(colmto.cse.policy.SUMONullPolicy())
+        l_sumo_policy.add_policy(colmto.cse.policy.SUMONullPolicy())
 
-    l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(vehicle_policies=[])
+    l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(policies=[])
     l_sumo_sub_policy = colmto.cse.policy.SUMOSpeedPolicy(speed_range=(0., 60.))
-    l_sumo_policy.add_vehicle_policy(l_sumo_sub_policy)
+    l_sumo_policy.add_policy(l_sumo_sub_policy)
 
     assert_true(
         l_sumo_policy.subpolicies_apply_to(
@@ -235,8 +235,8 @@ def test_sumo_extendable_policy():
         )
     )
 
-    l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(vehicle_policies=[], rule="all")
-    l_sumo_policy.add_vehicle_policy(l_sumo_sub_policy)
+    l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(policies=[], rule="all")
+    l_sumo_policy.add_policy(l_sumo_sub_policy)
 
     assert_true(
         l_sumo_policy.subpolicies_apply_to(
@@ -304,7 +304,7 @@ def test_sumo_speed_policy():
             colmto.cse.policy.SUMOSpeedPolicy(
                 speed_range=(0., 60.),
                 behaviour=colmto.cse.policy.Behaviour.DENY
-            ).add_vehicle_policy(
+            ).add_policy(
                 colmto.cse.policy.SUMOPositionPolicy(
                     position_bbox=((0., -1.), (100., 1.))
                 )
@@ -362,7 +362,7 @@ def test_sumo_position_policy():
             colmto.cse.policy.SUMOPositionPolicy(
                 position_bbox=((0., -1.), (100., 1.)),
                 behaviour=colmto.cse.policy.Behaviour.DENY
-            ).add_vehicle_policy(
+            ).add_policy(
                 colmto.cse.policy.SUMOSpeedPolicy(
                     speed_range=(0., 60.)
                 )

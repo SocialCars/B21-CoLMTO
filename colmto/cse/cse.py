@@ -113,7 +113,7 @@ class SumoCSE(BaseCSE):
             # look for sub-policies
             policy.rule = policy_cfg.get("vehicle_policies", {}).get("rule")
             for i_subpolicy in policy_cfg.get("vehicle_policies", {}).get("policies", []):
-                policy.add_vehicle_policy(
+                policy.add_policy(
                     self._valid_policies.get(i_subpolicy.get("type"))(
                         behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string_or_else(
                             i_subpolicy.get("behaviour"),
