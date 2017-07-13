@@ -32,13 +32,15 @@ def logger(name: str, loglevel=logging.NOTSET, quiet=False,
            logfile=os.path.expanduser("~/.colmto/colmto.log")) -> logging.Logger:
     """Create a logger instance."""
 
+    if not isinstance(loglevel, (int, str)):
+        raise TypeError("Unknown log level type %s" % type(loglevel))
+
     if os.path.dirname(logfile) != "" and not os.path.exists(os.path.dirname(logfile)):
         os.makedirs(os.path.dirname(logfile))  # pragma: no cover
 
     l_log = logging.getLogger(name)
-    # pylint: disable=expression-not-assigned
-    l_log.setLevel(loglevel.upper() if isinstance(loglevel, str) else loglevel) \
-        if isinstance(loglevel, (int, str)) else l_log.setLevel(logging.NOTSET)
+
+    l_log.setLevel(loglevel.upper() if isinstance(loglevel, str) else loglevel)
 
     # create a logging format
     l_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

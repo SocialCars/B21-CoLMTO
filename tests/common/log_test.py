@@ -38,17 +38,7 @@ import colmto.common.log
 
 def test_logger():
     """Test logger"""
-    assert_equal(
-        colmto.common.log.LOGLEVEL,
-        {
-            "NOTSET": logging.NOTSET,
-            "INFO": logging.INFO,
-            "DEBUG": logging.DEBUG,
-            "WARNING": logging.WARNING,
-            "ERROR": logging.ERROR,
-            "CRITICAL": logging.CRITICAL
-        }
-    )
+
     f_temp_log = tempfile.NamedTemporaryFile()
 
     l_logs = [
@@ -69,7 +59,7 @@ def test_logger():
     for i_logger in l_logs:
         i_logger.info("foo")
 
-    for i_level in colmto.common.log.LOGLEVEL:
+    for i_level in ("NOTSET", "INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"):
         l_log = colmto.common.log.logger(
             name="foo{}".format(i_level),
             logfile=f_temp_log.name,
@@ -84,18 +74,16 @@ def test_logger():
             "foo{}".format(i_level)
         )
         assert_equal(
-            l_log.level,
-            colmto.common.log.LOGLEVEL.get(i_level)
+            logging.getLevelName(l_log.level),
+            i_level
         )
-    assert_equal(
+    with assert_raises(ValueError):
         colmto.common.log.logger(
             name="bar",
             logfile=f_temp_log.name,
             quiet=True,
-            loglevel="this should result in NOTSET"
-        ).level,
-        logging.NOTSET
-    )
+            loglevel="this should raise value error: Unknown level"
+        )
 
     with assert_raises(TypeError):
         colmto.common.log.logger(
