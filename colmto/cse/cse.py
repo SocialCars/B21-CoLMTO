@@ -72,7 +72,7 @@ class BaseCSE(object):
         """
         for i_policy in self._policies:
             if i_policy.applies_to(vehicle) \
-                    and i_policy.behaviour == colmto.cse.policy.BEHAVIOUR.deny:
+                    and i_policy.behaviour == colmto.cse.policy.Behaviour.DENY:
                 vehicle.change_vehicle_class(
                     colmto.cse.policy.SUMOPolicy.to_disallowed_class()
                 )
@@ -117,7 +117,7 @@ class SumoCSE(BaseCSE):
                     self._valid_policies.get(i_subpolicy.get("type"))(
                         behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string_or_else(
                             i_subpolicy.get("behaviour"),
-                            colmto.cse.policy.BEHAVIOUR.deny
+                            colmto.cse.policy.Behaviour.DENY
                         ),
                         **i_subpolicy.get("args")
                     )
@@ -144,7 +144,7 @@ class SumoCSE(BaseCSE):
                 self._valid_policies.get(i_policy.get("type"))(
                     behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string_or_else(
                         i_policy.get("behaviour"),
-                        colmto.cse.policy.BEHAVIOUR.deny
+                        colmto.cse.policy.Behaviour.DENY
                     ),
                     **i_policy.get("args")
                 ),

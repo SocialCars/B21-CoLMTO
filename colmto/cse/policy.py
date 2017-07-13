@@ -32,40 +32,42 @@ import numpy
 from colmto.environment import SUMOVehicle
 
 
-class BEHAVIOUR(enum.Enum):
+@enum.unique
+class Behaviour(enum.Enum):
     """Behaviour enum for enumerating allow/deny states and corresponding vehicle classes."""
-    allow = "custom2"
-    deny = "custom1"
+    ALLOW = "custom2"
+    DENY = "custom1"
 
 
 class BasePolicy(object):
     """Base Policy"""
 
-    def __init__(self, behaviour=BEHAVIOUR.deny):
+    def __init__(self, behaviour=Behaviour.DENY):
         """
         C'tor
         @param behaviour Default, i.e. baseline policy.
-                       Enum of colmto.cse.policy.BEHAVIOUR.deny/allow
+                       Enum of colmto.cse.policy.Behaviour.DENY/ALLOW
         """
         self._behaviour = behaviour
 
     @staticmethod
-    def behaviour_from_string_or_else(behaviour, or_else):
+    def behaviour_from_string_or_else(behaviour, or_else: Behaviour):
         """
         Transforms string argument of behaviour, i.e. "allow", "deny" case insensitive to
         BEHAVIOUR enum value. Otherwise return passed or_else argument.
         @param behaviour string "allow", "deny"
         @param or_else otherwise returned argument
-        @retval BEHAVIOUR.allow, BEHAVIOUR.deny, or_else
+        @type or_else Behaviour
+        @retval Behaviour.ALLOW, Behaviour.DENY, or_else
         """
         if behaviour.lower() == "allow":
-            return BEHAVIOUR.allow
+            return Behaviour.ALLOW
         if behaviour.lower() == "deny":
-            return BEHAVIOUR.deny
+            return Behaviour.DENY
         return or_else
 
     @property
-    def behaviour(self):
+    def behaviour(self) -> Behaviour:
         """
         Returns behaviour
         @retval behaviour
@@ -82,12 +84,12 @@ class SUMOPolicy(BasePolicy):
     @staticmethod
     def to_allowed_class():
         """Get the SUMO class for allowed vehicles"""
-        return BEHAVIOUR.allow.value
+        return Behaviour.ALLOW.value
 
     @staticmethod
     def to_disallowed_class():
         """Get the SUMO class for disallowed vehicles"""
-        return BEHAVIOUR.deny.value
+        return Behaviour.DENY.value
 
 
 class SUMOExtendablePolicy(object):
@@ -243,7 +245,7 @@ class SUMONullPolicy(SUMOPolicy):
 class SUMOVehiclePolicy(SUMOPolicy, SUMOExtendablePolicy):
     """Base class for vehicle attribute specific policies."""
 
-    def __init__(self, behaviour=BEHAVIOUR.deny):
+    def __init__(self, behaviour=Behaviour.DENY):
         """C'tor."""
         self._vehicle_policies = []
         self._rule = []
@@ -253,7 +255,7 @@ class SUMOVehiclePolicy(SUMOPolicy, SUMOExtendablePolicy):
 class SUMOVTypePolicy(SUMOVehiclePolicy):
     """Vehicle type based policy: Applies to vehicles with a given SUMO vehicle type"""
 
-    def __init__(self, vehicle_type=None, behaviour=BEHAVIOUR.deny):
+    def __init__(self, vehicle_type=None, behaviour=Behaviour.DENY):
         """C'tor."""
         super(SUMOVTypePolicy, self).__init__(behaviour)
         self._vehicle_type = vehicle_type
@@ -293,7 +295,7 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
 class SUMOSpeedPolicy(SUMOVehiclePolicy):
     """Speed based policy: Applies to vehicles within a given speed range"""
 
-    def __init__(self, speed_range=(0, 120), behaviour=BEHAVIOUR.deny):
+    def __init__(self, speed_range=(0, 120), behaviour=Behaviour.DENY):
         """C'tor."""
         super(SUMOSpeedPolicy, self).__init__(behaviour)
         self._speed_range = numpy.array(speed_range)
@@ -337,7 +339,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
     """
 
     def __init__(self, position_bbox=numpy.array(((0.0, 0), (100.0, 1))),
-                 behaviour=BEHAVIOUR.deny):
+                 behaviour=Behaviour.DENY):
         """C'tor."""
         super(SUMOPositionPolicy, self).__init__(behaviour)
         self._position_bbox = position_bbox

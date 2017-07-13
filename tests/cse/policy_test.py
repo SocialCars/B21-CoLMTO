@@ -44,7 +44,7 @@ def test_base_policy():
     Test BasePolicy class
     """
     l_base_policy = colmto.cse.policy.BasePolicy(
-        colmto.cse.policy.BEHAVIOUR.deny
+        colmto.cse.policy.Behaviour.DENY
     )
     assert_is_instance(l_base_policy, colmto.cse.policy.BasePolicy)
 
@@ -53,19 +53,19 @@ def test_behaviourfromstringorelse():
     """Test colmto.cse.policy.BasePolicy.behaviour_from_string_or_else."""
     assert_equal(
         colmto.cse.policy.BasePolicy(
-            colmto.cse.policy.BEHAVIOUR.deny
+            colmto.cse.policy.Behaviour.DENY
         ).behaviour_from_string_or_else("Allow", "foo"),
-        colmto.cse.policy.BEHAVIOUR.allow
+        colmto.cse.policy.Behaviour.ALLOW
     )
     assert_equal(
         colmto.cse.policy.BasePolicy(
-            colmto.cse.policy.BEHAVIOUR.deny
+            colmto.cse.policy.Behaviour.DENY
         ).behaviour_from_string_or_else("Deny", "foo"),
-        colmto.cse.policy.BEHAVIOUR.deny
+        colmto.cse.policy.Behaviour.DENY
     )
     assert_equal(
         colmto.cse.policy.BasePolicy(
-            colmto.cse.policy.BEHAVIOUR.deny
+            colmto.cse.policy.Behaviour.DENY
         ).behaviour_from_string_or_else("Meh", "foo"),
         "foo"
     )
@@ -76,7 +76,7 @@ def test_sumo_policy():
     Test SumoPolicy class
     """
     l_sumo_policy = colmto.cse.policy.SUMOPolicy(
-        colmto.cse.policy.BEHAVIOUR.deny
+        colmto.cse.policy.Behaviour.DENY
     )
     assert_is_instance(l_sumo_policy, colmto.cse.policy.SUMOPolicy)
 
@@ -119,7 +119,7 @@ def test_sumo_vtype_policy():
         str(
             colmto.cse.policy.SUMOVTypePolicy(
                 vehicle_type="passenger",
-                behaviour=colmto.cse.policy.BEHAVIOUR.deny
+                behaviour=colmto.cse.policy.Behaviour.DENY
             ).add_vehicle_policy(
                 colmto.cse.policy.SUMOPositionPolicy(
                     position_bbox=((0., -1.), (100., 1.))
@@ -134,7 +134,7 @@ def test_sumo_vtype_policy():
     assert_true(
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="passenger",
-            behaviour=colmto.cse.policy.BEHAVIOUR.deny
+            behaviour=colmto.cse.policy.Behaviour.DENY
         ).applies_to(
             colmto.environment.vehicle.SUMOVehicle(
                 vehicle_type="passenger"
@@ -145,7 +145,7 @@ def test_sumo_vtype_policy():
     assert_false(
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="truck",
-            behaviour=colmto.cse.policy.BEHAVIOUR.allow
+            behaviour=colmto.cse.policy.Behaviour.ALLOW
         ).applies_to(
             colmto.environment.vehicle.SUMOVehicle(
                 vehicle_type="passenger"
@@ -156,31 +156,31 @@ def test_sumo_vtype_policy():
     assert_equal(
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="passenger",
-            behaviour=colmto.cse.policy.BEHAVIOUR.deny
+            behaviour=colmto.cse.policy.Behaviour.DENY
         ).apply(
             [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
         )[0].vehicle_class,
-        colmto.cse.policy.BEHAVIOUR.deny.value
+        colmto.cse.policy.Behaviour.DENY.value
     )
 
     assert_equal(
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="passenger",
-            behaviour=colmto.cse.policy.BEHAVIOUR.allow
+            behaviour=colmto.cse.policy.Behaviour.ALLOW
         ).apply(
             [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
         )[0].vehicle_class,
-        colmto.cse.policy.BEHAVIOUR.allow.value
+        colmto.cse.policy.Behaviour.ALLOW.value
     )
 
     assert_equal(
         colmto.cse.policy.SUMOVTypePolicy(
             vehicle_type="truck",
-            behaviour=colmto.cse.policy.BEHAVIOUR.deny
+            behaviour=colmto.cse.policy.Behaviour.DENY
         ).apply(
             [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
         )[0].vehicle_class,
-        colmto.cse.policy.BEHAVIOUR.allow.value
+        colmto.cse.policy.Behaviour.ALLOW.value
     )
 
 
@@ -303,14 +303,14 @@ def test_sumo_speed_policy():
         str(
             colmto.cse.policy.SUMOSpeedPolicy(
                 speed_range=(0., 60.),
-                behaviour=colmto.cse.policy.BEHAVIOUR.deny
+                behaviour=colmto.cse.policy.Behaviour.DENY
             ).add_vehicle_policy(
                 colmto.cse.policy.SUMOPositionPolicy(
                     position_bbox=((0., -1.), (100., 1.))
                 )
             )
         ),
-        "<class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_range = [  0.  60.], behaviour = deny, "
+        "<class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_range = [  0.  60.], behaviour = DENY, "
         "subpolicies: []: <class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1"
         ".0), (100.0, 1.0)), behaviour = custom1, subpolicies: []: "
     )
@@ -352,7 +352,7 @@ def test_sumo_position_policy():
     assert_tuple_equal(
         colmto.cse.policy.SUMOPositionPolicy(
             position_bbox=((0., -1.), (100., 1.)),
-            behaviour=colmto.cse.policy.BEHAVIOUR.deny
+            behaviour=colmto.cse.policy.Behaviour.DENY
         ).position_bbox,
         ((0., -1.), (100., 1.))
     )
@@ -361,7 +361,7 @@ def test_sumo_position_policy():
         str(
             colmto.cse.policy.SUMOPositionPolicy(
                 position_bbox=((0., -1.), (100., 1.)),
-                behaviour=colmto.cse.policy.BEHAVIOUR.deny
+                behaviour=colmto.cse.policy.Behaviour.DENY
             ).add_vehicle_policy(
                 colmto.cse.policy.SUMOSpeedPolicy(
                     speed_range=(0., 60.)
@@ -370,5 +370,5 @@ def test_sumo_position_policy():
         ),
         "<class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)"
         "), behaviour = custom1, subpolicies: []: <class 'colmto.cse.policy.SUMOSpeedPolicy'>: spee"
-        "d_range = [  0.  60.], behaviour = deny, subpolicies: []: "
+        "d_range = [  0.  60.], behaviour = DENY, subpolicies: []: "
     )
