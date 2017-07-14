@@ -31,11 +31,13 @@ import numpy
 
 from colmto.environment import SUMOVehicle
 
+
 @enum.unique
 class Behaviour(enum.Enum):
     """Behaviour enum for enumerating allow/deny states and corresponding vehicle classes."""
     ALLOW = "custom2"
     DENY = "custom1"
+
 
 @enum.unique
 class RuleOperator(enum.Enum):
@@ -47,6 +49,7 @@ class RuleOperator(enum.Enum):
     """
     ALL = all
     ANY = any
+
 
 class BasePolicy(object):
     """Base Policy"""
@@ -60,20 +63,35 @@ class BasePolicy(object):
         self._behaviour = behaviour
 
     @staticmethod
-    def behaviour_from_string_or_else(behaviour: str, or_else: Behaviour):
+    def behaviour_from_string(behaviour: str, or_else: Behaviour) -> Behaviour:
         """
         Transforms string argument of behaviour, i.e. "allow", "deny" case insensitive to
-        BEHAVIOUR enum value. Otherwise return passed or_else argument.
+        Behaviour enum value. Otherwise return passed or_else argument.
         @param behaviour string "allow", "deny"
         @param or_else otherwise returned argument
         @type or_else Behaviour
         @retval Behaviour.ALLOW, Behaviour.DENY, or_else
         """
-        if behaviour.lower() == "allow":
-            return Behaviour.ALLOW
-        if behaviour.lower() == "deny":
-            return Behaviour.DENY
-        return or_else
+        try:
+            return Behaviour[behaviour.upper()]
+        except KeyError:
+            return or_else
+
+    @staticmethod
+    def ruleoperator_from_string(
+            rule_operator: str, or_else: RuleOperator) -> RuleOperator:
+        """
+        Transforms string argument of rule operator, i.e. "any", "all" case insensitive to
+        RuleOperator enum value. Otherwise return passed or_else argument.
+        @param RuleOperator string ("any"|"all")
+        @param or_else otherwise returned argument
+        @type or_else RuleOperator
+        @retval RuleOperator.ANY, RuleOperator.ALL, or_else
+        """
+        try:
+            return RuleOperator[rule_operator.upper()]
+        except KeyError:
+            return or_else
 
     @property
     def behaviour(self) -> Behaviour:
@@ -179,8 +197,8 @@ class SUMOExtendablePolicy(object):
         @retval self
         """
 
-        if not isinstance(vehicle_policy, SUMOPolicy):
-            raise TypeError("%s is not of colmto.cse.policy.SUMOPolicy", vehicle_policy)
+        if not isinstance(vehicle_policy, SUMOExtendablePolicy):
+            raise TypeError("%s is not of colmto.cse.policy.SUMOExtendablePolicy", vehicle_policy)
 
         self._vehicle_policies.append(vehicle_policy)
 

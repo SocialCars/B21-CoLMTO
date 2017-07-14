@@ -67,6 +67,7 @@ setup(
 
     install_requires=[
         "doxypypy",
+        "defusedxml",
         "h5py",
         "lxml",
         "matplotlib",

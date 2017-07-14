@@ -36,6 +36,7 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
 
 * [Python 3.6](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
   * [doxypy](https://pypi.python.org/pypi/doxypy)
+  * [defusedxml](https://pypi.python.org/pypi/defusedxml)
   * [h5py](https://pypi.python.org/pypi/h5py)
   * [lxml](https://pypi.python.org/pypi/lxml)
   * [matplotlib](https://pypi.python.org/pypi/matplotlib)

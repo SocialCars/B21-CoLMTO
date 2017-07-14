@@ -50,24 +50,49 @@ def test_base_policy():
 
 
 def test_behaviourfromstringorelse():
-    """Test colmto.cse.policy.BasePolicy.behaviour_from_string_or_else."""
+    """Test colmto.cse.policy.BasePolicy.behaviour_from_string."""
     assert_equal(
         colmto.cse.policy.BasePolicy(
             colmto.cse.policy.Behaviour.DENY
-        ).behaviour_from_string_or_else("Allow", "foo"),
+        ).behaviour_from_string("Allow", colmto.cse.policy.Behaviour.DENY),
         colmto.cse.policy.Behaviour.ALLOW
     )
     assert_equal(
         colmto.cse.policy.BasePolicy(
             colmto.cse.policy.Behaviour.DENY
-        ).behaviour_from_string_or_else("Deny", "foo"),
+        ).behaviour_from_string("Deny", colmto.cse.policy.Behaviour.ALLOW),
         colmto.cse.policy.Behaviour.DENY
     )
     assert_equal(
         colmto.cse.policy.BasePolicy(
             colmto.cse.policy.Behaviour.DENY
-        ).behaviour_from_string_or_else("Meh", "foo"),
-        "foo"
+        ).behaviour_from_string("Meh", colmto.cse.policy.Behaviour.ALLOW),
+        colmto.cse.policy.Behaviour.ALLOW
+    )
+
+
+def test_ruleoperatorfromstring():
+    """Test colmto.cse.policy.BasePolicy.ruleoperator_from_string."""
+    assert_equal(
+        colmto.cse.policy.SUMOVehiclePolicy(
+            behaviour=colmto.cse.policy.Behaviour.DENY,
+            rule=colmto.cse.policy.RuleOperator.ANY
+        ).ruleoperator_from_string("All", colmto.cse.policy.RuleOperator.ANY),
+        colmto.cse.policy.RuleOperator.ALL
+    )
+    assert_equal(
+        colmto.cse.policy.SUMOVehiclePolicy(
+            behaviour=colmto.cse.policy.Behaviour.DENY,
+            rule=colmto.cse.policy.RuleOperator.ANY
+        ).ruleoperator_from_string("Any", colmto.cse.policy.RuleOperator.ALL),
+        colmto.cse.policy.RuleOperator.ANY
+    )
+    assert_equal(
+        colmto.cse.policy.SUMOVehiclePolicy(
+            behaviour=colmto.cse.policy.Behaviour.DENY,
+            rule=colmto.cse.policy.RuleOperator.ANY
+        ).ruleoperator_from_string("Meh", colmto.cse.policy.RuleOperator.ALL),
+        colmto.cse.policy.RuleOperator.ALL
     )
 
 
@@ -127,8 +152,8 @@ def test_sumo_vtype_policy():
             )
         ),
         "<class 'colmto.cse.policy.SUMOVTypePolicy'>: vehicle_type = passenger, behaviour = custom1"
-        ", subpolicies: []: <class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, "
-        "-1.0), (100.0, 1.0)), behaviour = custom1, subpolicies: []: "
+        ", subpolicies: RuleOperator.ANY: <class 'colmto.cse.policy.SUMOPositionPolicy'>: position_"
+        "bbox = ((0.0, -1.0), (100.0, 1.0)), behaviour = custom1, subpolicies: RuleOperator.ANY: "
     )
 
     assert_true(
@@ -186,7 +211,7 @@ def test_sumo_vtype_policy():
 
 def test_sumo_extendable_policy():
     """Test SUMOExtendablePolicy class"""
-    with assert_raises(TypeError):
+    with assert_raises(ValueError):
         colmto.cse.policy.SUMOExtendablePolicy(
             policies=[colmto.cse.policy.SUMONullPolicy()],
             rule="any"
@@ -200,12 +225,12 @@ def test_sumo_extendable_policy():
 
     l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(
         policies=[colmto.cse.policy.SUMOSpeedPolicy()],
-        rule="any"
+        rule=colmto.cse.policy.RuleOperator.ANY
     )
 
-    assert_equal(l_sumo_policy.rule, "any")
-    l_sumo_policy.rule = "all"
-    assert_equal(l_sumo_policy.rule, "all")
+    assert_equal(l_sumo_policy.rule, colmto.cse.policy.RuleOperator.ANY)
+    l_sumo_policy.rule = colmto.cse.policy.RuleOperator.ALL
+    assert_equal(l_sumo_policy.rule, colmto.cse.policy.RuleOperator.ALL)
 
     with assert_raises(ValueError):
         l_sumo_policy.rule = "foo"
@@ -235,7 +260,8 @@ def test_sumo_extendable_policy():
         )
     )
 
-    l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(policies=[], rule="all")
+    l_sumo_policy = colmto.cse.policy.SUMOExtendablePolicy(
+        policies=[], rule=colmto.cse.policy.RuleOperator.ALL)
     l_sumo_policy.add_policy(l_sumo_sub_policy)
 
     assert_true(
@@ -311,8 +337,8 @@ def test_sumo_speed_policy():
             )
         ),
         "<class 'colmto.cse.policy.SUMOSpeedPolicy'>: speed_range = [  0.  60.], behaviour = DENY, "
-        "subpolicies: []: <class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1"
-        ".0), (100.0, 1.0)), behaviour = custom1, subpolicies: []: "
+        "subpolicies: RuleOperator.ANY: <class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bb"
+        "ox = ((0.0, -1.0), (100.0, 1.0)), behaviour = custom1, subpolicies: RuleOperator.ANY: "
     )
 
 
@@ -369,6 +395,6 @@ def test_sumo_position_policy():
             )
         ),
         "<class 'colmto.cse.policy.SUMOPositionPolicy'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)"
-        "), behaviour = custom1, subpolicies: []: <class 'colmto.cse.policy.SUMOSpeedPolicy'>: spee"
-        "d_range = [  0.  60.], behaviour = DENY, subpolicies: []: "
+        "), behaviour = custom1, subpolicies: RuleOperator.ANY: <class 'colmto.cse.policy.SUMOSpeed"
+        "Policy'>: speed_range = [  0.  60.], behaviour = DENY, subpolicies: RuleOperator.ANY: "
     )

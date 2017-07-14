@@ -27,9 +27,16 @@ import copy
 import os
 import random
 import subprocess
+import typing
 from collections import OrderedDict
 
 import numpy
+try:
+    import lxml.etree as etree
+except ImportError:
+    import xml.etree.ElementTree as etree
+
+import defusedxml.lxml
 
 import colmto.common.configuration
 import colmto.common.io
@@ -288,19 +295,19 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if self._args.onlyoneotlsegment:
             l_length = 2 * l_segmentlength  # two times segment length
 
-        l_nodes = colmto.common.io.etree.Element("nodes")
-        colmto.common.io.etree.SubElement(
+        l_nodes = etree.Element("nodes")
+        etree.SubElement(
             l_nodes, "node", attrib={"id": "enter", "x": str(-l_segmentlength), "y": "0"}
         )
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_nodes, "node", attrib={"id": "21start", "x": "0", "y": "0"}
         )
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_nodes, "node", attrib={"id": "21end", "x": str(l_length), "y": "0"}
         )
 
         # dummy node for easier from-to routing
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_nodes,
             "node",
             attrib={
@@ -316,7 +323,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         with open(nodefile, "w") as f_nodesxml:
             f_nodesxml.write(
-                colmto.common.io.etree.tostring(l_nodes, pretty_print=True, encoding="unicode")
+                defusedxml.lxml.tostring(l_nodes, pretty_print=True, encoding="unicode")
             )
 
     def _generate_edge_xml(
@@ -345,10 +352,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_segmentlength = l_length / (l_nbswitches + 1)
 
         # create edges xml
-        l_edges = colmto.common.io.etree.Element("edges")
+        l_edges = etree.Element("edges")
 
         # Entering edge with one lane, leading to 2+1 Roadway
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_edges,
             "edge",
             attrib={
@@ -361,7 +368,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # 2+1 Roadway
-        l_21edge = colmto.common.io.etree.SubElement(
+        l_21edge = etree.SubElement(
             l_edges,
             "edge",
             attrib={
@@ -376,7 +383,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         # deny access to lane 1 (OTL) to vehicle with vClass "custom2"
         # <lane index="1" disallow="custom2"/>
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_21edge,
             "lane",
             attrib={
@@ -395,7 +402,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         self._generate_switches(l_21edge, scenario_config)
 
         # Exit lane
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_edges,
             "edge",
             attrib={
@@ -410,7 +417,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         with open(edgefile, "w") as f_edgexml:
             f_edgexml.write(
-                colmto.common.io.etree.tostring(l_edges, pretty_print=True, encoding="unicode")
+                defusedxml.lxml.tostring(l_edges, pretty_print=True, encoding="unicode")
             )
 
     def _generate_switches(self, edge, scenario_config):
@@ -431,7 +438,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             # add splits and joins
             l_add_otl_lane = True
             for i_segmentpos in l_parameters.get("switchpositions"):
-                colmto.common.io.etree.SubElement(
+                etree.SubElement(
                     edge,
                     "split",
                     attrib={
@@ -450,7 +457,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             for i_segmentpos in range(0, int(l_length), int(l_segmentlength)) \
                     if not self._args.onlyoneotlsegment \
                     else range(0, int(2 * l_segmentlength - 1), int(l_segmentlength)):
-                colmto.common.io.etree.SubElement(
+                etree.SubElement(
                     edge,
                     "split",
                     attrib={
@@ -488,25 +495,25 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if os.path.isfile(config_files.get("configfile")) and not forcerebuildscenarios:
             return
 
-        l_configuration = colmto.common.io.etree.Element("configuration")
-        l_input = colmto.common.io.etree.SubElement(l_configuration, "input")
-        colmto.common.io.etree.SubElement(
+        l_configuration = etree.Element("configuration")
+        l_input = etree.SubElement(l_configuration, "input")
+        etree.SubElement(
             l_input,
             "net-file",
             attrib={"value": config_files.get("netfile")}
         )
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_input,
             "route-files",
             attrib={"value": config_files.get("routefile")}
         )
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_input,
             "gui-settings-file",
             attrib={"value": config_files.get("settingsfile")}
         )
-        l_time = colmto.common.io.etree.SubElement(l_configuration, "time")
-        colmto.common.io.etree.SubElement(
+        l_time = etree.SubElement(l_configuration, "time")
+        etree.SubElement(
             l_time,
             "begin",
             attrib={"value": str(simtimeinterval[0])}
@@ -514,7 +521,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         with open(config_files.get("configfile"), "w") as f_configxml:
             f_configxml.write(
-                colmto.common.io.etree.tostring(
+                defusedxml.lxml.tostring(
                     l_configuration,
                     pretty_print=True,
                     encoding="unicode"
@@ -536,20 +543,20 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if os.path.isfile(settingsfile) and not forcerebuildscenarios:
             return
 
-        l_viewsettings = colmto.common.io.etree.Element("viewsettings")
-        colmto.common.io.etree.SubElement(
+        l_viewsettings = etree.Element("viewsettings")
+        etree.SubElement(
             l_viewsettings, "viewport",
             attrib={"x": str(scenarioconfig.get("parameters").get("length") / 2),
                     "y": "0",
                     "zoom": "100"}
         )
-        colmto.common.io.etree.SubElement(
+        etree.SubElement(
             l_viewsettings, "delay", attrib={"value": str(runcfg.get("sumo").get("gui-delay"))}
         )
 
         with open(settingsfile, "w") as f_configxml:
             f_configxml.write(
-                colmto.common.io.etree.tostring(
+                defusedxml.lxml.tostring(
                     l_viewsettings,
                     pretty_print=True,
                     encoding="unicode"
@@ -583,11 +590,16 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         return prev_start_time
 
-    def _create_vehicle_distribution(self, vtype_list, aadt, initialsorting, scenario_name):
+    def _create_vehicle_distribution(self,
+                                     vtype_list: typing.Iterable,
+                                     aadt: float,
+                                     initialsorting: str,
+                                     scenario_name
+                                    ) -> typing.Dict[int, colmto.environment.vehicle.SUMOVehicle]:
         """
         Create a distribution of vehicles based on
 
-        @param nbvehicles: number of vehicles
+        @param vtype_list: list of vehicle types
         @param aadt: annual average daily traffic (vehicles/day/lane)
         @param initialsorting: initial sorting of vehicles (by max speed)
                                 ["best", "random", "worst"]
@@ -602,11 +614,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
             "Create vehicle distribution with %s", self._run_config.get("vtypedistribution")
         )
 
-        l_vehps = aadt / (24 * 60 * 60) if not self._run_config.get(
-            "vehiclespersecond"
-        ).get(
-            "enabled"
-        ) else self._run_config.get("vehiclespersecond").get("value")
+        l_vehps = aadt / (24 * 60 * 60) \
+            if not self._run_config.get("vehiclespersecond").get("enabled") \
+            else self._run_config.get("vehiclespersecond").get("value")
 
         l_vehicle_list = [
             colmto.environment.vehicle.SUMOVehicle(
@@ -663,8 +673,12 @@ class SumoConfig(colmto.common.configuration.Configuration):
         ) if not self.run_config.get("aadt").get("enabled") \
             else self.run_config.get("aadt").get("value")
 
-    def _generate_trip_xml(self, scenario_runs, initialsorting, vtype_list, tripfile,
-                           forcerebuildscenarios=False):
+    def _generate_trip_xml(self,  # pylint: disable=too-many-arguments
+                           scenario_runs: dict,
+                           initialsorting: str,
+                           vtype_list: list,
+                           tripfile: str, forcerebuildscenarios=False
+                          ) -> typing.Dict[int, colmto.environment.vehicle.SUMOVehicle]:
         """
         Generate SUMO's trip file.
 
@@ -676,7 +690,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         """
 
         if os.path.isfile(tripfile) and not forcerebuildscenarios:
-            return
+            return OrderedDict({})
         self._log.debug("Generating trip xml for %s", scenario_runs.get("scenarioname"))
 
         self._log.debug(
@@ -692,7 +706,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # xml
-        l_trips = colmto.common.io.etree.Element("trips")
+        l_trips = etree.Element("trips")
 
         # create a sumo vehicle_type for each vehicle
         for i_vid, i_vehicle in l_vehicles.items():
@@ -729,11 +743,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
             l_vattr["type"] = l_vattr.get("vType")
 
-            colmto.common.io.etree.SubElement(l_trips, "vType", attrib=l_vattr)
+            etree.SubElement(l_trips, "vType", attrib=l_vattr)
 
         # add trip for each vehicle
         for i_vid, i_vehicle in l_vehicles.items():
-            colmto.common.io.etree.SubElement(l_trips, "trip", attrib={
+            etree.SubElement(l_trips, "trip", attrib={
                 "id": i_vid,
                 "depart": str(i_vehicle.start_time),
                 "from": "enter_21start",
@@ -744,7 +758,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         with open(tripfile, "w") as f_tripxml:
             f_tripxml.write(
-                colmto.common.io.etree.tostring(l_trips, pretty_print=True, encoding="unicode")
+                defusedxml.lxml.tostring(
+                    l_trips, pretty_print=True, encoding="unicode"
+                )
             )
 
         return l_vehicles

@@ -39,45 +39,10 @@ import yaml
 
 import h5py
 
-try:
-    from lxml import etree
-    from lxml.etree import XSLT
-except ImportError:  # pragma: no cover
-    try:
-        # Python 2.5
-        import xml.etree.cElementTree as etree
-        from xml.etree import XSLT
-    except ImportError:  # pragma: no cover
-        try:
-            # Python 2.5
-            import xml.etree.ElementTree as etree
-            from xml.etree import XSLT
-        except ImportError:  # pragma: no cover
-            try:
-                # normal cElementTree install
-                import cElementTree as etree
-                from xml.etree import XSLT
-            except ImportError:  # pragma: no cover
-                try:
-                    # normal ElementTree install
-                    import elementtree.ElementTree as etree
-                    from xml.etree import XSLT
-                except ImportError:  # pragma: no cover
-                    print("Failed to import ElementTree from any known place")
-
 import colmto.common.log
 
 
-def xslt(template):
-    """
-    Wrapper to apply template to XSLT and return transformation object.
-    @param template XSLT template
-    @retval transformation object
-    """
-    return XSLT(template)
-
-
-class Reader(object):
+class Reader(object):  # pylint: disable=too-few-public-methods
     """Read xml, json and yaml files."""
 
     def __init__(self, args):
@@ -86,23 +51,6 @@ class Reader(object):
             self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         else:
             self._log = colmto.common.log.logger(__name__)
-
-    def read_etree(self, fname):
-        """Parses xml file with etree. Returns etree object"""
-
-        self._log.debug("Parsing %s with etree", fname)
-
-        return etree.parse(fname)
-
-    def read_json(self, filename):
-        """Reads json file. Returns dictionary."""
-
-        self._log.debug("Reading %s", filename)
-
-        with gzip.GzipFile(filename, "r") \
-                if filename.endswith(".gz") \
-                else open(filename, mode="r") as f_json:
-            return json.loads(f_json.read())
 
     def read_yaml(self, filename):
         """

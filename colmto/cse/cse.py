@@ -111,11 +111,14 @@ class SumoCSE(BaseCSE):
         if policy_cfg is not None \
                 and policy_cfg.get("vehicle_policies", {}).get("rule", False):
             # look for sub-policies
-            policy.rule = policy_cfg.get("vehicle_policies", {}).get("rule")
+            policy.rule = colmto.cse.policy.BasePolicy.ruleoperator_from_string(
+                policy_cfg.get("vehicle_policies", {}).get("rule"),
+                colmto.cse.policy.RuleOperator.ALL
+            )
             for i_subpolicy in policy_cfg.get("vehicle_policies", {}).get("policies", []):
                 policy.add_policy(
                     self._valid_policies.get(i_subpolicy.get("type"))(
-                        behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string_or_else(
+                        behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string(
                             i_subpolicy.get("behaviour"),
                             colmto.cse.policy.Behaviour.DENY
                         ),
@@ -142,7 +145,7 @@ class SumoCSE(BaseCSE):
         for i_policy in policies_config:
             self.add_policy(
                 self._valid_policies.get(i_policy.get("type"))(
-                    behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string_or_else(
+                    behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string(
                         i_policy.get("behaviour"),
                         colmto.cse.policy.Behaviour.DENY
                     ),
