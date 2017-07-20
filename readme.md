@@ -25,7 +25,7 @@
 
 ## Execution Model
 
-The execution model of CoLMTO, developed to conduct my simulation studies, is depicted in the following figure.
+The execution model of CoLMTO, developed to conduct my simulation studies, is depicted in the following figure:
 
 ![CoLMTO Execution Model](executionmodel.png)
 
