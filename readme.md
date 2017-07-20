@@ -23,6 +23,11 @@
   * [Source Code Documentation (HTML)](http://socialcars.github.io/colmto/docs/sources/index.html)
   * [Source Code Documentation (PDF)](http://socialcars.github.io/colmto/docs/CoLMTO-doc.pdf)
 
+## Execution Model
+
+The execution model of CoLMTO, developed to conduct my simulation studies, is depicted in the following figure.
+
+![CoLMTO Execution Model](executionmodel.png)
 
 ## Architecture
 
