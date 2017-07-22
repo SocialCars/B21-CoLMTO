@@ -117,7 +117,22 @@ brew install libxml2 homebrew/science/hdf5 libyaml
 sudo apt-get install libyaml-dev libxslt1-dev
 ```
 
-### Build and Install CoLMTO
+### Install CoLMTO
+
+#### Setup virtual environment (optional)
+
+The benefits of setting up a virtual environment are that you can install the required dependecies without affecting
+your current environment and have CoLMTO installed in a local user directory, e.g. `colmto/venv`:
+
+```sh
+python3 -m virtualenv venv
+./venv/bin/activate
+```
+
+You can the run the following commands inside your virtual environment.
+To exit the environment, simply execute `deactivate`.
+
+#### Installation
 
 On OSes with include paths other than /usr/include,
 e.g., FreeBSD, MacOS export `CPPFLAGS` (adjust accordingly):
