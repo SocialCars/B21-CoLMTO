@@ -18,7 +18,8 @@
 # Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
 
 [![CircleCI](https://circleci.com/gh/SocialCars/colmto.svg?style=shield)](https://circleci.com/gh/SocialCars/colmto)
-[![codecov](https://codecov.io/gh/SocialCars/colmto/branch/master/graph/badge.svg)](https://codecov.io/gh/SocialCars/colmto)
+[![Codecov](https://codecov.io/gh/SocialCars/colmto/branch/master/graph/badge.svg)](https://codecov.io/gh/SocialCars/colmto)
+[![Codacy](https://api.codacy.com/project/badge/Grade/7219fdeb9df44627bf66e4966e02dafd)](https://www.codacy.com/app/masc/socialcars_colmto?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=SocialCars/colmto&amp;utm_campaign=Badge_Grade)
 
   * [Source Code Documentation (HTML)](http://socialcars.github.io/colmto/docs/sources/index.html)
   * [Source Code Documentation (PDF)](http://socialcars.github.io/colmto/docs/CoLMTO-doc.pdf)
