@@ -17,9 +17,10 @@
 
 # Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
 
-[![CircleCI](https://circleci.com/gh/SocialCars/colmto.svg?style=shield)](https://circleci.com/gh/SocialCars/colmto)
-[![Codecov](https://codecov.io/gh/SocialCars/colmto/branch/master/graph/badge.svg)](https://codecov.io/gh/SocialCars/colmto)
-[![Codacy](https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg)](https://www.codacy.com/app/masc/socialcars_colmto?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=SocialCars/colmto&amp;utm_campaign=Badge_Grade)
+[![license](https://img.shields.io/github/license/SocialCars/colmto.svg)](https://github.com/SocialCars/colmto/blob/master/license.md)
+[![CircleCI](https://img.shields.io/circleci/project/github/SocialCars/colmto.svg)](https://circleci.com/gh/SocialCars/colmto)
+[![Codecov](https://img.shields.io/codecov/c/github/SocialCars/colmto.svg)](https://codecov.io/gh/SocialCars/colmto)
+[![Codacy](https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg)](https://www.codacy.com/app/masc/socialcars_colmto)
 
   * [Source Code Documentation (HTML)](http://socialcars.github.io/colmto/docs/sources/index.html)
   * [Source Code Documentation (PDF)](http://socialcars.github.io/colmto/docs/CoLMTO-doc.pdf)
