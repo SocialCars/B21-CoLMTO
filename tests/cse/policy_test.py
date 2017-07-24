@@ -39,6 +39,32 @@ from nose.tools import assert_true
 from nose.tools import assert_tuple_equal
 
 
+def test_behaviour():
+    """
+    Test Behaviour enum
+    """
+    assert_equal(colmto.cse.policy.Behaviour.ALLOW.vclass, colmto.cse.policy.Behaviour.ALLOW.value)
+    assert_equal(colmto.cse.policy.Behaviour.DENY.vclass, colmto.cse.policy.Behaviour.DENY.value)
+    assert_equal(colmto.cse.policy.Behaviour.ALLOW.value, "custom2")
+    assert_equal(colmto.cse.policy.Behaviour.DENY.value, "custom1")
+
+
+def test_ruleoperator():
+    """
+    Test RuleOperator enum
+    """
+    assert_equal(colmto.cse.policy.RuleOperator.ANY.value, any)
+    assert_equal(colmto.cse.policy.RuleOperator.ALL.value, all)
+    assert_equal(colmto.cse.policy.RuleOperator.ANY.evaluate([True, True]), True)
+    assert_equal(colmto.cse.policy.RuleOperator.ANY.evaluate([False, True]), True)
+    assert_equal(colmto.cse.policy.RuleOperator.ANY.evaluate([True, False]), True)
+    assert_equal(colmto.cse.policy.RuleOperator.ANY.evaluate([False, False]), False)
+    assert_equal(colmto.cse.policy.RuleOperator.ALL.evaluate([True, True]), True)
+    assert_equal(colmto.cse.policy.RuleOperator.ALL.evaluate([False, True]), False)
+    assert_equal(colmto.cse.policy.RuleOperator.ALL.evaluate([True, False]), False)
+    assert_equal(colmto.cse.policy.RuleOperator.ALL.evaluate([False, False]), False)
+
+
 def test_base_policy():
     """
     Test BasePolicy class

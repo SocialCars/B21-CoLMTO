@@ -30,12 +30,18 @@ import tempfile
 import logging
 import gzip
 
-import colmto.common.io
-
 import h5py
+
 import yaml
+try:
+    from yaml import CSafeDumper as SafeDumper
+except ImportError:  # pragma: no cover
+    from yaml import SafeDumper
+
 from nose.tools import assert_equals
 from nose.tools import assert_raises
+
+import colmto.common.io
 
 
 class Namespace(object):
@@ -104,7 +110,7 @@ def test_reader_read_yaml():
     }
 
     f_temp_test = tempfile.NamedTemporaryFile()
-    f_temp_test.write(yaml.dump(l_yaml_gold).encode("utf8"))
+    f_temp_test.write(yaml.dump(l_yaml_gold, Dumper=SafeDumper).encode("utf8"))
     f_temp_test.seek(0)
 
     assert_equals(
@@ -117,7 +123,7 @@ def test_reader_read_yaml():
     # gzip
     f_temp_test = tempfile.NamedTemporaryFile(suffix=".gz")
     f_gz = gzip.GzipFile(f_temp_test.name, "a")
-    f_gz.write(yaml.dump(l_yaml_gold).encode("utf8"))
+    f_gz.write(yaml.dump(l_yaml_gold, Dumper=SafeDumper).encode("utf8"))
     f_gz.close()
     f_temp_test.seek(0)
 

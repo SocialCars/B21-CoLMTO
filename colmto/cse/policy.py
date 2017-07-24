@@ -38,6 +38,11 @@ class Behaviour(enum.Enum):
     ALLOW = "custom2"
     DENY = "custom1"
 
+    @property
+    def vclass(self) -> str:
+        """returns vehicle class string"""
+        return self.value
+
 
 @enum.unique
 class RuleOperator(enum.Enum):
@@ -49,6 +54,10 @@ class RuleOperator(enum.Enum):
     """
     ALL = all
     ANY = any
+
+    def evaluate(self, args: typing.Iterable):
+        """evaluate iterable args"""
+        return self.value(args)  # pylint: disable=too-many-function-args
 
 
 class BasePolicy(object):
@@ -120,12 +129,12 @@ class SUMOPolicy(BasePolicy):
     @staticmethod
     def to_allowed_class() -> str:
         """Get the SUMO class for allowed vehicles"""
-        return Behaviour.ALLOW.value
+        return Behaviour.ALLOW.vclass
 
     @staticmethod
     def to_disallowed_class() -> str:
         """Get the SUMO class for disallowed vehicles"""
-        return Behaviour.DENY.value
+        return Behaviour.DENY.vclass
 
 
 class SUMOExtendablePolicy(object):
@@ -213,7 +222,7 @@ class SUMOExtendablePolicy(object):
         """
 
         # pylint: disable=no-member
-        return self.rule.value(
+        return self.rule.evaluate(
             [i_subpolicy.applies_to(vehicle) for i_subpolicy in self._vehicle_policies]
         )
 
@@ -290,7 +299,7 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
 
     def __str__(self):
         return "{}: vehicle_type = {}, behaviour = {}, subpolicies: {}: {}".format(
-            self.__class__, self._vehicle_type, self._behaviour.value,
+            self.__class__, self._vehicle_type, self._behaviour.vclass,
             self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
         )
 
@@ -314,7 +323,7 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
 
         return [
             i_vehicle.change_vehicle_class(
-                self._behaviour.value
+                self._behaviour.vclass
             ) if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         ]
@@ -354,7 +363,7 @@ class SUMOSpeedPolicy(SUMOVehiclePolicy):
 
         return [
             i_vehicle.change_vehicle_class(
-                self._behaviour.value
+                self._behaviour.vclass
             ) if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         ]
@@ -374,7 +383,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
 
     def __str__(self):
         return "{}: position_bbox = {}, behaviour = {}, subpolicies: {}: {}".format(
-            self.__class__, self._position_bbox, self._behaviour.value,
+            self.__class__, self._position_bbox, self._behaviour.vclass,
             self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
         )
 
@@ -410,7 +419,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
 
         return [
             i_vehicle.change_vehicle_class(
-                self._behaviour.value
+                self._behaviour.vclass
             ) if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         ]
