@@ -31,9 +31,8 @@ h2.groupheader
 	color: rgb(60, 76, 108);
 	font-size: 24px;
 	font-weight: normal;
-	margin: 42px 0px 20px 0px;
-	margin-bottom: 20px;
-	padding: 0px;
+	margin: 42px 0 20px 0;
+	padding: 0;
 	width: 100%;
 }
 
@@ -46,7 +45,6 @@ h1, h2, h3, h4, h5, h6
 {
 	-webkit-transition: text-shadow 0.5s linear;
 	-moz-transition: text-shadow 0.5s linear;
-	-ms-transition: text-shadow 0.5s linear;
 	-o-transition: text-shadow 0.5s linear;
 	transition: text-shadow 0.5s linear;
 }
@@ -61,7 +59,7 @@ h2
 	color: rgb(60, 76, 108);
 	font-size: 24px;
 	font-weight: normal;
-	margin: 42px 0px 20px 0px;
+	margin: 42px 0 20px 0;
 }
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow
@@ -89,7 +87,7 @@ p.startli, p.startdd, p.starttd
 
 p.endli
 {
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 
 p.enddd
@@ -205,12 +203,11 @@ dl.el
 
 pre.fragment
 {
-
 	border: solid 1px rgb(221, 221, 221);
 	border-radius: 3px;
 	background-color: rgb(248, 248, 248);
 	padding: 6px 10px;
-	margin: 15px 0px;
+	margin: 15px 0;
     overflow: auto;
     word-wrap: break-word;
     font-size:  9pt;
@@ -222,7 +219,7 @@ pre.fragment
 div.fragment
 {
 	padding: 6px 10px;
-	margin: 15px 0px;
+	margin: 15px 0;
 	border: solid 1px rgb(221, 221, 221);
 	border-radius: 3px;
 	background-color: rgb(248, 248, 248);
@@ -242,14 +239,12 @@ div.line
 	word-wrap: break-word;      /* IE 5.5+ */
 	text-indent: -53px;
 	padding-left: 53px;
-	padding-bottom: 0px;
-	margin: 0px;
+	padding-bottom: 0;
+	margin: 0;
 	-webkit-transition-property: background-color, box-shadow;
 	-webkit-transition-duration: 0.5s;
 	-moz-transition-property: background-color, box-shadow;
 	-moz-transition-duration: 0.5s;
-	-ms-transition-property: background-color, box-shadow;
-	-ms-transition-duration: 0.5s;
 	-o-transition-property: background-color, box-shadow;
 	-o-transition-duration: 0.5s;
 	transition-property: background-color, box-shadow;
@@ -303,7 +298,7 @@ div.ah
 
 div.groupHeader
 {
-	margin-left: 0px;
+	margin-left: 0;
 	margin-top: 9px;
 	margin-bottom: 4.7px;
     font-size: 19px;
@@ -328,7 +323,7 @@ td.indexkey
 	background-color: #EBEFF6;
 	font-weight: bold;
 	border: 1px solid #C4CFE5;
-	margin: 2px 0px 2px 0;
+	margin: 2px 0 2px 0;
 	padding: 2px 10px;
     white-space: nowrap;
     vertical-align: top;
@@ -339,7 +334,7 @@ td.indexvalue
 	background-color: #EBEFF6;
 	border: 1px solid #C4CFE5;
 	padding: 2px 10px;
-	margin: 2px 0px;
+	margin: 2px 0;
 }
 
 tr.memlist
@@ -365,14 +360,14 @@ img.formulaInl
 div.center
 {
 	text-align: center;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
 }
 
 div.center img
 {
-	border: 0px;
+	border: 0;
 }
 
 address.footer
@@ -383,7 +378,7 @@ address.footer
 
 img.footer
 {
-	border: 0px;
+	border: 0;
 	vertical-align: middle;
 }
 
@@ -474,14 +469,14 @@ th.dirtab
 
 hr
 {
-	height: 0px;
+	height: 0;
 	border: none;
 	border-top: 1px solid #444;
 }
 
 hr.footer
 {
-	height: 0px;
+	height: 0;
 	border-top: 3px solid #444;
 }
 
@@ -489,8 +484,8 @@ hr.footer
 
 table.memberdecls
 {
-	border-spacing: 0px;
-	padding: 0px;
+	border-spacing: 0;
+	padding: 0;
 }
 
 .memberdecls td, .fieldtable tr
@@ -499,8 +494,6 @@ table.memberdecls
 	-webkit-transition-duration: 0.5s;
 	-moz-transition-property: background-color, box-shadow;
 	-moz-transition-duration: 0.5s;
-	-ms-transition-property: background-color, box-shadow;
-	-ms-transition-duration: 0.5s;
 	-o-transition-property: background-color, box-shadow;
 	-o-transition-duration: 0.5s;
 	transition-property: background-color, box-shadow;
@@ -524,7 +517,7 @@ table.memberdecls
 
 .mdescLeft, .mdescRight
 {
-	padding: 0px 8px 4px 24px;
+	padding: 0 8px 4px 24px;
 	color: black;
 	font-family: sans-serif;
 	font-style: normal;
@@ -534,8 +527,8 @@ table.memberdecls
 {
        border-bottom: none;
        line-height: 8px;
-       margin: 0px;
-       padding: 0px;
+       margin: 0;
+       padding: 0;
 }
 
 .memItemLeft, .memTemplItemLeft
@@ -592,10 +585,9 @@ table.memberdecls
 	margin-right: 5px;
     -webkit-transition: box-shadow 0.5s linear;
     -moz-transition: box-shadow 0.5s linear;
-    -ms-transition: box-shadow 0.5s linear;
     -o-transition: box-shadow 0.5s linear;
     transition: box-shadow 0.5s linear;
-    display: table !important;
+    display: table;
     width: 100%;
 }
 
@@ -609,7 +601,7 @@ table.memberdecls
     font-family: sans-serif;
 	font-weight: 400;
 	font-size: 19px;
-	margin-left: 0px;
+	margin-left: 0;
 }
 
 .memname td
@@ -622,7 +614,7 @@ table.memberdecls
 	margin-top: 1.5em;
 	border: none;
 	border-bottom: 1px solid rgb(172, 172, 172);
-	padding: 0px;
+	padding: 0;
 	color: black;
 	font-weight: bold;
 	text-shadow: none;
@@ -630,37 +622,37 @@ table.memberdecls
 	background-color: rgb(235, 238, 241);
 	/* opera specific markup */
 	box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
-	border-top-right-radius: 0px;
-	border-top-left-radius: 0px;
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
 	/* firefox specific markup */
 	-moz-box-shadow: none;
-	-moz-border-radius-topright: 0px;
-	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-topright: 0;
+	-moz-border-radius-topleft: 0;
 	/* webkit specific markup */
 	-webkit-box-shadow: none;
-	-webkit-border-top-right-radius: 0px;
-	-webkit-border-top-left-radius: 0px;
+	-webkit-border-top-right-radius: 0;
+	-webkit-border-top-left-radius: 0;
 }
 
 .memdoc, dl.reflist dd
 {
 	border: none;
     padding: 6px;
-    background-color: #FBFCFD;
+    /*background-color: #FBFCFD;*/
     border-top-width: 0;
     background-image: none;
     background-color: #FFFFFF;
     /* opera specific markup */
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     box-shadow: none;
     /* firefox specific markup */
-    -moz-border-radius-bottomleft: 0px;
-    -moz-border-radius-bottomright: 0px;
+    -moz-border-radius-bottomleft: 0;
+    -moz-border-radius-bottomright: 0;
     -moz-box-shadow: none;
     /* webkit specific markup */
-    -webkit-border-bottom-left-radius: 0px;
-    -webkit-border-bottom-right-radius: 0px;
+    -webkit-border-bottom-left-radius: 0;
+    -webkit-border-bottom-right-radius: 0;
     -webkit-box-shadow: none;
 }
 
@@ -671,7 +663,7 @@ dl.reflist dt
 
 dl.reflist dd
 {
-    margin: 0px 0px 10px 0px;
+    margin: 0 0 10px 0;
     padding: 5px;
 }
 
@@ -703,15 +695,15 @@ dl.reflist dd
 
 .params, .retval, .exception, .tparams
 {
-    margin-left: 0px;
-    padding-left: 0px;
+    margin-left: 0;
+    padding-left: 0;
 }
 
 .params .paramname, .retval .paramname {
     font-family: monospace;
 	font-style: italic;
 	font-weight: normal;
-	text-shadow: rgba(0, 0, 0, 0.3) 0px 1px 1px;
+	text-shadow: rgba(0, 0, 0, 0.3) 0 1px 1px;
 }
 
 .params .paramtype
@@ -728,19 +720,19 @@ dl.reflist dd
 
 table.mlabels
 {
-	border-spacing: 0px;
+	border-spacing: 0;
 }
 
 td.mlabels-left
 {
 	width: 100%;
-	padding: 0px;
+	padding: 0;
 }
 
 td.mlabels-right
 {
 	vertical-align: middle;
-	padding: 0px;
+	padding: 0;
 	white-space: nowrap;
 }
 
@@ -769,7 +761,7 @@ span.mlabel
 
 div.directory
 {
-    margin: 10px 0px;
+    margin: 10px 0;
     border-top: 1px solid #A8B8D9;
     border-bottom: 1px solid #A8B8D9;
     width: 100%;
@@ -782,8 +774,8 @@ div.directory
 
 .directory td
 {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 	vertical-align: top;
 }
 
@@ -845,7 +837,6 @@ div.dynheader
     margin-top: 8px;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
-	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
@@ -883,7 +874,7 @@ table.fieldtable
 {
     margin-bottom: 10px;
     border: 1px solid #A8B8D9;
-    border-spacing: 0px;
+    border-spacing: 0;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -917,7 +908,7 @@ table.fieldtable
 
 .fieldtable td.fielddoc p:first-child
 {
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 .fieldtable td.fielddoc p:last-child
@@ -952,7 +943,7 @@ table.fieldtable
 
 .tabsearch
 {
-	top: 0px;
+	top: 0;
 	left: 10px;
 	height: 36px;
 	background-image: url('tab_b.png');
@@ -972,8 +963,8 @@ table.fieldtable
 	color:#8AA0CC;
 	border:solid 1px #C2CDE4;
 	overflow:hidden;
-	margin:0px;
-	padding:0px;
+	margin:0;
+	padding:0;
 }
 
 .navpath li
@@ -996,8 +987,7 @@ table.fieldtable
 	outline: none;
 	color: #283A5D;
 	font-family: sans-serif;
-	text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
-	text-decoration: none;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
 .navpath li.navelem a:hover
@@ -1048,7 +1038,7 @@ div.header
 {
 	background-image: none;
 	background-color: white;
-	margin:  0px;
+	margin:  0;
 	border: none;
 }
 
@@ -1064,14 +1054,14 @@ dl
 
 dl.section
 {
-	margin-left: 0px;
-	padding-left: 0px;
+	margin-left: 0;
+	padding-left: 0;
 }
 
 dl.note
 {
-    margin-left: 0px;
-	padding: 6px 0px 3px 8px;
+    margin-left: 0;
+	padding: 6px 0 3px 8px;
     border-left:  6px solid;
     border-color: #D0C000;
 	background-color: #fff799
@@ -1079,8 +1069,8 @@ dl.note
 
 dl.warning, dl.attention
 {
-	margin-left: 0px;
-	padding: 6px 0px 3px 8px;
+	margin-left: 0;
+	padding: 6px 0 3px 8px;
 	border-left: 6px solid;
 	border-color: #FF0000;
 }
@@ -1095,8 +1085,8 @@ dl.pre, dl.post, dl.invariant
 
 dl.deprecated
 {
-    margin-left: 0px;
-	padding: 6px 0px 3px 8px;
+    margin-left: 0;
+	padding: 6px 0 3px 8px;
     border-left: 6px solid;
     border-color: #505050;
 }
@@ -1108,8 +1098,8 @@ dl.deprecated dt a.el
 
 dl.todo
 {
-    margin-left: 0px;
-	padding: 6px 0px 3px 8px;
+    margin-left: 0;
+	padding: 6px 0 3px 8px;
     border-left:4px solid;
     border-color: #00C0E0;
 }
@@ -1145,34 +1135,34 @@ dl.section dd
 
 #projectlogo img
 {
-	border: 0px none;
+	border: 0 none;
 }
 
 #projectname
 {
 	font: 300% sans-serif;
-	margin: 0px;
-	padding: 2px 0px;
+	margin: 0;
+	padding: 2px 0;
 }
 
 #projectbrief
 {
 	font: 120% sans-serif;
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 }
 
 #projectnumber
 {
 	font: 50% sans-serif;
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 }
 
 #titlearea
 {
-	padding: 0px;
-	margin: 0px;
+	padding: 0;
+	margin: 0;
 	width: 100%;
 	border-bottom: 1px solid #5373B4;
 }
@@ -1255,12 +1245,12 @@ div.toc ul
 {
     list-style: none outside none;
     border: medium none;
-    padding: 0px;
+    padding: 0;
 }
 
 div.toc li.level1
 {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 div.toc li.level2
@@ -1285,7 +1275,6 @@ div.toc li.level4
     cursor: pointer;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
-	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
@@ -1293,7 +1282,7 @@ div.toc li.level4
 
 .inherit_header td
 {
-    padding: 6px 0px 2px 5px;
+    padding: 6px 0 2px 5px;
 }
 
 .inherit
@@ -1319,9 +1308,9 @@ tr.heading h2
 
   #doc-content
   {
-    margin-left:0 !important;
-    height:auto !important;
-    width:auto !important;
+    margin-left:0;
+    height:auto;
+    width:auto;
     overflow:inherit;
     display:inline;
   }
@@ -1350,7 +1339,7 @@ tr.heading h2
 {
 	background-image: none;
 	color: white;
-	text-shadow: rgba(0, 0, 0, 0.6) 0px 2px 2px;
+	text-shadow: rgba(0, 0, 0, 0.6) 0 2px 2px;
 }
 
 .tablist a:hover
@@ -1414,5 +1403,4 @@ tr.heading h2
 .image img
 {
 	max-height: 800px;
-	weight: auto;
 }
