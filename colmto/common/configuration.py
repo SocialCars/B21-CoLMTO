@@ -413,6 +413,7 @@ class Configuration(object):
         """
         @retval run config
         """
+        # TODO: return proxy mapping
         return copy.copy(self._run_config)
 
     @property
@@ -420,6 +421,7 @@ class Configuration(object):
         """
         @retval scenario config
         """
+        # TODO: return proxy mapping
         return copy.copy(self._scenario_config)
 
     @property
@@ -427,6 +429,7 @@ class Configuration(object):
         """
         @retval scenario directory.
         """
+        # TODO: return proxy mapping
         return copy.copy(self._args.scenario_dir)
 
     @property

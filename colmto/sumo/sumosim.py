@@ -39,7 +39,8 @@ import colmto.common.io
 import colmto.common.statistics
 import colmto.common.log
 import colmto.cse.cse
-import colmto.sumo.sumocfg
+from colmto.sumo.sumocfg import SumoConfig
+from colmto.sumo.sumocfg import InitialSorting
 import colmto.sumo.runtime
 
 
@@ -55,7 +56,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
         # initialise numpy PRNG
         self._prng = numpy.random.RandomState()
 
-        self._sumocfg = colmto.sumo.sumocfg.SumoConfig(
+        self._sumocfg = SumoConfig(
             args,
             sumolib.checkBinary("netconvert"),
             sumolib.checkBinary("duarouter")
@@ -128,7 +129,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
                                 self._runtime.run_traci(
                                     self._sumocfg.generate_run(
                                         l_scenario,
-                                        i_initial_sorting,
+                                        InitialSorting[i_initial_sorting.upper()],
                                         i_run,
                                         l_vtype_list.get(scenario_name)
                                     ),
@@ -163,7 +164,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
                     self._runtime.run_standalone(
                         self._sumocfg.generate_run(
                             l_scenario,
-                            i_initial_sorting,
+                            InitialSorting[i_initial_sorting.upper()],
                             i_run,
                             l_vtype_list.get(scenario_name)
                         )
@@ -190,6 +191,16 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
 
         for i_scenarioname in self._sumocfg.run_config.get("scenarios"):
             self.run_scenario(i_scenarioname)
+
+        # convert vtype_lists from numpy arrays to plain lists
+        for i_scenarioname in self._sumocfg.run_config.get("vtype_list").keys():
+            if isinstance(
+                    self._sumocfg.run_config.get("vtype_list").get(i_scenarioname),
+                    numpy.ndarray
+            ):
+                self._sumocfg.run_config.get("vtype_list")[i_scenarioname] \
+                    = self._sumocfg.run_config.get("vtype_list").get(i_scenarioname).tolist()
+
 
         # dump configuration to run dir
         self._writer.write_yaml(

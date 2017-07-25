@@ -25,6 +25,7 @@
 # pylint: disable=no-member
 
 import copy
+import enum
 import os
 import subprocess
 import typing
@@ -43,6 +44,52 @@ import colmto.common.io
 import colmto.common.log
 import colmto.common.visualisation
 import colmto.environment.vehicle
+
+
+@enum.unique
+class InitialSorting(enum.Enum):
+    """Initial sorting modes of vehicles"""
+    BEST = enum.auto()
+    RANDOM = enum.auto()
+    WORST = enum.auto()
+    _prng = numpy.random.RandomState()
+    def order(self, vehicles: list):
+        """*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)"""
+        if self is InitialSorting.BEST:
+            vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
+        elif self is InitialSorting.WORST:
+            vehicles.sort(key=lambda i_v: i_v.speed_max)
+        elif self is InitialSorting.RANDOM:
+            self._prng.value.shuffle(vehicles)
+
+
+@enum.unique
+class Distribution(enum.Enum):
+    """Enumerates distribution types for vehicle starting times"""
+    LINEAR = enum.auto()
+    POISSON = enum.auto()
+    _prng = numpy.random.RandomState()
+
+    def next_timestep(self, lamb, prev_start_time):
+        r"""
+        Calculate next time step in Exponential or linear distribution.
+        Exponential distribution with
+        \f$F(x) := 1 - e^{-\lambda x}\f$
+        by using numpy.random.exponential(lambda).
+        Linear distribution just adds 1/lamb to the previous start time.
+        For every other value of distribution this function just returns the input value of
+        prev_start_time.
+
+        @param lamb: lambda
+        @param prev_start_time: start time
+        @param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
+        @retval next start time
+        """
+        if self is Distribution.POISSON:
+            return prev_start_time + self._prng.value.exponential(scale=lamb)
+        elif self is Distribution.LINEAR:
+            return prev_start_time + 1 / lamb
+        return prev_start_time
 
 
 class SumoConfig(colmto.common.configuration.Configuration):
@@ -168,56 +215,63 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         return l_scenarioruns
 
-    def generate_run(self, scenario_run_config, initial_sorting, run_number, vtype_list):
+    def generate_run(
+            self,
+            scenario_run_config,
+            initial_sorting: InitialSorting,
+            run_number,
+            vtype_list):
         """generate run configurations
 
         @param scenario_run_config: run configuration of scenario
-        @param initial_sorting: initial sorting of vehicles ("best", "random", "worst")
+        @param initial_sorting: initial sorting of vehicles (InitialSorting enum)
         @param run_number: number of current run
         @retval
             run configuration dictionary
         """
-        self._log.debug("Generating run %s for %s sorting", run_number, initial_sorting)
+        self._log.debug(
+            "Generating run %s for %s sorting", run_number, initial_sorting.name.lower()
+        )
 
         l_destinationdir = os.path.join(self.runsdir, scenario_run_config.get("scenarioname"))
         if not os.path.exists(os.path.join(l_destinationdir)):
             os.mkdir(l_destinationdir)
 
-        if not os.path.exists(os.path.join(l_destinationdir, str(initial_sorting))):
+        if not os.path.exists(os.path.join(l_destinationdir, initial_sorting.name.lower())):
             os.mkdir(
-                os.path.join(os.path.join(l_destinationdir, str(initial_sorting)))
+                os.path.join(os.path.join(l_destinationdir, initial_sorting.name.lower()))
             )
 
         if not os.path.exists(
-                os.path.join(l_destinationdir, str(initial_sorting), str(run_number))):
+                os.path.join(l_destinationdir, initial_sorting.name.lower(), str(run_number))):
             os.mkdir(
                 os.path.join(
-                    os.path.join(l_destinationdir, str(initial_sorting), str(run_number))
+                    os.path.join(l_destinationdir, initial_sorting.name.lower(), str(run_number))
                 )
             )
 
         self._log.debug(
             "Generating SUMO run configuration for scenario %s / sorting %s / run %d",
-            scenario_run_config.get("scenarioname"), initial_sorting, run_number
+            scenario_run_config.get("scenarioname"), initial_sorting.name, run_number
         )
 
         l_tripfile = os.path.join(
-            l_destinationdir, str(initial_sorting), str(run_number),
+            l_destinationdir, initial_sorting.name.lower(), str(run_number),
             "{}.trip.xml".format(scenario_run_config.get("scenarioname"))
         )
         l_routefile = os.path.join(
-            l_destinationdir, str(initial_sorting), str(run_number),
+            l_destinationdir, initial_sorting.name.lower(), str(run_number),
             "{}.rou.xml".format(scenario_run_config.get("scenarioname"))
         )
         l_configfile = os.path.join(
-            l_destinationdir, str(initial_sorting), str(run_number),
+            l_destinationdir, initial_sorting.name.lower(), str(run_number),
             "{}.sumo.cfg".format(scenario_run_config.get("scenarioname"))
         )
 
         l_output_measurements_dir = os.path.join(
             self.resultsdir,
             scenario_run_config.get("scenarioname"),
-            str(initial_sorting),
+            initial_sorting.name.lower(),
             str(run_number)
         )
 
@@ -229,7 +283,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if [fname for fname in l_runcfgfiles if not os.path.isfile(fname)]:
             self._log.debug(
                 "Incomplete/non-existing SUMO run configuration for %s, %s, %d -> (re)building",
-                scenario_run_config.get("scenarioname"), initial_sorting, run_number
+                scenario_run_config.get("scenarioname"), initial_sorting.name, run_number
             )
             self._args.forcerebuildscenarios = True
 
@@ -566,36 +620,36 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 )
             )
 
-    def _next_timestep(self, lamb, prev_start_time, distribution="poisson"):
-        r"""
-        Calculate next time step in Exponential or linear distribution.
-
-        Exponential distribution with
-        \f$F(x) := 1 - e^{-\lambda x}\f$
-        by using numpy.random.exponential(lambda).
-
-        Linear distribution just adds 1/lamb to the previous start time.
-
-        For every other value of distribution this function just returns the input value of
-        prev_start_time.
-
-        @param lamb: lambda
-        @param prev_start_time: start time
-        @param distribution: distribution, i.e. "poisson" or "linear"
-        @retval next start time
-        """
-
-        if distribution == "poisson":
-            return prev_start_time + self._prng.exponential(scale=lamb)
-        elif distribution == "linear":
-            return prev_start_time + 1 / lamb
-
-        return prev_start_time
+    # def _next_timestep(self, lamb, prev_start_time, distribution=Distribution.POISSON):
+    #     r"""
+    #     Calculate next time step in Exponential or linear distribution.
+    #
+    #     Exponential distribution with
+    #     \f$F(x) := 1 - e^{-\lambda x}\f$
+    #     by using numpy.random.exponential(lambda).
+    #
+    #     Linear distribution just adds 1/lamb to the previous start time.
+    #
+    #     For every other value of distribution this function just returns the input value of
+    #     prev_start_time.
+    #
+    #     @param lamb: lambda
+    #     @param prev_start_time: start time
+    #     @param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
+    #     @retval next start time
+    #     """
+    #
+    #     if distribution == Distribution.POISSON:
+    #         return prev_start_time + self._prng.exponential(scale=lamb)
+    #     elif distribution == Distribution.LINEAR:
+    #         return prev_start_time + 1 / lamb
+    #
+    #     return prev_start_time
 
     def _create_vehicle_distribution(self,
                                      vtype_list: typing.Iterable,
                                      aadt: float,
-                                     initialsorting: str,
+                                     initialsorting: InitialSorting,
                                      scenario_name
                                     ) -> typing.Dict[int, colmto.environment.vehicle.SUMOVehicle]:
         """
@@ -603,13 +657,12 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         @param vtype_list: list of vehicle types
         @param aadt: annual average daily traffic (vehicles/day/lane)
-        @param initialsorting: initial sorting of vehicles (by max speed)
-                                ["best", "random", "worst"]
+        @param initialsorting: initial sorting of vehicles (by max speed), i.e. InitialSorting enum
         @param scenario_name: name of scenario
         @retval OrderedDict of ID -> colmto.environment.vehicle.Vehicle
         """
 
-        if initialsorting not in ["best", "random", "worst"]:
+        if not isinstance(initialsorting, InitialSorting):
             raise ValueError
 
         self._log.debug(
@@ -637,12 +690,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         ]
 
         # sort speeds according to initial sorting flag
-        if initialsorting == "best":
-            l_vehicle_list.sort(key=lambda i_v: i_v.speed_max, reverse=True)
-        elif initialsorting == "worst":
-            l_vehicle_list.sort(key=lambda i_v: i_v.speed_max)
-        elif initialsorting == "random":
-            self._prng.shuffle(l_vehicle_list)
+        initialsorting.order(l_vehicle_list)
 
         # assign a new id according to sort order and starting time to each vehicle
         l_vehicles = OrderedDict()
@@ -650,10 +698,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
             # update colors
             i_vehicle.color = numpy.array(self._speed_colormap(i_vehicle.speed_max))*255
             # update start time
-            i_vehicle.start_time = self._next_timestep(
+            i_vehicle.start_time = Distribution[
+                self.run_config.get("starttimedistribution").upper()
+            ].next_timestep(
                 l_vehps,
-                l_vehicle_list[i - 1].start_time if i > 0 else 0,
-                self.run_config.get("starttimedistribution")
+                l_vehicle_list[i - 1].start_time if i > 0 else 0
             )
             l_vehicles["vehicle{}".format(i)] = i_vehicle
         return l_vehicles
@@ -676,7 +725,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
     def _generate_trip_xml(self,  # pylint: disable=too-many-arguments
                            scenario_runs: dict,
-                           initialsorting: str,
+                           initialsorting: InitialSorting,
                            vtype_list: list,
                            tripfile: str, forcerebuildscenarios=False
                           ) -> typing.Dict[int, colmto.environment.vehicle.SUMOVehicle]:
