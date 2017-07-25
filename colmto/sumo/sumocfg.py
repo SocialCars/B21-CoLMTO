@@ -22,10 +22,10 @@
 # #############################################################################
 # @endcond
 """This module generates static sumo configuration files for later execution."""
+# pylint: disable=no-member
 
 import copy
 import os
-import random
 import subprocess
 import typing
 from collections import OrderedDict
@@ -54,6 +54,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._writer = colmto.common.io.Writer(args)
+
+        # initialise numpy PRNG
+        self._prng = numpy.random.RandomState()
 
         self._binaries = {
             "netconvert": netconvertbinary,
@@ -563,14 +566,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 )
             )
 
-    @staticmethod
-    def _next_timestep(lamb, prev_start_time, distribution="poisson"):
+    def _next_timestep(self, lamb, prev_start_time, distribution="poisson"):
         r"""
-        Calculate next time step in Poisson or linear distribution.
+        Calculate next time step in Exponential or linear distribution.
 
-        Poisson (exponential) distribution with
+        Exponential distribution with
         \f$F(x) := 1 - e^{-\lambda x}\f$
-        by using random.expovariate(lamb).
+        by using numpy.random.exponential(lambda).
 
         Linear distribution just adds 1/lamb to the previous start time.
 
@@ -584,7 +586,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         """
 
         if distribution == "poisson":
-            return prev_start_time + random.expovariate(lamb)
+            return prev_start_time + self._prng.exponential(scale=lamb)
         elif distribution == "linear":
             return prev_start_time + 1 / lamb
 
@@ -626,13 +628,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
                     "vtypedistribution"
                 ).get(vtype).get("speedDev"),
                 speed_max=min(
-                    random.choice(
+                    self._prng.choice(
                         self._run_config.get("vtypedistribution").get(vtype).get("desiredSpeeds")
                     ),
                     self.scenario_config.get(scenario_name).get("parameters").get("speedlimit")
                 )
             ) for vtype in vtype_list
-            ]
+        ]
 
         # sort speeds according to initial sorting flag
         if initialsorting == "best":
@@ -640,7 +642,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         elif initialsorting == "worst":
             l_vehicle_list.sort(key=lambda i_v: i_v.speed_max)
         elif initialsorting == "random":
-            random.shuffle(l_vehicle_list)
+            self._prng.shuffle(l_vehicle_list)
 
         # assign a new id according to sort order and starting time to each vehicle
         l_vehicles = OrderedDict()
@@ -654,7 +656,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 self.run_config.get("starttimedistribution")
             )
             l_vehicles["vehicle{}".format(i)] = i_vehicle
-
         return l_vehicles
 
     def aadt(self, scenario_runs):

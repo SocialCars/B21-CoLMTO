@@ -22,6 +22,7 @@
 # #############################################################################
 # @endcond
 """I/O module"""
+# pylint: disable=no-member
 
 import csv
 import gzip
@@ -138,7 +139,9 @@ class Writer(object):
             for i_path, i_object_value in Writer._flatten_object_dict(object_dict).items():
 
                 # remove filters if we have a scalar object, i.e. string, int, float
-                if isinstance(i_object_value.get("value"), (str, int, float)):
+                if isinstance(
+                        i_object_value.get("value"),
+                        (str, int, float, numpy.str_, numpy.int_, numpy.float_)):
                     kwargs.pop("compression", None)
                     kwargs.pop("compression_opts", None)
                     kwargs.pop("fletcher32", None)
@@ -154,8 +157,8 @@ class Writer(object):
                         l_group.create_dataset(
                             name=i_path,
                             data=numpy.asarray(i_object_value.get("value"))
-                            if not isinstance(i_object_value.get("value"), str)
-                            else i_object_value.get("value"),
+                            if not isinstance(i_object_value.get("value"), (str, numpy.str_))
+                            else str(i_object_value.get("value")),
                             **kwargs
                         ).attrs.update(
                             i_object_value.get("attr")
@@ -163,9 +166,10 @@ class Writer(object):
                         )
                     except TypeError as error:
                         self._log.error(
-                            "error writing %s: %s (%s)",
+                            "error writing %s: %s (%s), error was: %s",
                             i_path,
                             i_object_value.get("value"),
+                            type(i_object_value.get("value")),
                             error
                         )
                         raise TypeError(error)

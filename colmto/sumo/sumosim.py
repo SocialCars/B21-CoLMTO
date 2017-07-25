@@ -22,12 +22,11 @@
 # #############################################################################
 # @endcond
 """Main module to run/initialise SUMO scenarios."""
-
+# pylint: disable=no-member
 
 import os
 import sys
-import itertools
-import random
+import numpy
 
 try:
     sys.path.append(os.path.join("sumo", "sumo", "tools"))
@@ -44,7 +43,7 @@ import colmto.sumo.sumocfg
 import colmto.sumo.runtime
 
 
-class SumoSim(object):
+class SumoSim(object):  # pylint: disable=too-many-instance-attributes
     """Class for initialising/running SUMO scenarios."""
 
     def __init__(self, args):
@@ -52,6 +51,10 @@ class SumoSim(object):
 
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._args = args
+
+        # initialise numpy PRNG
+        self._prng = numpy.random.RandomState()
+
         self._sumocfg = colmto.sumo.sumocfg.SumoConfig(
             args,
             sumolib.checkBinary("netconvert"),
@@ -85,25 +88,28 @@ class SumoSim(object):
         if scenario_name not in l_vtype_list:
             self._log.debug("Generating new vtype_list")
 
-            l_vtypedistribution = list(
-                itertools.chain.from_iterable(
-                    [
-                        [k] * int(round(100 * v.get("fraction")))
-                        for (k, v) in self._sumocfg.run_config.get("vtypedistribution").items()
-                    ]
+            l_vtypes, l_vtypefractions = zip(
+                *(
+                    (k, v.get("fraction", 0))
+                    for k, v in self._sumocfg.run_config.get("vtypedistribution").items()
                 )
             )
-            l_timebegin, l_timeend = self._sumocfg.run_config.get("simtimeinterval")
+
             l_numberofvehicles = int(
                 round(
-                    self._sumocfg.aadt(l_scenario) / (24 * 60 * 60) * (l_timeend - l_timebegin)
+                    self._sumocfg.aadt(l_scenario) / (24 * 60 * 60) * -numpy.subtract(
+                        *self._sumocfg.run_config.get("simtimeinterval")
+                    )
                 )
             ) if not self._sumocfg.run_config.get("nbvehicles").get("enabled") \
                 else self._sumocfg.run_config.get("nbvehicles").get("value")
 
-            l_vtype_list[scenario_name] = [
-                random.choice(l_vtypedistribution) for _ in range(l_numberofvehicles)
-            ]
+            l_vtype_list[scenario_name] = self._prng.choice(
+                l_vtypes,
+                size=l_numberofvehicles,
+                p=l_vtypefractions
+            )
+
         else:
             self._log.debug("Using pre-configured vtype_list")
 
