@@ -22,7 +22,7 @@
 # #############################################################################
 # @endcond
 # pylint: disable=too-few-public-methods
-"""Policy related classes"""
+"""Rule related classes"""
 
 import typing
 
@@ -60,14 +60,14 @@ class RuleOperator(enum.Enum):
         return self.value(args)  # pylint: disable=too-many-function-args
 
 
-class BasePolicy(object):
-    """Base Policy"""
+class BaseRule(object):
+    """Base Rule"""
 
     def __init__(self, behaviour=Behaviour.DENY):
         """
         C'tor
-        @param behaviour Default, i.e. baseline policy.
-                       Enum of colmto.cse.policy.Behaviour.DENY/ALLOW
+        @param behaviour Default, i.e. baseline rule.
+                       Enum of colmto.cse.rule.Behaviour.DENY/ALLOW
         """
         self._behaviour = behaviour
 
@@ -113,16 +113,16 @@ class BasePolicy(object):
     # pylint: disable=unused-argument,no-self-use
     def applies_to(self, vehicle: SUMOVehicle) -> bool:
         """
-        Test whether this policy applies to given vehicle
+        Test whether this rule applies to given vehicle
         @param vehicle Vehicle
         @retval boolean
         """
         return False
 
 
-class SUMOPolicy(BasePolicy):
+class SUMORule(BaseRule):
     """
-    Policy class to encapsulate SUMO's 'custom2'/'custom1' vehicle classes
+    Rule class to encapsulate SUMO's 'custom2'/'custom1' vehicle classes
     for allowing/disallowing access to overtaking lane (OTL)
     """
 
@@ -137,10 +137,10 @@ class SUMOPolicy(BasePolicy):
         return Behaviour.DENY.vclass
 
 
-class SUMOExtendablePolicy(object):
+class SUMOExtendableRule(object):
     """Add ability to policies to be extended, i.e. to add sub-policies to them"""
 
-    def __init__(self, policies: typing.Iterable[SUMOPolicy], rule=RuleOperator.ANY):
+    def __init__(self, policies: typing.Iterable[SUMORule], rule=RuleOperator.ANY):
         """
         C'tor.
 
@@ -148,11 +148,11 @@ class SUMOExtendablePolicy(object):
         @param rule Rule of RuleOperator enum for applying sub-policies ANY|ALL
         """
 
-        # check policy types
-        for i_policy in policies:
-            if not isinstance(i_policy, SUMOPolicy):
+        # check rule types
+        for i_rule in policies:
+            if not isinstance(i_rule, SUMORule):
                 raise TypeError(
-                    "%s is not of colmto.cse.policy.SUMOPolicy", i_policy
+                    "%s is not of colmto.cse.rule.SUMORule", i_rule
                 )
 
         self._vehicle_policies = list(policies)
@@ -162,7 +162,7 @@ class SUMOExtendablePolicy(object):
 
         self._rule = rule
 
-        super(SUMOExtendablePolicy, self).__init__()
+        super(SUMOExtendableRule, self).__init__()
 
     @property
     def vehicle_policies(self):
@@ -195,21 +195,21 @@ class SUMOExtendablePolicy(object):
             raise ValueError
         self._rule = rule
 
-    def add_policy(self, vehicle_policy: SUMOPolicy):
+    def add_rule(self, vehicle_rule: SUMORule):
         """
-        Adds a policy, specifically for SUMO attributes.
+        Adds a rule, specifically for SUMO attributes.
 
-        Policy must derive from colmto.cse.policy.SUMOPolicy.
+        Rule must derive from colmto.cse.rule.SUMORule.
 
-        @param vehicle_policy A policy
+        @param vehicle_rule A rule
 
         @retval self
         """
 
-        if not isinstance(vehicle_policy, SUMOExtendablePolicy):
-            raise TypeError("%s is not of colmto.cse.policy.SUMOExtendablePolicy", vehicle_policy)
+        if not isinstance(vehicle_rule, SUMOExtendableRule):
+            raise TypeError("%s is not of colmto.cse.rule.SUMOExtendableRule", vehicle_rule)
 
-        self._vehicle_policies.append(vehicle_policy)
+        self._vehicle_policies.append(vehicle_rule)
 
         return self
 
@@ -223,19 +223,19 @@ class SUMOExtendablePolicy(object):
 
         # pylint: disable=no-member
         return self.rule.evaluate(
-            [i_subpolicy.applies_to(vehicle) for i_subpolicy in self._vehicle_policies]
+            [i_subrule.applies_to(vehicle) for i_subrule in self._vehicle_policies]
         )
 
 
-class SUMOUniversalPolicy(SUMOPolicy):
+class SUMOUniversalRule(SUMORule):
     """
-    Universal policy, i.e. always applies to any vehicle
+    Universal rule, i.e. always applies to any vehicle
     """
 
     # pylint: disable=unused-argument
     def applies_to(self, vehicle: SUMOVehicle):
         """
-        Test whether this policy applies to given vehicle
+        Test whether this rule applies to given vehicle
         @param vehicle Vehicle
         @retval boolean
         """
@@ -243,7 +243,7 @@ class SUMOUniversalPolicy(SUMOPolicy):
 
     def apply(self, vehicles: typing.Iterable[SUMOVehicle]):
         """
-        apply policy to vehicles
+        apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
         @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
         """
@@ -255,15 +255,15 @@ class SUMOUniversalPolicy(SUMOPolicy):
         ]
 
 
-class SUMONullPolicy(SUMOPolicy):
+class SUMONullRule(SUMORule):
     """
-    Null policy, i.e. no restrictions: Applies to no vehicle
+    Null rule, i.e. no restrictions: Applies to no vehicle
     """
 
     # pylint: disable=unused-argument
     def applies_to(self, vehicle: SUMOVehicle):
         """
-        Test whether this policy applies to given vehicle
+        Test whether this rule applies to given vehicle
         @param vehicle Vehicle
         @retval boolean
         """
@@ -272,35 +272,35 @@ class SUMONullPolicy(SUMOPolicy):
     # pylint: disable=no-self-use
     def apply(self, vehicles: typing.Iterable[SUMOVehicle]) -> typing.Iterable[SUMOVehicle]:
         """
-        apply policy to vehicles
+        apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
         @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
         """
         return vehicles
 
 
-class SUMOVehiclePolicy(SUMOPolicy, SUMOExtendablePolicy):
+class SUMOVehicleRule(SUMORule, SUMOExtendableRule):
     """Base class for vehicle attribute specific policies."""
 
     def __init__(self, behaviour=Behaviour.DENY, rule=RuleOperator.ANY):
         """C'tor."""
         self._vehicle_policies = []
         self._rule = rule
-        super(SUMOVehiclePolicy, self).__init__(behaviour)
+        super(SUMOVehicleRule, self).__init__(behaviour)
 
 
-class SUMOVTypePolicy(SUMOVehiclePolicy):
-    """Vehicle type based policy: Applies to vehicles with a given SUMO vehicle type"""
+class SUMOVTypeRule(SUMOVehicleRule):
+    """Vehicle type based rule: Applies to vehicles with a given SUMO vehicle type"""
 
     def __init__(self, vehicle_type=None, behaviour=Behaviour.DENY):
         """C'tor."""
-        super(SUMOVTypePolicy, self).__init__(behaviour)
+        super(SUMOVTypeRule, self).__init__(behaviour)
         self._vehicle_type = vehicle_type
 
     def __str__(self):
         return "{}: vehicle_type = {}, behaviour = {}, subpolicies: {}: {}".format(
             self.__class__, self._vehicle_type, self._behaviour.vclass,
-            self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
+            self._rule, ",".join([str(i_rule) for i_rule in self._vehicle_policies])
         )
 
     def applies_to(self, vehicle: SUMOVehicle) -> bool:
@@ -316,7 +316,7 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
 
     def apply(self, vehicles: typing.Iterable[SUMOVehicle]) -> typing.List[SUMOVehicle]:
         """
-        apply policy to vehicles
+        apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
         @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
         """
@@ -329,18 +329,18 @@ class SUMOVTypePolicy(SUMOVehiclePolicy):
         ]
 
 
-class SUMOSpeedPolicy(SUMOVehiclePolicy):
-    """Speed based policy: Applies to vehicles within a given speed range"""
+class SUMOSpeedRule(SUMOVehicleRule):
+    """Speed based rule: Applies to vehicles within a given speed range"""
 
     def __init__(self, speed_range=(0, 120), behaviour=Behaviour.DENY):
         """C'tor."""
-        super(SUMOSpeedPolicy, self).__init__(behaviour)
+        super(SUMOSpeedRule, self).__init__(behaviour)
         self._speed_range = numpy.array(speed_range)
 
     def __str__(self):
         return "{}: speed_range = {}, behaviour = {}, subpolicies: {}: {}".format(
             self.__class__, self._speed_range, self._behaviour.name,
-            self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
+            self._rule, ",".join([str(i_rule) for i_rule in self._vehicle_policies])
         )
 
     def applies_to(self, vehicle: SUMOVehicle) -> bool:
@@ -356,7 +356,7 @@ class SUMOSpeedPolicy(SUMOVehiclePolicy):
 
     def apply(self, vehicles: typing.Iterable[SUMOVehicle]) -> typing.List[SUMOVehicle]:
         """
-        apply policy to vehicles
+        apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
         @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
         """
@@ -369,22 +369,22 @@ class SUMOSpeedPolicy(SUMOVehiclePolicy):
         ]
 
 
-class SUMOPositionPolicy(SUMOVehiclePolicy):
+class SUMOPositionRule(SUMOVehicleRule):
     """
-    Position based policy: Applies to vehicles which are located inside a given bounding box, i.e.
+    Position based rule: Applies to vehicles which are located inside a given bounding box, i.e.
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)]
     """
 
     def __init__(self, position_bbox=numpy.array(((0.0, 0), (100.0, 1))),
                  behaviour=Behaviour.DENY):
         """C'tor."""
-        super(SUMOPositionPolicy, self).__init__(behaviour)
+        super(SUMOPositionRule, self).__init__(behaviour)
         self._position_bbox = position_bbox
 
     def __str__(self):
         return "{}: position_bbox = {}, behaviour = {}, subpolicies: {}: {}".format(
             self.__class__, self._position_bbox, self._behaviour.vclass,
-            self._rule, ",".join([str(i_policy) for i_policy in self._vehicle_policies])
+            self._rule, ",".join([str(i_rule) for i_rule in self._vehicle_policies])
         )
 
     @property
@@ -412,7 +412,7 @@ class SUMOPositionPolicy(SUMOVehiclePolicy):
     def apply(self, vehicles: typing.Iterable[SUMOVehicle]) \
             -> typing.List[SUMOVehicle]:
         """
-        apply policy to vehicles
+        apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
         @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
         """

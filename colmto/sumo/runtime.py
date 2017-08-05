@@ -116,17 +116,17 @@ class Runtime(object):
         )
 
         # add polygon of otl denied positions if --gui enabled
-        # and cse contains instance objects of colmto.cse.policy.SUMOPositionPolicy
+        # and cse contains instance objects of colmto.cse.rule.SUMOPositionRule
         if self._args.gui:
-            for i_policy in cse.policies:
-                if isinstance(i_policy, colmto.cse.policy.SUMOPositionPolicy):
+            for i_rule in cse.policies:
+                if isinstance(i_rule, colmto.cse.rule.SUMOPositionRule):
                     traci.polygon.add(
-                        polygonID=str(i_policy),
+                        polygonID=str(i_rule),
                         shape=(
-                            (i_policy.position_bbox[0][0], 2*(i_policy.position_bbox[0][1])+10),
-                            (i_policy.position_bbox[1][0], 2*(i_policy.position_bbox[0][1])+10),
-                            (i_policy.position_bbox[1][0], 2*(i_policy.position_bbox[1][1])+10),
-                            (i_policy.position_bbox[0][0], 2*(i_policy.position_bbox[1][1])+10)
+                            (i_rule.position_bbox[0][0], 2*(i_rule.position_bbox[0][1])+10),
+                            (i_rule.position_bbox[1][0], 2*(i_rule.position_bbox[0][1])+10),
+                            (i_rule.position_bbox[1][0], 2*(i_rule.position_bbox[1][1])+10),
+                            (i_rule.position_bbox[0][0], 2*(i_rule.position_bbox[1][1])+10)
                         ),
                         color=(255, 0, 0, 255),
                         fill=True,
@@ -164,7 +164,7 @@ class Runtime(object):
                 l_vehicle = run_config.get("vehicles").get(i_vehicle_id)
 
                 # set vclass according to policies for each vehicle, i.e.
-                # allow vehicles access to OTL depending on policy
+                # allow vehicles access to OTL depending on rule
                 cse.apply_one(
 
                     # update vehicle position and speed
@@ -183,7 +183,7 @@ class Runtime(object):
                         l_vehicle.vehicle_class
                     )
                     if l_vehicle.vehicle_class \
-                            == colmto.cse.policy.SUMOPolicy.to_disallowed_class():
+                            == colmto.cse.rule.SUMORule.to_disallowed_class():
                         traci.vehicle.setColor(
                             i_vehicle_id,
                             (255, 0, 0, 255)

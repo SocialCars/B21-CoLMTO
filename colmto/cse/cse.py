@@ -27,7 +27,7 @@
 import typing
 
 import colmto.common.log
-import colmto.cse.policy
+import colmto.cse.rule
 import colmto.environment.vehicle
 
 
@@ -70,17 +70,17 @@ class BaseCSE(object):
         @param vehicle: Vehicle
         @retval self
         """
-        for i_policy in self._policies:
-            if i_policy.applies_to(vehicle) \
-                    and i_policy.behaviour == colmto.cse.policy.Behaviour.DENY:
+        for i_rule in self._policies:
+            if i_rule.applies_to(vehicle) \
+                    and i_rule.behaviour == colmto.cse.rule.Behaviour.DENY:
                 vehicle.change_vehicle_class(
-                    colmto.cse.policy.SUMOPolicy.to_disallowed_class()
+                    colmto.cse.rule.SUMORule.to_disallowed_class()
                 )
                 return self
 
-        # default case: no applicable policy found
+        # default case: no applicable rule found
         vehicle.change_vehicle_class(
-            colmto.cse.policy.SUMOPolicy.to_allowed_class()
+            colmto.cse.rule.SUMORule.to_allowed_class()
         )
 
         return self
@@ -90,44 +90,44 @@ class SumoCSE(BaseCSE):
     """First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL."""
 
     _valid_policies = {
-        "SUMOUniversalPolicy": colmto.cse.policy.SUMOUniversalPolicy,
-        "SUMONullPolicy": colmto.cse.policy.SUMONullPolicy,
-        "SUMOSpeedPolicy": colmto.cse.policy.SUMOSpeedPolicy,
-        "SUMOPositionPolicy": colmto.cse.policy.SUMOPositionPolicy,
-        "SUMOVTypePolicy": colmto.cse.policy.SUMOVTypePolicy
+        "SUMOUniversalRule": colmto.cse.rule.SUMOUniversalRule,
+        "SUMONullRule": colmto.cse.rule.SUMONullRule,
+        "SUMOSpeedRule": colmto.cse.rule.SUMOSpeedRule,
+        "SUMOPositionRule": colmto.cse.rule.SUMOPositionRule,
+        "SUMOVTypeRule": colmto.cse.rule.SUMOVTypeRule
     }
 
-    def add_policy(self, policy: colmto.cse.policy.SUMOVehiclePolicy, policy_cfg=None):
+    def add_rule(self, rule: colmto.cse.rule.SUMOVehicleRule, rule_cfg=None):
         """
-        Add policy to SumoCSE.
-        @param policy: policy object
-        @param policy_cfg: policy configuration
+        Add rule to SumoCSE.
+        @param rule: rule object
+        @param rule_cfg: rule configuration
         @retval self
         """
 
-        if not isinstance(policy, colmto.cse.policy.SUMOVehiclePolicy):
+        if not isinstance(rule, colmto.cse.rule.SUMOVehicleRule):
             raise TypeError
 
-        if policy_cfg is not None \
-                and policy_cfg.get("vehicle_policies", {}).get("rule", False):
+        if rule_cfg is not None \
+                and rule_cfg.get("vehicle_policies", {}).get("rule", False):
             # look for sub-policies
-            policy.rule = colmto.cse.policy.BasePolicy.ruleoperator_from_string(
-                policy_cfg.get("vehicle_policies", {}).get("rule"),
-                colmto.cse.policy.RuleOperator.ALL
+            rule.rule = colmto.cse.rule.BaseRule.ruleoperator_from_string(
+                rule_cfg.get("vehicle_policies", {}).get("rule"),
+                colmto.cse.rule.RuleOperator.ALL
             )
-            for i_subpolicy in policy_cfg.get("vehicle_policies", {}).get("policies", []):
-                policy.add_policy(
-                    self._valid_policies.get(i_subpolicy.get("type"))(
-                        behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string(
-                            i_subpolicy.get("behaviour"),
-                            colmto.cse.policy.Behaviour.DENY
+            for i_subrule in rule_cfg.get("vehicle_policies", {}).get("policies", []):
+                rule.add_rule(
+                    self._valid_policies.get(i_subrule.get("type"))(
+                        behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
+                            i_subrule.get("behaviour"),
+                            colmto.cse.rule.Behaviour.DENY
                         ),
-                        **i_subpolicy.get("args")
+                        **i_subrule.get("args")
                     )
                 )
 
         self._policies.append(
-            policy
+            rule
         )
 
         return self
@@ -142,16 +142,16 @@ class SumoCSE(BaseCSE):
         if policies_config is None:
             return self
 
-        for i_policy in policies_config:
-            self.add_policy(
-                self._valid_policies.get(i_policy.get("type"))(
-                    behaviour=colmto.cse.policy.BasePolicy.behaviour_from_string(
-                        i_policy.get("behaviour"),
-                        colmto.cse.policy.Behaviour.DENY
+        for i_rule in policies_config:
+            self.add_rule(
+                self._valid_policies.get(i_rule.get("type"))(
+                    behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
+                        i_rule.get("behaviour"),
+                        colmto.cse.rule.Behaviour.DENY
                     ),
-                    **i_policy.get("args")
+                    **i_rule.get("args")
                 ),
-                i_policy
+                i_rule
             )
 
         return self

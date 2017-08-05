@@ -25,7 +25,7 @@
 
 import numpy
 
-import colmto.cse.policy
+import colmto.cse.rule
 
 
 class BaseVehicle(object):
@@ -111,7 +111,7 @@ class SUMOVehicle(BaseVehicle):
                 "speedDev": speed_deviation,
                 "maxSpeed": speed_max,
                 "vType": vehicle_type,
-                "vClass": colmto.cse.policy.SUMOPolicy.to_allowed_class(),
+                "vClass": colmto.cse.rule.SUMORule.to_allowed_class(),
                 "grid_position": numpy.array((0, 0)),
                 "baseline_relative_time_loss": 0.0
             }
