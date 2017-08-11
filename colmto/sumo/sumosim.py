@@ -204,9 +204,9 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
         # dump configuration to run dir
         self._writer.write_yaml(
             {
-                "run_config": self._sumocfg.run_config,
-                "scenario_config": self._sumocfg.scenario_config,
-                "vtypes_config": self._sumocfg.vtypes_config
+                "run_config": dict(self._sumocfg.run_config),
+                "scenario_config": dict(self._sumocfg.scenario_config),
+                "vtypes_config": dict(self._sumocfg.vtypes_config)
             },
             self._sumocfg.sumo_config_dir / self._sumocfg.run_prefix / "configuration.yaml"
         )
