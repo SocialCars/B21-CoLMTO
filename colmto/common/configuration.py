@@ -26,6 +26,7 @@
 import copy
 from pathlib import Path
 import sh
+from types import MappingProxyType
 
 import colmto.common.io
 import colmto.common.log
@@ -408,19 +409,18 @@ class Configuration(object):
                 self._run_config["scenarios"] = list(self._scenario_config.keys())
 
     @property
-    def run_config(self):
+    def run_config(self) -> MappingProxyType:
         """
         @retval run config
         """
-        # TODO: return proxy mapping
-        return copy.copy(self._run_config)
+        return MappingProxyType(self._run_config)
 
     @property
-    def scenario_config(self):
+    def scenario_config(self) -> MappingProxyType:
         """
         @retval scenario config
         """
-        return copy.copy(self._scenario_config)
+        return MappingProxyType(self._scenario_config)
 
     @property
     def scenario_dir(self) -> Path:
@@ -430,11 +430,11 @@ class Configuration(object):
         return self._args.scenario_dir
 
     @property
-    def vtypes_config(self):
+    def vtypes_config(self) -> MappingProxyType:
         """
         @retval vehicle type config
         """
-        return copy.copy(self._vtypes_config)
+        return MappingProxyType(self._vtypes_config)
 
     @property
     def output_dir(self) -> Path:
@@ -444,7 +444,7 @@ class Configuration(object):
         return self._args.output_dir
 
     @property
-    def run_prefix(self):
+    def run_prefix(self) -> str:
         """
         @retval run prefix
         """
