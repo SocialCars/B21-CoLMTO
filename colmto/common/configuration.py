@@ -25,8 +25,8 @@
 
 import copy
 from pathlib import Path
-import sh
 from types import MappingProxyType
+import sh
 
 import colmto.common.io
 import colmto.common.log
