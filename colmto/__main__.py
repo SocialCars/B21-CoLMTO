@@ -164,10 +164,9 @@ class Colmto(object):
         l_configuration = colmto.common.configuration.Configuration(self._args)
         self._log.debug("Initial loading of configuration done")
 
-        # if l_configuration.run_config.get("sumo").get("enabled") or self._args.runsumo:
-        #    self._log.info("---- Starting SUMO Baseline Simulation ----")
-        #    colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
-        print(self._args.results_hdf5_file, type(self._args.results_hdf5_file))
+        if l_configuration.run_config.get("sumo").get("enabled") or self._args.runsumo:
+           self._log.info("---- Starting SUMO Baseline Simulation ----")
+           colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
 
 
 def main():
