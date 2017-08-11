@@ -25,7 +25,8 @@
 """Colmto main module."""
 import argparse
 import datetime
-import os
+
+from pathlib import Path
 
 import colmto.common.configuration
 import colmto.common.log
@@ -37,7 +38,10 @@ class Colmto(object):
 
     def __init__(self):
         """C'tor."""
-        l_config_dir = os.path.expanduser("~/.colmto")
+
+        # get config dir  ~/.colmto and create if not exist
+        l_config_dir = Path("~/.colmto").expanduser()
+        l_config_dir.mkdir(exist_ok=True)
 
         l_parser = argparse.ArgumentParser(
             prog="colmto",
@@ -46,15 +50,15 @@ class Colmto(object):
 
         l_parser.add_argument(
             "--runconfigfile", dest="runconfigfile", type=str,
-            default=os.path.join(l_config_dir, "runconfig.yaml")
+            default=l_config_dir / "runconfig.yaml"
         )
         l_parser.add_argument(
             "--scenarioconfigfile", dest="scenarioconfigfile", type=str,
-            default=os.path.join(l_config_dir, "scenarioconfig.yaml")
+            default=l_config_dir / "scenarioconfig.yaml"
         )
         l_parser.add_argument(
             "--vtypesconfigfile", dest="vtypesconfigfile", type=str,
-            default=os.path.join(l_config_dir, "vtypesconfig.yaml")
+            default=l_config_dir / "vtypesconfig.yaml"
         )
         l_parser.add_argument(
             "--fresh-configs",
@@ -94,7 +98,7 @@ class Colmto(object):
         )
         l_parser.add_argument(
             "--logfile", dest="logfile", type=str,
-            default=os.path.join(l_config_dir, "colmto.log")
+            default=l_config_dir / "colmto.log"
         )
         l_parser.add_argument(
             "--loglevel", dest="loglevel", type=str,
@@ -146,10 +150,7 @@ class Colmto(object):
         )
         self._args = l_parser.parse_args()
 
-        # place default config in ~/.colmto if there exists none or --fresh-configs set
-        if not os.path.exists(l_config_dir):
-            os.mkdir(l_config_dir)
-
+        # get logger
         self._log = colmto.common.log.logger(
             __name__,
             self._args.loglevel,

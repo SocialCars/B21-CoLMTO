@@ -24,8 +24,7 @@
 """Configuration super class."""
 
 import copy
-import os
-
+from pathlib import Path
 import sh
 
 import colmto.common.io
@@ -345,7 +344,7 @@ class Configuration(object):
         if self._args.vtypesconfigfile is None:
             raise BaseException("vehicle_type configuration file flag is None")
 
-        if not os.path.isfile(self._args.runconfigfile) or self._args.freshconfigs:
+        if not self._args.runconfigfile.is_file() or self._args.freshconfigs:
             self._log.info(
                 "generating default run configuration %s", self._args.runconfigfile
             )
@@ -354,7 +353,7 @@ class Configuration(object):
         else:
             self._run_config = self._reader.read_yaml(self._args.runconfigfile)
 
-        if not os.path.isfile(self._args.scenarioconfigfile) or self._args.freshconfigs:
+        if not self._args.scenarioconfigfile.is_file() or self._args.freshconfigs:
             self._log.info(
                 "generating default scenario configuration %s", self._args.scenarioconfigfile
             )
@@ -363,7 +362,7 @@ class Configuration(object):
         else:
             self._scenario_config = self._reader.read_yaml(self._args.scenarioconfigfile)
 
-        if not os.path.isfile(self._args.vtypesconfigfile) or self._args.freshconfigs:
+        if not self._args.vtypesconfigfile.is_file() or self._args.freshconfigs:
             self._log.info(
                 "generating default vehicle_type configuration %s", self._args.vtypesconfigfile
             )
@@ -421,16 +420,14 @@ class Configuration(object):
         """
         @retval scenario config
         """
-        # TODO: return proxy mapping
         return copy.copy(self._scenario_config)
 
     @property
-    def scenario_dir(self):
+    def scenario_dir(self) -> Path:
         """
         @retval scenario directory.
         """
-        # TODO: return proxy mapping
-        return copy.copy(self._args.scenario_dir)
+        return self._args.scenario_dir
 
     @property
     def vtypes_config(self):
@@ -440,15 +437,15 @@ class Configuration(object):
         return copy.copy(self._vtypes_config)
 
     @property
-    def output_dir(self):
+    def output_dir(self) -> Path:
         """
         @retval destination dir
         """
-        return copy.copy(self._args.output_dir)
+        return self._args.output_dir
 
     @property
     def run_prefix(self):
         """
         @retval run prefix
         """
-        return copy.copy(self._args.run_prefix)
+        return self._args.run_prefix

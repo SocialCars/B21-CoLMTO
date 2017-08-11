@@ -26,7 +26,7 @@
 
 import copy
 import enum
-import os
+from pathlib import Path
 import subprocess
 import typing
 from collections import OrderedDict
@@ -116,14 +116,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
             "duarouter": duarouterbinary
         }
 
-        if not os.path.exists(self.sumo_config_dir):
-            os.makedirs(self.sumo_config_dir)
-
-        if not os.path.exists(self.runsdir):
-            os.makedirs(self.runsdir)
-
-        if not os.path.exists(self.resultsdir):
-            os.makedirs(self.resultsdir)
+        self.sumo_config_dir.mkdir(parents=True, exist_ok=True)
+        self.runsdir.mkdir(parents=True, exist_ok=True)
+        self.resultsdir.mkdir(parents=True, exist_ok=True)
 
         if self._args.forcerebuildscenarios:
             self._log.debug(
@@ -144,28 +139,28 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
     @property
-    def sumo_config_dir(self):
+    def sumo_config_dir(self) -> Path:
         """
         Returns:
              directory of SUMO config
         """
-        return os.path.join(self.output_dir, "SUMO")
+        return self.output_dir / "SUMO"
 
     @property
-    def runsdir(self):
+    def runsdir(self) -> Path:
         """
         Returns:
              directory of runs
         """
-        return os.path.join(self.output_dir, "SUMO", self.run_prefix, "runs")
+        return self.output_dir / "SUMO" / self.run_prefix / "runs"
 
     @property
-    def resultsdir(self):
+    def resultsdir(self) -> Path:
         """
         Returns:
             directory for results
         """
-        return os.path.join(self.output_dir, "SUMO", self.run_prefix, "results")
+        return self.output_dir / "SUMO" / self.run_prefix / "results"
 
     @property
     def sumo_run_config(self):
@@ -182,9 +177,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         self._log.debug("Generating scenario %s", scenarioname)
 
-        l_destinationdir = os.path.join(self.runsdir, scenarioname)
-        if not os.path.exists(os.path.join(l_destinationdir)):
-            os.mkdir(l_destinationdir)
+        l_destinationdir = self.runsdir / scenarioname
+        l_destinationdir.mkdir(parents=True, exist_ok=True)
 
         l_scenarioconfig = self.scenario_config.get(scenarioname)
 
@@ -193,18 +187,14 @@ class SumoConfig(colmto.common.configuration.Configuration):
             "runs": {}
         }
 
-        l_nodefile = l_scenarioruns["nodefile"] = os.path.join(
-            l_destinationdir, "{}.nod.xml".format(scenarioname)
-        )
-        l_edgefile = l_scenarioruns["edgefile"] = os.path.join(
-            l_destinationdir, "{}.edg.xml".format(scenarioname)
-        )
-        l_netfile = l_scenarioruns["netfile"] = os.path.join(
-            l_destinationdir, "{}.net.xml".format(scenarioname)
-        )
-        l_settingsfile = l_scenarioruns["settingsfile"] = os.path.join(
-            l_destinationdir, "{}.settings.xml".format(scenarioname)
-        )
+        l_nodefile = l_scenarioruns["nodefile"] = \
+            l_destinationdir / "{}.nod.xml".format(scenarioname)
+        l_edgefile = l_scenarioruns["edgefile"] = \
+            l_destinationdir / "{}.edg.xml".format(scenarioname)
+        l_netfile = l_scenarioruns["netfile"] = \
+            l_destinationdir / "{}.net.xml".format(scenarioname)
+        l_settingsfile = l_scenarioruns["settingsfile"] = \
+            l_destinationdir / "{}.settings.xml".format(scenarioname)
 
         self._generate_node_xml(
             l_scenarioconfig, l_nodefile, self._args.forcerebuildscenarios
@@ -239,54 +229,35 @@ class SumoConfig(colmto.common.configuration.Configuration):
             "Generating run %s for %s sorting", run_number, initial_sorting.name.lower()
         )
 
-        l_destinationdir = os.path.join(self.runsdir, scenario_run_config.get("scenarioname"))
-        if not os.path.exists(os.path.join(l_destinationdir)):
-            os.mkdir(l_destinationdir)
+        l_destinationdir = self.runsdir / scenario_run_config.get("scenarioname")
 
-        if not os.path.exists(os.path.join(l_destinationdir, initial_sorting.name.lower())):
-            os.mkdir(
-                os.path.join(os.path.join(l_destinationdir, initial_sorting.name.lower()))
-            )
+        (l_destinationdir / initial_sorting.name.lower()).mkdir(parents=True, exist_ok=True)
 
-        if not os.path.exists(
-                os.path.join(l_destinationdir, initial_sorting.name.lower(), str(run_number))):
-            os.mkdir(
-                os.path.join(
-                    os.path.join(l_destinationdir, initial_sorting.name.lower(), str(run_number))
-                )
-            )
+        (l_destinationdir / initial_sorting.name.lower() / str(run_number))\
+            .mkdir(parents=True, exist_ok=True)
 
         self._log.debug(
             "Generating SUMO run configuration for scenario %s / sorting %s / run %d",
             scenario_run_config.get("scenarioname"), initial_sorting.name, run_number
         )
 
-        l_tripfile = os.path.join(
-            l_destinationdir, initial_sorting.name.lower(), str(run_number),
-            "{}.trip.xml".format(scenario_run_config.get("scenarioname"))
-        )
-        l_routefile = os.path.join(
-            l_destinationdir, initial_sorting.name.lower(), str(run_number),
-            "{}.rou.xml".format(scenario_run_config.get("scenarioname"))
-        )
-        l_configfile = os.path.join(
-            l_destinationdir, initial_sorting.name.lower(), str(run_number),
-            "{}.sumo.cfg".format(scenario_run_config.get("scenarioname"))
-        )
+        l_tripfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
+                     / "{}.trip.xml".format(scenario_run_config.get("scenarioname"))
 
-        l_output_measurements_dir = os.path.join(
-            self.resultsdir,
-            scenario_run_config.get("scenarioname"),
-            initial_sorting.name.lower(),
-            str(run_number)
-        )
+        l_routefile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
+                      / "{}.rou.xml".format(scenario_run_config.get("scenarioname"))
 
-        if not os.path.exists(l_output_measurements_dir):
-            os.makedirs(l_output_measurements_dir)
+        l_configfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
+                       / "{}.sumo.cfg".format(scenario_run_config.get("scenarioname"))
+
+        l_output_measurements_dir = self.resultsdir / scenario_run_config.get("scenarioname") \
+                                    / initial_sorting.name.lower() / str(run_number)
+
+        l_output_measurements_dir.mkdir(parents=True, exist_ok=True)
 
         l_runcfgfiles = [l_tripfile, l_routefile, l_configfile]
 
-        if [fname for fname in l_runcfgfiles if not os.path.isfile(fname)]:
+        if [fname for fname in l_runcfgfiles if not fname.exists()]:
             self._log.debug(
                 "Incomplete/non-existing SUMO run configuration for %s, %s, %d -> (re)building",
                 scenario_run_config.get("scenarioname"), initial_sorting.name, run_number
@@ -328,14 +299,12 @@ class SumoConfig(colmto.common.configuration.Configuration):
             "tripfile": l_tripfile,
             "routefile": l_routefile,
             "configfile": l_configfile,
-            "fcdfile": os.path.join(
-                l_output_measurements_dir,
-                "{}.fcd-output.xml".format(scenario_run_config.get("scenarioname"))
-            ),
+            "fcdfile": l_output_measurements_dir /
+                       "{}.fcd-output.xml".format(scenario_run_config.get("scenarioname")),
             "scenario_config": self.scenario_config.get(scenario_run_config.get("scenarioname"))
         }
 
-    def _generate_node_xml(self, scenarioconfig, nodefile, forcerebuildscenarios=False):
+    def _generate_node_xml(self, scenarioconfig, nodefile: Path, forcerebuildscenarios=False):
         """
         Generate SUMO's node configuration file.
 
@@ -345,7 +314,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                                         even if they already exist for current run
         """
 
-        if os.path.isfile(nodefile) and not forcerebuildscenarios:
+        if Path(nodefile).exists() and not forcerebuildscenarios:
             return
 
         self._log.debug("Generating node xml")
@@ -390,7 +359,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             )
 
     def _generate_edge_xml(
-            self, scenario_name, scenario_config, edgefile, forcerebuildscenarios=False):
+            self, scenario_name: str, scenario_config, edgefile: Path, forcerebuildscenarios=False):
         """
         Generate SUMO's edge configuration file.
 
@@ -401,7 +370,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                                         even if they already exist for current run
         """
 
-        if os.path.isfile(edgefile) and not forcerebuildscenarios:
+        if Path(edgefile).exists() and not forcerebuildscenarios:
             return
 
         self._log.debug("Generating edge xml for %s", scenario_name)
@@ -539,7 +508,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 l_add_otl_lane ^= True
 
     @staticmethod
-    def _generate_config_xml(config_files, simtimeinterval, forcerebuildscenarios=False):
+    def _generate_config_xml(config_files: dict, simtimeinterval, forcerebuildscenarios=False):
         """
         Generate SUMO's main configuration file.
 
@@ -555,7 +524,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if not len(simtimeinterval) == 2:
             raise ValueError
 
-        if os.path.isfile(config_files.get("configfile")) and not forcerebuildscenarios:
+        if config_files.get("configfile").exists() and not forcerebuildscenarios:
             return
 
         l_configuration = etree.Element("configuration")
@@ -563,17 +532,17 @@ class SumoConfig(colmto.common.configuration.Configuration):
         etree.SubElement(
             l_input,
             "net-file",
-            attrib={"value": config_files.get("netfile")}
+            attrib={"value": str(config_files.get("netfile"))}
         )
         etree.SubElement(
             l_input,
             "route-files",
-            attrib={"value": config_files.get("routefile")}
+            attrib={"value": str(config_files.get("routefile"))}
         )
         etree.SubElement(
             l_input,
             "gui-settings-file",
-            attrib={"value": config_files.get("settingsfile")}
+            attrib={"value": str(config_files.get("settingsfile"))}
         )
         l_time = etree.SubElement(l_configuration, "time")
         etree.SubElement(
@@ -593,7 +562,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
     @staticmethod
     def _generate_settings_xml(
-            scenarioconfig, runcfg, settingsfile, forcerebuildscenarios=False):
+            scenarioconfig: dict, runcfg: dict, settingsfile: Path, forcerebuildscenarios=False):
         """
         Generate SUMO's settings configuration file.
 
@@ -603,7 +572,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         @param forcerebuildscenarios: Rebuild scenarios,
                                         even if they already exist for current run
         """
-        if os.path.isfile(settingsfile) and not forcerebuildscenarios:
+        if Path(settingsfile).exists() and not forcerebuildscenarios:
             return
 
         l_viewsettings = etree.Element("viewsettings")
@@ -625,32 +594,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
                     encoding="unicode"
                 )
             )
-
-    # def _next_timestep(self, lamb, prev_start_time, distribution=Distribution.POISSON):
-    #     r"""
-    #     Calculate next time step in Exponential or linear distribution.
-    #
-    #     Exponential distribution with
-    #     \f$F(x) := 1 - e^{-\lambda x}\f$
-    #     by using numpy.random.exponential(lambda).
-    #
-    #     Linear distribution just adds 1/lamb to the previous start time.
-    #
-    #     For every other value of distribution this function just returns the input value of
-    #     prev_start_time.
-    #
-    #     @param lamb: lambda
-    #     @param prev_start_time: start time
-    #     @param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
-    #     @retval next start time
-    #     """
-    #
-    #     if distribution == Distribution.POISSON:
-    #         return prev_start_time + self._prng.exponential(scale=lamb)
-    #     elif distribution == Distribution.LINEAR:
-    #         return prev_start_time + 1 / lamb
-    #
-    #     return prev_start_time
 
     def _create_vehicle_distribution(self,
                                      vtype_list: typing.Iterable,
@@ -733,7 +676,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                            scenario_runs: dict,
                            initialsorting: InitialSorting,
                            vtype_list: list,
-                           tripfile: str, forcerebuildscenarios=False
+                           tripfile: Path, forcerebuildscenarios=False
                           ) -> typing.Dict[int, colmto.environment.vehicle.SUMOVehicle]:
         """
         Generate SUMO's trip file.
@@ -745,7 +688,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         @retval vehicles
         """
 
-        if os.path.isfile(tripfile) and not forcerebuildscenarios:
+        if Path(tripfile).exists() and not forcerebuildscenarios:
             return OrderedDict({})
         self._log.debug("Generating trip xml for %s", scenario_runs.get("scenarioname"))
 
@@ -823,7 +766,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
     # create net xml using netconvert
     def _generate_net_xml(
-            self, nodefile, edgefile, netfile, forcerebuildscenarios=False):
+            self, nodefile: Path, edgefile: Path, netfile: Path, forcerebuildscenarios=False):
         """
         Generate SUMO's net xml.
 
@@ -833,7 +776,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         @param forcerebuildscenarios:
         """
 
-        if os.path.isfile(netfile) and not forcerebuildscenarios:
+        if Path(netfile).exists() and not forcerebuildscenarios:
             return
 
         l_netconvertprocess = subprocess.check_output(
@@ -854,7 +797,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
     def _generate_route_xml(
-            self, netfile, tripfile, routefile, forcerebuildscenarios=False):
+            self, netfile: Path, tripfile: Path, routefile: Path, forcerebuildscenarios=False):
         """
         Generate SUMO's route xml.
 
@@ -864,7 +807,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         @param forcerebuildscenarios:
         """
 
-        if os.path.isfile(routefile) and not forcerebuildscenarios:
+        if Path(routefile).exists() and not forcerebuildscenarios:
             return
 
         l_duarouterprocess = subprocess.check_output(

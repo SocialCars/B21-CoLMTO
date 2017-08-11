@@ -24,19 +24,19 @@
 """Logging module"""
 import logging
 import logging.handlers
-import os
+from pathlib import Path
 import sys
 
 
 def logger(name: str, loglevel=logging.NOTSET, quiet=False,
-           logfile=os.path.expanduser("~/.colmto/colmto.log")) -> logging.Logger:
+           logfile=Path("~/.colmto/colmto.log").expanduser()) -> logging.Logger:
     """Create a logger instance."""
 
     if not isinstance(loglevel, (int, str)):
         raise TypeError("Unknown log level type %s" % type(loglevel))
 
-    if os.path.dirname(logfile) != "" and not os.path.exists(os.path.dirname(logfile)):
-        os.makedirs(os.path.dirname(logfile))  # pragma: no cover
+    # create logfile dir if not exist
+    Path(logfile).expanduser().parent.mkdir(parents=True, exist_ok=True)
 
     l_log = logging.getLogger(name)
 

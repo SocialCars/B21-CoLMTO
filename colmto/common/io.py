@@ -26,7 +26,7 @@
 
 import csv
 import gzip
-import os
+from pathlib import Path
 
 import json
 import numpy
@@ -53,14 +53,14 @@ class Reader(object):  # pylint: disable=too-few-public-methods
         else:
             self._log = colmto.common.log.logger(__name__)
 
-    def read_yaml(self, filename):
+    def read_yaml(self, filename: Path):
         """
         Reads yaml file and returns dictionary.
         If filename ends with .gz treat file as gzipped yaml.
         """
         self._log.debug("Reading %s", filename)
 
-        if filename.endswith(".gz"):
+        if Path(filename).suffix.lower() == ".gz":
             return yaml.load(gzip.GzipFile(filename, "r"), Loader=SafeLoader)
 
         return yaml.load(open(filename), Loader=SafeLoader)
@@ -75,27 +75,27 @@ class Writer(object):
         else:
             self._log = colmto.common.log.logger(__name__)
 
-    def write_json_pretty(self, obj, filename):
+    def write_json_pretty(self, obj, filename: Path):
         """Write json in human readable form (slow!). If filename ends with .gz, compress file."""
 
         self._log.debug("Writing %s", filename)
-        with gzip.open(filename, "wt") if filename.endswith(".gz") \
+        with gzip.open(filename, "wt") if Path(filename).suffix.lower() == ".gz" \
                 else open(filename, mode="w") as f_json:
             json.dump(obj, f_json, sort_keys=True, indent=4, separators=(", ", " : "))
 
-    def write_json(self, obj, filename):
+    def write_json(self, obj, filename: Path):
         """Write json in compact form, compress file with gzip if filename ends with .gz."""
 
         self._log.debug("Writing %s", filename)
-        with gzip.open(filename, "wt") if filename.endswith(".gz") \
+        with gzip.open(filename, "wt") if Path(filename).suffix.lower() == ".gz" \
                 else open(filename, mode="w") as f_json:
             json.dump(obj, f_json)
 
-    def write_yaml(self, obj, filename, default_flow_style=False):
+    def write_yaml(self, obj, filename: Path, default_flow_style=False):
         """Write yaml, compress file with gzip if filename ends with .gz."""
 
         self._log.debug("Writing %s", filename)
-        with gzip.open(filename, "wt") if filename.endswith(".gz") \
+        with gzip.open(filename, "wt") if Path(filename).suffix.lower() == ".gz" \
                 else open(filename, mode="w") as f_yaml:
             yaml.dump(
                 data=obj,
@@ -104,7 +104,7 @@ class Writer(object):
                 default_flow_style=default_flow_style
             )
 
-    def write_csv(self, fieldnames, rowdict, filename):
+    def write_csv(self, fieldnames, rowdict, filename: Path):
         """Write row dictionary with provided fieldnames as csv with headers."""
 
         self._log.debug("Writing %s", filename)
@@ -113,7 +113,7 @@ class Writer(object):
             csv_writer.writeheader()
             csv_writer.writerows(rowdict)
 
-    def write_hdf5(self, object_dict, hdf5_file, hdf5_base_path, **kwargs):
+    def write_hdf5(self, object_dict: dict, hdf5_file: str, hdf5_base_path: str, **kwargs):
         """Write an object to a specific path into an open file, identified by fileid
 
         @param hdf5_file The file name
@@ -175,7 +175,7 @@ class Writer(object):
                         raise TypeError(error)
 
     @staticmethod
-    def _flatten_object_dict(dictionary):
+    def _flatten_object_dict(dictionary: dict) -> dict:
         """
         Flatten dictionary and apply a "/"-separated key (path) structure for HDF5 writing.
         @param dictionary: dictionary
@@ -191,7 +191,7 @@ class Writer(object):
             for i_k, i_v in list(dictionary.items()):
                 if isinstance(i_v, dict) and "value" not in list(i_v.keys()):
                     for i_sk, i_sv in list(Writer._flatten_object_dict(i_v).items()):
-                        yield os.path.join(str(i_k), str(i_sk)), i_sv
+                        yield str(Path(i_k) / Path(i_sk)), i_sv
                 else:
                     yield i_k, i_v
         return dict(items())

@@ -148,8 +148,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
                         ),
 
                         hdf5_file=self._args.results_hdf5_file if self._args.results_hdf5_file
-                        else os.path.join(self._sumocfg.resultsdir,
-                                          "{}.hdf5".format(self._sumocfg.run_prefix)),
+                        else self._sumocfg.resultsdir / "{}.hdf5".format(self._sumocfg.run_prefix),
                         hdf5_base_path=os.path.join(
                             scenario_name,
                             str(self._sumocfg.aadt(self._sumocfg.generate_scenario(scenario_name))),
@@ -209,6 +208,5 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
                 "scenario_config": self._sumocfg.scenario_config,
                 "vtypes_config": self._sumocfg.vtypes_config
             },
-            os.path.join(self._sumocfg.sumo_config_dir, self._sumocfg.run_prefix,
-                         "configuration.yaml")
+            self._sumocfg.sumo_config_dir / self._sumocfg.run_prefix / "configuration.yaml"
         )
