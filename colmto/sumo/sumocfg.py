@@ -53,6 +53,7 @@ class InitialSorting(enum.Enum):
     RANDOM = enum.auto()
     WORST = enum.auto()
     _prng = numpy.random.RandomState()
+
     def order(self, vehicles: list):
         """*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)"""
         if self is InitialSorting.BEST:
@@ -60,7 +61,12 @@ class InitialSorting(enum.Enum):
         elif self is InitialSorting.WORST:
             vehicles.sort(key=lambda i_v: i_v.speed_max)
         elif self is InitialSorting.RANDOM:
-            self._prng.value.shuffle(vehicles)
+            self.prng.shuffle(vehicles)
+
+    @property
+    def prng(self):
+        """returns numpy PRNG state"""
+        return self._prng.value
 
 
 @enum.unique
