@@ -49,15 +49,15 @@ class Colmto(object):
         )
 
         l_parser.add_argument(
-            "--runconfigfile", dest="runconfigfile", type=str,
+            "--runconfigfile", dest="runconfigfile", type=Path,
             default=l_config_dir / "runconfig.yaml"
         )
         l_parser.add_argument(
-            "--scenarioconfigfile", dest="scenarioconfigfile", type=str,
+            "--scenarioconfigfile", dest="scenarioconfigfile", type=Path,
             default=l_config_dir / "scenarioconfig.yaml"
         )
         l_parser.add_argument(
-            "--vtypesconfigfile", dest="vtypesconfigfile", type=str,
+            "--vtypesconfigfile", dest="vtypesconfigfile", type=Path,
             default=l_config_dir / "vtypesconfig.yaml"
         )
         l_parser.add_argument(
@@ -68,19 +68,19 @@ class Colmto(object):
             help="generate fresh config files (overwrite existing ones in {})".format(l_config_dir)
         )
         l_parser.add_argument(
-            "--output-dir", dest="output_dir", type=str,
+            "--output-dir", dest="output_dir", type=Path,
             default=l_config_dir
         )
         l_parser.add_argument(
-            "--output-scenario-dir", dest="scenario_dir", type=str,
+            "--output-scenario-dir", dest="scenario_dir", type=Path,
             default=l_config_dir, help="target directory scenario files will be written to"
         )
         l_parser.add_argument(
-            "--output-results-dir", dest="results_dir", type=str,
+            "--output-results-dir", dest="results_dir", type=Path,
             default=l_config_dir, help="target directory results will be written to"
         )
         l_parser.add_argument(
-            "--output-hdf5-file", dest="results_hdf5_file", type=str,
+            "--output-hdf5-file", dest="results_hdf5_file", type=Path,
             default=None, help="target HDF5 file results will be written to"
         )
 
@@ -97,7 +97,7 @@ class Colmto(object):
             default=datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         )
         l_parser.add_argument(
-            "--logfile", dest="logfile", type=str,
+            "--logfile", dest="logfile", type=Path,
             default=l_config_dir / "colmto.log"
         )
         l_parser.add_argument(
@@ -164,14 +164,16 @@ class Colmto(object):
         l_configuration = colmto.common.configuration.Configuration(self._args)
         self._log.debug("Initial loading of configuration done")
 
-        if l_configuration.run_config.get("sumo").get("enabled") or self._args.runsumo:
-            self._log.info("---- Starting SUMO Baseline Simulation ----")
-            colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
+        # if l_configuration.run_config.get("sumo").get("enabled") or self._args.runsumo:
+        #    self._log.info("---- Starting SUMO Baseline Simulation ----")
+        #    colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
+        print(self._args.results_hdf5_file, type(self._args.results_hdf5_file))
 
 
 def main():
     """main entry point"""
     Colmto().run()
+
 
 if __name__ == "__main__":
     main()
