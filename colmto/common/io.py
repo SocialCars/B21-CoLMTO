@@ -178,6 +178,7 @@ class Writer(object):
     def _flatten_object_dict(dictionary: dict) -> dict:
         """
         Flatten dictionary and apply a "/"-separated key (path) structure for HDF5 writing.
+        EXECPT there is a key named "value" in a sub-dictionary, indicating a leaf in the tree
         @param dictionary: dictionary
         @retval: dictionary with flattened structure
         """
@@ -188,10 +189,10 @@ class Writer(object):
             yields (key, value) pairs of sub-dictionaries
             @retval: (key, value) pairs
             """
-            for i_k, i_v in list(dictionary.items()):
-                if isinstance(i_v, dict) and "value" not in list(i_v.keys()):
-                    for i_sk, i_sv in list(Writer._flatten_object_dict(i_v).items()):
-                        yield str(Path(i_k) / Path(i_sk)), i_sv
+            for i_k, i_v in dictionary.items():
+                if isinstance(i_v, dict) and "value" not in i_v:
+                    for i_sk, i_sv in Writer._flatten_object_dict(i_v).items():
+                        yield f"{i_k}/{i_sk}", i_sv
                 else:
                     yield i_k, i_v
         return dict(items())
