@@ -86,10 +86,12 @@ class BaseVehicle(object):
 class SUMOVehicle(BaseVehicle):
     """SUMO vehicle class."""
 
+    # pylint: disable=too-many-arguments
     def __init__(self,
                  vehicle_type=None,
                  vtype_sumo_cfg=None,
                  speed_deviation=0.0,
+                 sigma=0.0,
                  speed_max=0.0):
         """
         C'tor.
@@ -97,6 +99,7 @@ class SUMOVehicle(BaseVehicle):
         @param vehicle_type
         @param vtype_sumo_cfg
         @param speed_deviation
+        @param sigma
         @param speed_max
         """
 
@@ -110,12 +113,11 @@ class SUMOVehicle(BaseVehicle):
                 "color": numpy.array((255, 255, 0, 255)),
                 "start_time": 0.0,
                 "speedDev": speed_deviation,
+                "sigma": sigma,
                 "maxSpeed": speed_max,
                 "vType": vehicle_type,
                 "vClass": colmto.cse.rule.SUMORule.to_allowed_class(),
-                "grid_position": numpy.array((0, 0)),
-                # TODO: remove baseline_relative_time_loss after fixing SUMO conf
-                "baseline_relative_time_loss": 0.0,
+                "grid_position": numpy.array((0, 0))
             }
         )
 
@@ -230,20 +232,6 @@ class SUMOVehicle(BaseVehicle):
         """
         return MappingProxyType(self._travel_stats)
 
-    # TODO: remove baseline_relative_time_loss after fixing SUMO conf for vehicle speed variance
-    @property
-    def baseline_relative_time_loss(self) -> float:
-        """
-        returns baseline relative time loss
-        @retval self.properties.get("baseline_relative_time_loss")
-        """
-        return float(self._properties.get("baseline_relative_time_loss"))
-
-    @baseline_relative_time_loss.setter
-    def baseline_relative_time_loss(self, time_loss: float):
-        """ sets baseline_relative_time_loss in vehicle properties """
-        self._properties["baseline_relative_time_loss"] = float(time_loss)
-
     @property
     def dsat_threshold(self) -> float:
         """
@@ -330,7 +318,6 @@ class SUMOVehicle(BaseVehicle):
                     time_step - self.start_time - self.position[0] / self.speed_max,
                     self.position[0] / self.speed_max,
                     self._properties.get("dsat_threshold")
-                    + self._properties.get("baseline_relative_time_loss")
                 )
             )
 
@@ -353,7 +340,6 @@ class SUMOVehicle(BaseVehicle):
                         time_step - self.start_time - self.position[0] / self.speed_max,
                         self.position[0] / self.speed_max,
                         self._properties.get("dsat_threshold")
-                        + self._properties.get("baseline_relative_time_loss")
                     )
                 ]
             )
@@ -374,7 +360,6 @@ class SUMOVehicle(BaseVehicle):
                 time_step - self.start_time - self.position[0] / self.speed_max,
                 self.position[0] / self.speed_max,
                 self._properties.get("dsat_threshold")
-                + self._properties.get("baseline_relative_time_loss")
             )
         )
 

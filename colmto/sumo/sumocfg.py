@@ -279,13 +279,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
             self._args.forcerebuildscenarios
         )
 
-        # TODO: remove baseline_relative_time_loss after fixing SUMO conf for vehicle speed variance
-        # update baseline_relative_time_loss for each vehicle according to scenario
-        for i_vehicle in l_vehicles.values():
-            i_vehicle.baseline_relative_time_loss = self.scenario_config.get(
-                scenario_run_config.get("scenarioname")
-            ).get("baseline_relative_time_loss").get(i_vehicle.properties.get("vType"))
-
         self._generate_route_xml(
             scenario_run_config.get("netfile"), l_tripfile, l_routefile,
             self._args.forcerebuildscenarios
@@ -630,6 +623,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 speed_deviation=self._run_config.get(
                     "vtypedistribution"
                 ).get(vtype).get("speedDev"),
+                sigma=self._run_config.get(
+                    "vtypedistribution"
+                ).get(vtype).get("sigma"),
                 speed_max=min(
                     self._prng.choice(
                         self._run_config.get("vtypedistribution").get(vtype).get("desiredSpeeds")
@@ -726,16 +722,22 @@ class SumoConfig(colmto.common.configuration.Configuration):
             if l_runcfgspeeddev is not None:
                 l_vattr["speedDev"] = str(l_runcfgspeeddev)
 
-            l_vattr["speedlimit"] = str(i_vehicle.speed_max)
-            l_vattr["maxSpeed"] = str(i_vehicle.speed_max)
+            l_runcfgsigma = self.run_config \
+                .get("vtypedistribution") \
+                .get(l_vattr.get("vType")) \
+                .get("sigma")
+            if l_runcfgsigma is not None:
+                l_vattr["sigma"] = str(l_runcfgsigma)
 
             l_runcfglength = self.run_config \
                 .get("vtypedistribution") \
                 .get(l_vattr.get("vType")) \
                 .get("length")
-
             if l_runcfglength is not None:
                 l_vattr["length"] = str(l_runcfglength)
+
+            l_vattr["speedlimit"] = str(i_vehicle.speed_max)
+            l_vattr["maxSpeed"] = str(i_vehicle.speed_max)
 
             # fix tractor vType to trailer
             if l_vattr["vType"] == "tractor":
