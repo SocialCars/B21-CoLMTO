@@ -162,7 +162,7 @@ class SUMOExtendableRule(object):
 
         self._rule = rule
 
-        super(SUMOExtendableRule, self).__init__()
+        super().__init__()
 
     @property
     def vehicle_policies(self):
@@ -286,7 +286,7 @@ class SUMOVehicleRule(SUMORule, SUMOExtendableRule):
         """C'tor."""
         self._vehicle_policies = []
         self._rule = rule
-        super(SUMOVehicleRule, self).__init__(behaviour)
+        super().__init__(behaviour)
 
 
 class SUMOVTypeRule(SUMOVehicleRule):
@@ -294,7 +294,7 @@ class SUMOVTypeRule(SUMOVehicleRule):
 
     def __init__(self, vehicle_type=None, behaviour=Behaviour.DENY):
         """C'tor."""
-        super(SUMOVTypeRule, self).__init__(behaviour)
+        super().__init__(behaviour)
         self._vehicle_type = vehicle_type
 
     def __str__(self):
@@ -334,7 +334,7 @@ class SUMOSpeedRule(SUMOVehicleRule):
 
     def __init__(self, speed_range=(0, 120), behaviour=Behaviour.DENY):
         """C'tor."""
-        super(SUMOSpeedRule, self).__init__(behaviour)
+        super().__init__(behaviour)
         self._speed_range = numpy.array(speed_range)
 
     def __str__(self):
@@ -378,7 +378,7 @@ class SUMOPositionRule(SUMOVehicleRule):
     def __init__(self, position_bbox=numpy.array(((0.0, 0), (100.0, 1))),
                  behaviour=Behaviour.DENY):
         """C'tor."""
-        super(SUMOPositionRule, self).__init__(behaviour)
+        super().__init__(behaviour)
         self._position_bbox = position_bbox
 
     def __str__(self):
