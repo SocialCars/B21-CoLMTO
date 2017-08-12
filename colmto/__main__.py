@@ -65,7 +65,7 @@ class Colmto(object):
             dest="freshconfigs",
             action="store_true",
             default=False,
-            help="generate fresh config files (overwrite existing ones in {})".format(l_config_dir)
+            help=f"generate fresh config files (overwrite existing ones in {l_config_dir})"
         )
         l_parser.add_argument(
             "--output-dir", dest="output_dir", type=Path,
@@ -142,7 +142,7 @@ class Colmto(object):
             "--force-rebuild-scenarios", dest="forcerebuildscenarios", action="store_true",
             default=False,
             help="Rebuild and overwrite existing SUMO scenarios in configuration directory "
-                 "({})".format(l_config_dir)
+                 f"({l_config_dir})"
         )
         l_sumo_group.add_argument(
             "--only-one-otl-segment", dest="onlyoneotlsegment", action="store_true",

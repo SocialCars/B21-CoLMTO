@@ -187,14 +187,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
             "runs": {}
         }
 
-        l_nodefile = l_scenarioruns["nodefile"] = \
-            l_destinationdir / "{}.nod.xml".format(scenarioname)
-        l_edgefile = l_scenarioruns["edgefile"] = \
-            l_destinationdir / "{}.edg.xml".format(scenarioname)
-        l_netfile = l_scenarioruns["netfile"] = \
-            l_destinationdir / "{}.net.xml".format(scenarioname)
-        l_settingsfile = l_scenarioruns["settingsfile"] = \
-            l_destinationdir / "{}.settings.xml".format(scenarioname)
+        l_nodefile = l_scenarioruns["nodefile"] = l_destinationdir / f"{scenarioname}.nod.xml"
+        l_edgefile = l_scenarioruns["edgefile"] = l_destinationdir / f"{scenarioname}.edg.xml"
+        l_netfile = l_scenarioruns["netfile"] = l_destinationdir / f"{scenarioname}.net.xml"
+        l_settingsfile = l_scenarioruns["settingsfile"] = l_destinationdir \
+                                                          / f"{scenarioname}.settings.xml"
 
         self._generate_node_xml(
             l_scenarioconfig, l_nodefile, self._args.forcerebuildscenarios
@@ -228,8 +225,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         self._log.debug(
             "Generating run %s for %s sorting", run_number, initial_sorting.name.lower()
         )
+        l_scenarioname = scenario_run_config.get("scenarioname")
 
-        l_destinationdir = self.runsdir / scenario_run_config.get("scenarioname")
+        l_destinationdir = self.runsdir / l_scenarioname
 
         (l_destinationdir / initial_sorting.name.lower()).mkdir(parents=True, exist_ok=True)
 
@@ -238,19 +236,19 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         self._log.debug(
             "Generating SUMO run configuration for scenario %s / sorting %s / run %d",
-            scenario_run_config.get("scenarioname"), initial_sorting.name, run_number
+            l_scenarioname, initial_sorting.name, run_number
         )
 
         l_tripfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                     / "{}.trip.xml".format(scenario_run_config.get("scenarioname"))
+                     / "{l_scenarioname}.trip.xml"
 
         l_routefile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                      / "{}.rou.xml".format(scenario_run_config.get("scenarioname"))
+                      / "{l_scenarioname}.rou.xml"
 
         l_configfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                       / "{}.sumo.cfg".format(scenario_run_config.get("scenarioname"))
+                       / "{l_scenarioname}.sumo.cfg"
 
-        l_output_measurements_dir = self.resultsdir / scenario_run_config.get("scenarioname") \
+        l_output_measurements_dir = self.resultsdir / l_scenarioname \
                                     / initial_sorting.name.lower() / str(run_number)
 
         l_output_measurements_dir.mkdir(parents=True, exist_ok=True)
@@ -260,7 +258,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if [fname for fname in l_runcfgfiles if not fname.exists()]:
             self._log.debug(
                 "Incomplete/non-existing SUMO run configuration for %s, %s, %d -> (re)building",
-                scenario_run_config.get("scenarioname"), initial_sorting.name, run_number
+                l_scenarioname, initial_sorting.name, run_number
             )
             self._args.forcerebuildscenarios = True
 
@@ -285,7 +283,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         return {
-            "scenarioname": scenario_run_config.get("scenarioname"),
+            "scenarioname": l_scenarioname,
             "sumoport": self.run_config.get("sumo").get("port"),
             "runnumber": run_number,
             "vehicles": l_vehicles,
@@ -293,9 +291,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
             "tripfile": l_tripfile,
             "routefile": l_routefile,
             "configfile": l_configfile,
-            "fcdfile": l_output_measurements_dir /
-                       "{}.fcd-output.xml".format(scenario_run_config.get("scenarioname")),
-            "scenario_config": self.scenario_config.get(scenario_run_config.get("scenarioname"))
+            "fcdfile": l_output_measurements_dir / "{l_scenarioname}.fcd-output.xml",
+            "scenario_config": self.scenario_config.get(l_scenarioname)
         }
 
     def _generate_node_xml(self, scenarioconfig, nodefile: Path, forcerebuildscenarios=False):
@@ -650,7 +647,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 l_vehps,
                 l_vehicle_list[i - 1].start_time if i > 0 else 0
             )
-            l_vehicles["vehicle{}".format(i)] = i_vehicle
+            l_vehicles[f"vehicle{i}"] = i_vehicle
         return l_vehicles
 
     def aadt(self, scenario_runs):
@@ -711,7 +708,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
             l_vattr = {k: str(v) for k, v in i_vehicle.properties.items()}
             l_vattr.update({
                 "id": str(i_vid),
-                "color": "{},{},{},{}".format(*i_vehicle.color/255.)
+                "color": f"{i_vehicle.color[0]/255.},"
+                         f"{i_vehicle.color[1]/255.},"
+                         f"{i_vehicle.color[2]/255.},"
+                         f"{i_vehicle.color[3]/255.}"
             })
 
             # override parameters speedDev, desiredSpeed, and length if defined in run config
@@ -785,9 +785,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_netconvertprocess = subprocess.check_output(
             [
                 self._binaries.get("netconvert"),
-                "--node-files={}".format(nodefile),
-                "--edge-files={}".format(edgefile),
-                "--output-file={}".format(netfile)
+                f"--node-files={nodefile}",
+                f"--edge-files={edgefile}",
+                f"--output-file={netfile}"
             ],
             stderr=subprocess.STDOUT,
             bufsize=-1,
