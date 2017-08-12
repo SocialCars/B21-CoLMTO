@@ -189,7 +189,7 @@ def test_aggregate_hdf5():
     )
 
     for i_vehicle in l_vehicles.values():
-        i_vehicle.properties["dsat_threshold"] = 0.0
+        i_vehicle.dsat_threshold = 0.0
 
     for i_step in range(1, 3):
         for i_vehicle in l_vehicles.values():

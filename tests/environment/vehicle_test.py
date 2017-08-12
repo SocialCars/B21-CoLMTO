@@ -77,7 +77,7 @@ def test_sumovehicle():
     assert_equal(l_sumovehicle.speed_max, 0.0)
     assert_equal(l_sumovehicle.speed, 0.0)
     assert_true(numpy.array_equal(l_sumovehicle.position, numpy.array((0.0, 0))))
-    assert_equal(l_sumovehicle.vehicle_type, None)
+    assert_equal(l_sumovehicle.vehicle_type, "None")
     assert_true(numpy.array_equal(l_sumovehicle.color, numpy.array((255, 255, 0, 255))))
 
     # test custom values
@@ -207,7 +207,7 @@ def test_record_travel_stats():
         speed_max=100.,
     )
     l_sumovehicle.position = (1.0, 1.0)
-    l_sumovehicle.properties["dsat_threshold"] = 0.
+    l_sumovehicle.dsat_threshold = 0.0
     l_sumovehicle.record_travel_stats(1)
     l_sumovehicle.record_travel_stats(2)
     assert_equal(

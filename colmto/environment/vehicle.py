@@ -23,6 +23,7 @@
 # @endcond
 """Vehicle classes for storing vehicle data/attributes/states."""
 
+from types import MappingProxyType
 import numpy
 
 import colmto.cse.rule
@@ -45,41 +46,41 @@ class BaseVehicle(object):
         }
 
     @property
-    def properties(self):
+    def properties(self) -> MappingProxyType:
         """
-        @retval vehicle properties as dictionary bundle
+        @retval vehicle properties as MappingProxyType dictionary bundle
         """
-        return self._properties
+        return MappingProxyType(self._properties)
 
     @property
-    def speed(self):
+    def speed(self) -> float:
         """
         @retval current speed at time step
         """
         return self._properties.get("speed")
 
     @speed.setter
-    def speed(self, speed):
+    def speed(self, speed: float):
         """
         Set vehicle speed
         @param speed current position
         """
-        self._properties["speed"] = speed
+        self._properties["speed"] = float(speed)
 
     @property
-    def position(self):
+    def position(self) -> numpy.ndarray:
         """
         @retval current position
         """
-        return self._properties.get("position")
+        return numpy.array(self._properties.get("position"))
 
     @position.setter
-    def position(self, position):
+    def position(self, position: numpy.ndarray):
         """
         Set vehicle position
         @param position current position
         """
-        self._properties["position"] = position
+        self._properties["position"] = numpy.array(position)
 
 
 class SUMOVehicle(BaseVehicle):
@@ -99,7 +100,7 @@ class SUMOVehicle(BaseVehicle):
         @param speed_max
         """
 
-        super(SUMOVehicle, self).__init__()
+        super().__init__()
 
         if isinstance(vtype_sumo_cfg, dict):
             self._properties.update(vtype_sumo_cfg)
@@ -113,7 +114,8 @@ class SUMOVehicle(BaseVehicle):
                 "vType": vehicle_type,
                 "vClass": colmto.cse.rule.SUMORule.to_allowed_class(),
                 "grid_position": numpy.array((0, 0)),
-                "baseline_relative_time_loss": 0.0
+                # TODO: remove baseline_relative_time_loss after fixing SUMO conf
+                "baseline_relative_time_loss": 0.0,
             }
         )
 
@@ -141,14 +143,14 @@ class SUMOVehicle(BaseVehicle):
         }
 
     @property
-    def grid_position(self):
+    def grid_position(self) -> numpy.ndarray:
         """
         @retval current grid position
         """
-        return self._properties.get("grid_position")
+        return numpy.array(self._properties.get("grid_position"))
 
     @grid_position.setter
-    def grid_position(self, position):
+    def grid_position(self, position: numpy.ndarray):
         """
         Updates current position
         @param position current grid position
@@ -156,47 +158,40 @@ class SUMOVehicle(BaseVehicle):
         self._properties["grid_position"] = numpy.array(position, dtype=int)
 
     @property
-    def properties(self):
-        """
-        @retval vehicle's properties as a dict bundle
-        """
-        return self._properties
-
-    @property
-    def vehicle_type(self):
+    def vehicle_type(self) -> str:
         """
         @retval vehicle type
         """
-        return self._properties.get("vType")
+        return str(self._properties.get("vType"))
 
     @property
-    def start_time(self):
+    def start_time(self) -> float:
         """
         Returns start time
 
         @retval start time
         """
-        return self._properties.get("start_time")
+        return float(self._properties.get("start_time"))
 
     @start_time.setter
-    def start_time(self, start_time):
+    def start_time(self, start_time: float):
         """
         Sets start time.
 
         @param start_time start time
         """
-        self._properties["start_time"] = start_time
+        self._properties["start_time"] = float(start_time)
 
     @property
-    def color(self):
+    def color(self) -> numpy.ndarray:
         """
         Returns:
             color
         """
-        return self._properties.get("color")
+        return numpy.array(self._properties.get("color"))
 
     @color.setter
-    def color(self, color):
+    def color(self, color: numpy.ndarray):
         """
         Update color
         @param color Color (rgba-tuple, e.g. (255, 255, 0, 255))
@@ -204,39 +199,69 @@ class SUMOVehicle(BaseVehicle):
         self._properties["color"] = numpy.array(color)
 
     @property
-    def vehicle_class(self):
+    def vehicle_class(self) -> str:
         """
         @retval SUMO vehicle class
         """
-        return self._properties.get("vClass")
+        return str(self._properties.get("vClass"))
 
     @property
-    def speed_max(self):
+    def speed_max(self) -> float:
         """
         @retval self._properties.get("maxSpeed")
         """
-        return self._properties.get("maxSpeed")
+        return float(self._properties.get("maxSpeed"))
 
     @property
-    def travel_time(self):
+    def travel_time(self) -> float:
         """
         Returns current travel time
 
         @retval travel time
         """
-        return self._travel_stats.get("travel_time")
+        return float(self._travel_stats.get("travel_time"))
 
     @property
-    def travel_stats(self):
+    def travel_stats(self) -> MappingProxyType:
         """
-        @brief Returns travel stats dictionary
+        @brief Returns MappingProxyType travel stats dictionary
 
         @retval self._travel_stats
         """
-        return self._travel_stats
+        return MappingProxyType(self._travel_stats)
+
+    # TODO: remove baseline_relative_time_loss after fixing SUMO conf for vehicle speed variance
+    @property
+    def baseline_relative_time_loss(self) -> float:
+        """
+        returns baseline relative time loss
+        @retval self.properties.get("baseline_relative_time_loss")
+        """
+        return float(self._properties.get("baseline_relative_time_loss"))
+
+    @baseline_relative_time_loss.setter
+    def baseline_relative_time_loss(self, time_loss: float):
+        """ sets baseline_relative_time_loss in vehicle properties """
+        self._properties["baseline_relative_time_loss"] = float(time_loss)
+
+    @property
+    def dsat_threshold(self) -> float:
+        """
+        returns dissatisfaction threshold
+        @retval self.properties.get("dsat_threshold")
+        """
+        return float(self._properties.get("dsat_threshold"))
+
+    @dsat_threshold.setter
+    def dsat_threshold(self, threshold: float):
+        """ sets dissatisfaction threshold """
+        self._properties["dsat_threshold"] = float(threshold)
 
     @staticmethod
-    def _dissatisfaction(time_loss, optimal_travel_time, time_loss_threshold=0.2):
+    def _dissatisfaction(
+            time_loss: float,
+            optimal_travel_time: float,
+            time_loss_threshold=0.2) -> float:
         r"""Calculate driver's dissatisfaction.
         Calculate driver's dissatisfaction.
         \f{eqnarray*}{
@@ -262,28 +287,20 @@ class SUMOVehicle(BaseVehicle):
         )
         # pylint: enable=no-member
 
-    def record_travel_stats(self, time_step):
+    def record_travel_stats(self, time_step: float) -> BaseVehicle:
         r"""Record travel statistics to vehicle.
         Write travel stats, i.e. travel time, time loss, position,
         and dissatisfaction of vehicle for a given time step into self._travel_stats
-        \f{eqnarray*}{
-            TT &:=& \text{travel time}, \\
-            TT^{*} &:=& \text{optimal travel time}, \\
-            TL &:=& \text{time loss}, \\
-            TLT &:=& \text{time loss threshold}, \\
-            \widehat{v} &:=& \text{maximum speed of vehicle}, \\
-            \text{dissatisfaction} &:=& dsat(TL, TT^{*}, TLT) \\
-            &=&\frac{1}{1+e^{-TL + TLT \cdot TT^{*}}}.
-        \f}
+
         @param time_step current time step
         @retval self
         """
 
         # update current travel time
-        self._travel_stats["travel_time"] = time_step - self.start_time
+        self._travel_stats["travel_time"] = float(time_step) - self.start_time
 
         # current step number
-        self._travel_stats.get("step").get("number").append(time_step)
+        self._travel_stats.get("step").get("number").append(float(time_step))
 
         # position
         self._travel_stats.get("step").get("pos_x").append(self.position[0])
@@ -381,16 +398,16 @@ class SUMOVehicle(BaseVehicle):
 
         return self
 
-    def change_vehicle_class(self, class_name):
+    def change_vehicle_class(self, class_name: str) -> BaseVehicle:
         """
         Change vehicle class
         @param class_name vehicle class
         @retval self
         """
-        self._properties["vClass"] = class_name
+        self._properties["vClass"] = str(class_name)
         return self
 
-    def update(self, position, lane_index, speed):
+    def update(self, position: tuple, lane_index: int, speed: float) -> BaseVehicle:
         """
         Update current properties of vehicle providing data acquired from TraCI call.
 
@@ -414,6 +431,6 @@ class SUMOVehicle(BaseVehicle):
             )
         )
         # set speed
-        self._properties["speed"] = speed
+        self._properties["speed"] = float(speed)
 
         return self

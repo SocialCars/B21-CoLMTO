@@ -103,7 +103,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
     def __init__(self, args, netconvertbinary, duarouterbinary):
         """C'tor"""
-        super(SumoConfig, self).__init__(args)
+        super().__init__(args)
 
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._writer = colmto.common.io.Writer(args)
@@ -279,9 +279,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
             self._args.forcerebuildscenarios
         )
 
+        # TODO: remove baseline_relative_time_loss after fixing SUMO conf for vehicle speed variance
         # update baseline_relative_time_loss for each vehicle according to scenario
         for i_vehicle in l_vehicles.values():
-            i_vehicle.properties["baseline_relative_time_loss"] = self.scenario_config.get(
+            i_vehicle.baseline_relative_time_loss = self.scenario_config.get(
                 scenario_run_config.get("scenarioname")
             ).get("baseline_relative_time_loss").get(i_vehicle.properties.get("vType"))
 
