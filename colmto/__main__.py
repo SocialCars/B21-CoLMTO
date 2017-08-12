@@ -165,8 +165,8 @@ class Colmto(object):
         self._log.debug("Initial loading of configuration done")
 
         if l_configuration.run_config.get("sumo").get("enabled") or self._args.runsumo:
-           self._log.info("---- Starting SUMO Baseline Simulation ----")
-           colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
+            self._log.info("---- Starting SUMO Baseline Simulation ----")
+            colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
 
 
 def main():
