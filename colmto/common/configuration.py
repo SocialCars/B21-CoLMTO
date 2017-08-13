@@ -44,37 +44,38 @@ _DEFAULT_CONFIG_RUN = {
         "value": 30
     },
     "runs": 1000,
-    "scenarios": ["NI-B210", "HE-B62", "NW-B1"],
+    "scenarios": ["NI-B210"],
     "simtimeinterval": [0, 1800],
     "starttimedistribution": "poisson",
-    # "rules": [
-    #     {
-    #         "type": "SUMOSpeedRule",
-    #         "behaviour": "deny",
-    #         "args": {
-    #             "speed_range": (0., 30/3.6)
-    #         }
-    #     },
-    #     {
-    #         "type": "SUMOPositionRule",
-    #         "behaviour": "deny",
-    #         "args": {
-    #             "position_bbox": ((1350., -2.), (2500., 2.))
-    #         },
-    #         "vehicle_rules": {
-    #             "rule": "any",
-    #             "rules": [
-    #                 {
-    #                     "type": "SUMOSpeedRule",
-    #                     "behaviour": "deny",
-    #                     "args": {
-    #                         "speed_range": (0., 85/3.6)
-    #                     },
-    #                 }
-    #             ]
-    #         }
-    #     }
-    # ],
+    "rules": [
+        {
+            "type": "SUMOPositionRule",
+            "behaviour": "deny",
+            "args": {
+                "position_bbox": ((0., -2.), (9520., 2.))
+            },
+            "vehicle_rules": {
+                "rule": "any",
+                "rules": [
+                    {
+                        "type": "SUMOVTypeRule",
+                        "behaviour": "deny",
+                        "args": {
+                            "vehicle_type": "truck"
+                        },
+                    },
+                    {
+                        "type": "SUMOVTypeRule",
+                        "behaviour": "deny",
+                        "args": {
+                            "vehicle_type": "passenger"
+                        },
+                    },
+
+                ]
+            }
+        }
+    ],
     "sumo": {
         "enabled": True,
         "gui-delay": 200,
@@ -88,19 +89,19 @@ _DEFAULT_CONFIG_RUN = {
     "vtypedistribution": {
         "passenger": {
             "desiredSpeeds": [34.0],
-            "fraction": 0.6,
+            "fraction": 0.8,
             "speedDev": 0.0,
             "sigma": 0.0
         },
         "tractor": {
             "desiredSpeeds": [8.0],
-            "fraction": 0.1,
+            "fraction": 0.05,
             "speedDev": 0.0,
             "sigma": 0.0
         },
         "truck": {
             "desiredSpeeds": [23.0],
-            "fraction": 0.3,
+            "fraction": 0.15,
             "speedDev": 0.0,
             "sigma": 0.0
         }
