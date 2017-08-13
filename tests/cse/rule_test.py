@@ -178,7 +178,7 @@ def test_sumo_vtype_rule():
             )
         ),
         "<class 'colmto.cse.rule.SUMOVTypeRule'>: vehicle_type = passenger, behaviour = custom1, ru"
-        "le_operator: RuleOperator.ANY, subrules: [<class 'colmto.cse.rule.SUMOPositionRule'>]"
+        "le_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
     )
 
     assert_true(
@@ -276,7 +276,7 @@ def test_sumo_extendable_rule():
     l_sumo_rule.add_rule(l_sumo_sub_rule)
 
     assert_true(
-        l_sumo_rule.subpolicies_apply_to(
+        l_sumo_rule.subrules_apply_to(
             colmto.environment.vehicle.SUMOVehicle(
                 speed_max=50.,
             )
@@ -298,7 +298,7 @@ def test_sumo_extendable_rule():
     l_sumo_rule.add_rule(l_sumo_sub_rule)
 
     assert_true(
-        l_sumo_rule.subpolicies_apply_to(
+        l_sumo_rule.subrules_apply_to(
             colmto.environment.vehicle.SUMOVehicle(
                 speed_max=50.,
             )
@@ -372,7 +372,7 @@ def test_sumo_speed_rule():
             )
         ),
         "<class 'colmto.cse.rule.SUMOSpeedRule'>: speed_range = [  0.  60.], behaviour = DENY, rule"
-        "_operator: RuleOperator.ANY, subrules: [<class 'colmto.cse.rule.SUMOPositionRule'>]"
+        "_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
     )
 
 
@@ -428,7 +428,7 @@ def test_sumo_position_rule():
                 )
             )
         ),
-    "<class 'colmto.cse.rule.SUMOPositionRule'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)), behav"
-    "iour = custom1, rule_operator: RuleOperator.ANY, subrules: [<class 'colmto.cse.rule.SUMOSpeedR"
-    "ule'>]"
+        "<class 'colmto.cse.rule.SUMOPositionRule'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)), b"
+        "ehaviour = custom1, rule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUM"
+        "OSpeedRule'>"
     )

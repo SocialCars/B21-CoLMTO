@@ -119,7 +119,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
             for i_run in range(self._sumocfg.run_config.get("runs")):
 
                 if self._sumocfg.run_config.get("cse-enabled"):
-                    # cse mode: apply cse policies to vehicles and run with TraCI
+                    # cse mode: apply cse rules to vehicles and run with TraCI
                     self._writer.write_hdf5(
 
                         self._statistics.stats_to_hdf5_structure(
@@ -135,8 +135,8 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
                                     ),
                                     colmto.cse.cse.SumoCSE(
                                         self._args
-                                    ).add_policies_from_cfg(
-                                        self._sumocfg.run_config.get("policies")
+                                    ).add_rules_from_cfg(
+                                        self._sumocfg.run_config.get("rules")
                                     )
                                 )
                             ),

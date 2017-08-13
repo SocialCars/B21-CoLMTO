@@ -83,9 +83,9 @@ def test_sumo_cse():
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_speed).add_rule(l_rule_position)
 
     assert_is_instance(l_sumo_cse, colmto.cse.cse.SumoCSE)
-    assert_is_instance(l_sumo_cse.policies, tuple)
-    assert_in(l_rule_position, l_sumo_cse.policies)
-    assert_in(l_rule_position, l_sumo_cse.policies)
+    assert_is_instance(l_sumo_cse.rules, tuple)
+    assert_in(l_rule_position, l_sumo_cse.rules)
+    assert_in(l_rule_position, l_sumo_cse.rules)
 
     with assert_raises(TypeError):
         l_sumo_cse.add_rule("foo")
@@ -115,11 +115,11 @@ def test_sumo_cse():
             )
 
     assert_equal(
-        colmto.cse.cse.SumoCSE().add_policies_from_cfg(None).policies,
+        colmto.cse.cse.SumoCSE().add_rules_from_cfg(None).rules,
         tuple()
     )
 
-    l_sumo_cse = colmto.cse.cse.SumoCSE().add_policies_from_cfg(
+    l_sumo_cse = colmto.cse.cse.SumoCSE().add_rules_from_cfg(
         [
             {
                 "type": "SUMOSpeedRule",
@@ -134,9 +134,9 @@ def test_sumo_cse():
                 "args": {
                     "position_bbox": ((1350., -2.), (2500., 2.))
                 },
-                "vehicle_policies": {
+                "vehicle_rules": {
                     "rule": "any",
-                    "policies": [
+                    "rules": [
                         {
                             "type": "SUMOSpeedRule",
                             "behaviour": "deny",
@@ -150,9 +150,9 @@ def test_sumo_cse():
         ]
     )
 
-    assert_is_instance(l_sumo_cse.policies[0], colmto.cse.rule.SUMOSpeedRule)
-    assert_is_instance(l_sumo_cse.policies[1], colmto.cse.rule.SUMOPositionRule)
+    assert_is_instance(l_sumo_cse.rules[0], colmto.cse.rule.SUMOSpeedRule)
+    assert_is_instance(l_sumo_cse.rules[1], colmto.cse.rule.SUMOPositionRule)
     assert_is_instance(
-        l_sumo_cse.policies[1].vehicle_policies[0],
+        l_sumo_cse.rules[1].vehicle_rules[0],
         colmto.cse.rule.SUMOSpeedRule
     )

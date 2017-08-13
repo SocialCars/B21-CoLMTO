@@ -43,19 +43,19 @@ class BaseCSE(object):
             self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._log = colmto.common.log.logger(__name__)
         self._vehicles = set()
-        self._policies = []
+        self._rules = []
 
     @property
-    def policies(self) -> tuple:
+    def rules(self) -> tuple:
         """
         Policies of CSE
-        @retval policies tuple
+        @retval rules tuple
         """
-        return tuple(self._policies)
+        return tuple(self._rules)
 
     def apply(self, vehicles: typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]):
         """
-        Apply policies to vehicles
+        Apply rules to vehicles
         @param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
         @retval self
         """
@@ -66,11 +66,11 @@ class BaseCSE(object):
 
     def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle):
         """
-        Apply policies to one vehicles
+        Apply rules to one vehicles
         @param vehicle: Vehicle
         @retval self
         """
-        for i_rule in self._policies:
+        for i_rule in self._rules:
             if i_rule.applies_to(vehicle) \
                     and i_rule.behaviour == colmto.cse.rule.Behaviour.DENY:
                 vehicle.change_vehicle_class(
@@ -89,7 +89,7 @@ class BaseCSE(object):
 class SumoCSE(BaseCSE):
     """First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL."""
 
-    _valid_policies = {
+    _valid_rules = {
         "SUMOUniversalRule": colmto.cse.rule.SUMOUniversalRule,
         "SUMONullRule": colmto.cse.rule.SUMONullRule,
         "SUMOSpeedRule": colmto.cse.rule.SUMOSpeedRule,
@@ -109,15 +109,15 @@ class SumoCSE(BaseCSE):
             raise TypeError
 
         if rule_cfg is not None \
-                and rule_cfg.get("vehicle_policies", {}).get("rule", False):
-            # look for sub-policies
+                and rule_cfg.get("vehicle_rules", {}).get("rule", False):
+            # look for sub-rules
             rule.rule = colmto.cse.rule.BaseRule.ruleoperator_from_string(
-                rule_cfg.get("vehicle_policies", {}).get("rule"),
+                rule_cfg.get("vehicle_rules", {}).get("rule"),
                 colmto.cse.rule.RuleOperator.ALL
             )
-            for i_subrule in rule_cfg.get("vehicle_policies", {}).get("policies", []):
+            for i_subrule in rule_cfg.get("vehicle_rules", {}).get("rules", []):
                 rule.add_rule(
-                    self._valid_policies.get(i_subrule.get("type"))(
+                    self._valid_rules.get(i_subrule.get("type"))(
                         behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
                             i_subrule.get("behaviour"),
                             colmto.cse.rule.Behaviour.DENY
@@ -126,25 +126,25 @@ class SumoCSE(BaseCSE):
                     )
                 )
 
-        self._policies.append(
+        self._rules.append(
             rule
         )
 
         return self
 
-    def add_policies_from_cfg(self, policies_config: typing.Dict[dict, typing.Any]):
+    def add_rules_from_cfg(self, rules_config: typing.Dict[dict, typing.Any]):
         """
-        Add policies to SumoCSE based on run config's "policies" section.
-        @param policies_config: run config's "policies" section
+        Add rules to SumoCSE based on run config's "rules" section.
+        @param rules_config: run config's "rules" section
         @retval self
         """
 
-        if policies_config is None:
+        if rules_config is None:
             return self
 
-        for i_rule in policies_config:
+        for i_rule in rules_config:
             self.add_rule(
-                self._valid_policies.get(i_rule.get("type"))(
+                self._valid_rules.get(i_rule.get("type"))(
                     behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
                         i_rule.get("behaviour"),
                         colmto.cse.rule.Behaviour.DENY

@@ -29,6 +29,7 @@ import subprocess
 
 import colmto.common.log
 import colmto.cse.cse
+import colmto.cse.rule
 
 try:
     import traci
@@ -92,7 +93,7 @@ class Runtime(object):
             raise AttributeError("Provided CSE object is not of type SumoCSE.")
 
         self._log.debug("starting sumo process")
-        self._log.debug("CSE %s with policies %s", cse, cse.policies)
+        self._log.debug("CSE %s with rules %s", cse, cse.rules)
         traci.start(
             [
                 self._sumo_binary,
@@ -118,7 +119,7 @@ class Runtime(object):
         # add polygon of otl denied positions if --gui enabled
         # and cse contains instance objects of colmto.cse.rule.SUMOPositionRule
         if self._args.gui:
-            for i_rule in cse.policies:
+            for i_rule in cse.rules:
                 if isinstance(i_rule, colmto.cse.rule.SUMOPositionRule):
                     traci.polygon.add(
                         polygonID=str(i_rule),
@@ -157,13 +158,13 @@ class Runtime(object):
                     ]
                 )
 
-            # retrieve results, update vehicle objects, apply cse policies
+            # retrieve results, update vehicle objects, apply cse rules
             for i_vehicle_id, i_results in traci.vehicle.getSubscriptionResults().items():
 
                 # vehicle object corresponding to current vehicle fetched from traci
                 l_vehicle = run_config.get("vehicles").get(i_vehicle_id)
 
-                # set vclass according to policies for each vehicle, i.e.
+                # set vclass according to rules for each vehicle, i.e.
                 # allow vehicles access to OTL depending on rule
                 cse.apply_one(
 

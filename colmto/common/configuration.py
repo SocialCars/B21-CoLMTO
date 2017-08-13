@@ -47,7 +47,7 @@ _DEFAULT_CONFIG_RUN = {
     "scenarios": ["NI-B210", "HE-B62", "NW-B1"],
     "simtimeinterval": [0, 1800],
     "starttimedistribution": "poisson",
-    # "policies": [
+    # "rules": [
     #     {
     #         "type": "SUMOSpeedRule",
     #         "behaviour": "deny",
@@ -61,9 +61,9 @@ _DEFAULT_CONFIG_RUN = {
     #         "args": {
     #             "position_bbox": ((1350., -2.), (2500., 2.))
     #         },
-    #         "vehicle_policies": {
+    #         "vehicle_rules": {
     #             "rule": "any",
-    #             "policies": [
+    #             "rules": [
     #                 {
     #                     "type": "SUMOSpeedRule",
     #                     "behaviour": "deny",

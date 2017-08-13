@@ -30,7 +30,6 @@ import enum
 import numpy
 
 from colmto.environment import SUMOVehicle
-from colmto.environment import BaseVehicle
 
 @enum.unique
 class Behaviour(enum.Enum):
@@ -138,14 +137,14 @@ class SUMORule(BaseRule):
 
 
 class SUMOExtendableRule(object):
-    """Add ability to policies to be extended, i.e. to add sub-policies to them"""
+    """Add ability to rules to be extended, i.e. to add sub-rules to them"""
 
     def __init__(self, rules: typing.Iterable[SUMORule], rule_operator=RuleOperator.ANY):
         """
         C'tor.
 
         @param rules List of rules
-        @param rule_operator Rule operator of RuleOperator enum for applying sub-policies ANY|ALL
+        @param rule_operator Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
         """
 
         # check rule types
@@ -165,14 +164,24 @@ class SUMOExtendableRule(object):
         super().__init__()
 
     @property
-    def vehicle_policies(self) -> tuple:
+    def vehicle_rules(self) -> tuple:
         """
-        Return vehicle related sub-policies.
+        Return vehicle related sub-rules.
 
         Returns:
-            vehicle_policies
+            vehicle_rules
         """
         return tuple(self._vehicle_rules)
+
+    @property
+    def vehicle_rules_as_str(self) -> str:
+        """
+        Return string representation of vehicle related sub-rules.
+
+        Returns:
+            vehicle_rules as string
+        """
+        return ", ".join(str(type(i_rule)) for i_rule in self._vehicle_rules)
 
     @property
     def rule_operator(self) -> RuleOperator:
@@ -187,9 +196,9 @@ class SUMOExtendableRule(object):
     @rule_operator.setter
     def rule_operator(self, rule_operator: RuleOperator):
         """
-        Sets rule operator for applying sub-policies (ANY|ALL).
+        Sets rule operator for applying sub-rules (ANY|ALL).
 
-        @param rule_operator Rule for applying sub-policies (ANY|ALL)
+        @param rule_operator Rule for applying sub-rules (ANY|ALL)
         """
         if rule_operator not in RuleOperator:
             raise ValueError
@@ -213,9 +222,9 @@ class SUMOExtendableRule(object):
 
         return self
 
-    def subpolicies_apply_to(self, vehicle: SUMOVehicle) -> bool:
+    def subrules_apply_to(self, vehicle: SUMOVehicle) -> bool:
         """
-        Check whether sub-policies apply to this vehicle.
+        Check whether sub-rules apply to this vehicle.
 
         @param vehicle vehicle object
         @retval boolean
@@ -243,7 +252,7 @@ class SUMOUniversalRule(SUMORule):
 
     def apply(self,
               vehicles: typing.Iterable[SUMOVehicle]
-              ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
         """
         apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
@@ -274,7 +283,7 @@ class SUMONullRule(SUMORule):
     # pylint: disable=no-self-use
     def apply(self,
               vehicles: typing.Iterable[SUMOVehicle]
-              ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
         """
         apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
@@ -288,7 +297,7 @@ class SUMONullRule(SUMORule):
 
 
 class SUMOVehicleRule(SUMORule, SUMOExtendableRule):
-    """Base class for vehicle attribute specific policies."""
+    """Base class for vehicle attribute specific rules."""
 
     def __init__(self, behaviour=Behaviour.DENY, rule_operator=RuleOperator.ANY):
         """C'tor."""
@@ -310,22 +319,22 @@ class SUMOVTypeRule(SUMOVehicleRule):
                f"vehicle_type = {self._vehicle_type}, " \
                f"behaviour = {self._behaviour.vclass}, " \
                f"rule_operator: {self._rule_operator}, " \
-               f"subrules: {[type(i_rule) for i_rule in self._vehicle_rules]}"
+               f"subrules: {self.vehicle_rules_as_str}"
 
     def applies_to(self, vehicle: SUMOVehicle) -> bool:
         """
-        Test whether this (and sub)policies apply to given vehicle.
+        Test whether this (and sub)rules apply to given vehicle.
         @param vehicle Vehicle
         @retval boolean
         """
         if (self._vehicle_type == vehicle.vehicle_type) and \
-                (self.subpolicies_apply_to(vehicle) if self._vehicle_rules else True):
+                (self.subrules_apply_to(vehicle) if self._vehicle_rules else True):
             return True
         return False
 
     def apply(self,
               vehicles: typing.Iterable[SUMOVehicle]
-              ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
         """
         apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
@@ -353,22 +362,22 @@ class SUMOSpeedRule(SUMOVehicleRule):
                f"speed_range = {self._speed_range}, " \
                f"behaviour = {self._behaviour.name}, " \
                f"rule_operator: {self._rule_operator}, " \
-               f"subrules: {[type(i_rule) for i_rule in self._vehicle_rules]}"
+               f"subrules: {self.vehicle_rules_as_str}"
 
     def applies_to(self, vehicle: SUMOVehicle) -> bool:
         """
-        Test whether this (and sub)policies apply to given vehicle
+        Test whether this (and sub)rules apply to given vehicle
         @param vehicle Vehicle
         @retval boolean
         """
         if (self._speed_range[0] <= vehicle.speed_max <= self._speed_range[1]) and \
-                (self.subpolicies_apply_to(vehicle) if self._vehicle_rules else True):
+                (self.subrules_apply_to(vehicle) if self._vehicle_rules else True):
             return True
         return False
 
     def apply(self,
               vehicles: typing.Iterable[SUMOVehicle]
-              ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
         """
         apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
@@ -400,7 +409,7 @@ class SUMOPositionRule(SUMOVehicleRule):
                f"position_bbox = {self._position_bbox}, " \
                f"behaviour = {self._behaviour.vclass}, " \
                f"rule_operator: {self._rule_operator}, " \
-               f"subrules: {[type(i_rule) for i_rule in self._vehicle_rules]}"
+               f"subrules: {self.vehicle_rules_as_str}"
 
     @property
     def position_bbox(self) -> numpy.array:
@@ -412,21 +421,21 @@ class SUMOPositionRule(SUMOVehicleRule):
 
     def applies_to(self, vehicle: SUMOVehicle) -> bool:
         """
-        Test whether this (and sub)policies apply to given vehicle
+        Test whether this (and sub)rules apply to given vehicle
         @param vehicle Vehicle
         @retval boolean
         """
         # pylint: disable=no-member
         if numpy.all(numpy.logical_and(self._position_bbox[0] <= vehicle.position,
                                        vehicle.position <= self._position_bbox[1])) and \
-                (self.subpolicies_apply_to(vehicle) if self._vehicle_rules else True):
+                (self.subrules_apply_to(vehicle) if self._vehicle_rules else True):
             return True
         return False
         # pylint: enable=no-member
 
     def apply(self,
               vehicles: typing.Iterable[SUMOVehicle]
-              ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
         """
         apply rule to vehicles
         @param vehicles iterable object containing BaseVehicles, or inherited objects
