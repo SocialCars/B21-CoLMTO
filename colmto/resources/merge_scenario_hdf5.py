@@ -38,12 +38,9 @@ def main(argv):
         print("Usage: merge_scenario_hdf5.py hdf5-input-file hdf5-output-file")
         return
 
-    f_src = h5py.File(argv[1], "r")
-    f_destination = h5py.File(argv[2], "a", libver="latest")
-    for i_key in list(f_src.keys()):
-        f_src.copy(source=i_key, dest=f_destination)
-    f_destination.close()
-    f_src.close()
+    with h5py.File(argv[1], "r") as f_src, h5py.File(argv[2], "a", libver="latest") as f_dest:
+        for i_key in f_src:
+            f_src.copy(source=i_key, dest=f_dest)
 
 if __name__ == "__main__":
     main(sys.argv)
