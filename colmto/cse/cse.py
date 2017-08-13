@@ -132,7 +132,7 @@ class SumoCSE(BaseCSE):
 
         return self
 
-    def add_rules_from_cfg(self, rules_config: typing.Dict[dict, typing.Any]):
+    def add_rules_from_cfg(self, rules_config: typing.Union[typing.List[dict], None]):
         """
         Add rules to SumoCSE based on run config's "rules" section.
         @param rules_config: run config's "rules" section
