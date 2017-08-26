@@ -21,7 +21,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""Runtime to control SUMO."""
+'''Runtime to control SUMO.'''
 
 
 
@@ -34,77 +34,77 @@ import colmto.cse.rule
 try:
     import traci
 except ImportError:  # pragma: no cover
-    raise ImportError("please declare environment variable 'SUMO_HOME' as the root")
+    raise ImportError('please declare environment variable \'SUMO_HOME\' as the root')
 
 
 class Runtime(object):
-    """Runtime class"""
+    '''Runtime class'''
     # pylint: disable=too-few-public-methods
 
     def __init__(self, args, sumo_config, sumo_binary):
-        """C'tor."""
+        '''C'tor.'''
         self._args = args
         self._sumo_config = sumo_config
         self._sumo_binary = sumo_binary
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
 
     def run_standalone(self, run_config):
-        """
+        '''
         @brief Run provided scenario in one shot.
 
         @param run_config run configuration object
-        """
+        '''
 
         self._log.info(
-            "Running scenario %s: run %d",
-            run_config.get("scenarioname"), run_config.get("runnumber")
+            'Running scenario %s: run %d',
+            run_config.get('scenarioname'), run_config.get('runnumber')
         )
 
         l_sumoprocess = subprocess.check_output(
             [
                 self._sumo_binary,
-                "-c", run_config.get("configfile"),
-                "--gui-settings-file", run_config.get("settingsfile"),
-                "--time-to-teleport", "-1",
-                "--no-step-log",
-                "--fcd-output", run_config.get("fcdfile")
+                '-c', run_config.get('configfile'),
+                '--gui-settings-file', run_config.get('settingsfile'),
+                '--time-to-teleport', '-1',
+                '--no-step-log',
+                '--fcd-output', run_config.get('fcdfile')
             ],
             stderr=subprocess.STDOUT,
             bufsize=-1
         )
 
         self._log.debug(
-            "%s : %s",
+            '%s : %s',
             self._sumo_binary,
-            l_sumoprocess.decode("utf8").replace("\n", "")
+            l_sumoprocess.decode('utf8').replace('\n', '')
         )
 
     def run_traci(self, run_config, cse):
-        """
+        '''
         Run provided scenario with TraCI by providing a ref to an optimisation entity.
 
         @param run_config run configuration
         @param cse central optimisation entity instance of colmto.cse.cse.SumoCSE
 
         @retval list of vehicles, containing travel stats
-        """
+        '''
 
         if not isinstance(cse, colmto.cse.cse.SumoCSE):
-            raise AttributeError("Provided CSE object is not of type SumoCSE.")
+            raise AttributeError('Provided CSE object is not of type SumoCSE.')
 
-        self._log.debug("starting sumo process")
-        self._log.debug("CSE %s with rules %s", cse, cse.rules)
+        self._log.debug('starting sumo process')
+        self._log.debug('CSE %s with rules %s', cse, cse.rules)
         traci.start(
             [
                 self._sumo_binary,
-                "-c", run_config.get("configfile"),
-                "--gui-settings-file", run_config.get("settingsfile"),
-                "--time-to-teleport", "-1",
-                "--no-step-log"
+                '-c', run_config.get('configfile'),
+                '--gui-settings-file', run_config.get('settingsfile'),
+                '--time-to-teleport', '-1',
+                '--no-step-log'
             ]
         )
 
-        self._log.debug("connecting to TraCI instance on port %d", run_config.get("sumoport"))
+        self._log.debug('connecting to TraCI instance on port %d', run_config.get('sumoport'))
 
         # subscribe to global simulation vars
         traci.simulation.subscribe(
@@ -144,7 +144,7 @@ class Runtime(object):
             for i_vehicle_id in l_results_simulation.get(traci.constants.VAR_DEPARTED_VEHICLES_IDS):
 
                 # set TraCI -> vehicle.start_time
-                run_config.get("vehicles").get(i_vehicle_id).start_time = \
+                run_config.get('vehicles').get(i_vehicle_id).start_time = \
                     l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
 
                 # subscribe to parameters
@@ -162,7 +162,7 @@ class Runtime(object):
             for i_vehicle_id, i_results in traci.vehicle.getSubscriptionResults().items():
 
                 # vehicle object corresponding to current vehicle fetched from traci
-                l_vehicle = run_config.get("vehicles").get(i_vehicle_id)
+                l_vehicle = run_config.get('vehicles').get(i_vehicle_id)
 
                 # set vclass according to rules for each vehicle, i.e.
                 # allow vehicles access to OTL depending on rule
@@ -200,20 +200,20 @@ class Runtime(object):
                     l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
                 )
 
-                # if i_vehicle_id == "vehicle10":
+                # if i_vehicle_id == 'vehicle10':
                 #     self._log.debug(
-                #         "pos: %s, %s, act TT: %s, opt TT: %s, time loss: %s (%s pct.), dsat: %s",
+                #         'pos: %s, %s, act TT: %s, opt TT: %s, time loss: %s (%s pct.), dsat: %s',
                 #         l_vehicle.position,
                 #         l_vehicle.grid_position,
                 #         l_vehicle.travel_time,
                 #         round(l_vehicle.position[0] / l_vehicle.speed_max, 2),
-                #         round(l_vehicle.travel_stats.get("step").get("time_loss")[-1], 2),
+                #         round(l_vehicle.travel_stats.get('step').get('time_loss')[-1], 2),
                 #         round(
-                #             l_vehicle.travel_stats.get("step").get("time_loss")[-1] /
+                #             l_vehicle.travel_stats.get('step').get('time_loss')[-1] /
                 #             (l_vehicle.position[0] / l_vehicle.speed_max) * 100,
                 #             2
                 #         ),
-                #         round(l_vehicle.travel_stats.get("step").get("dissatisfaction")[-1], 32)
+                #         round(l_vehicle.travel_stats.get('step').get('dissatisfaction')[-1], 32)
                 #     )
 
             traci.simulationStep()
@@ -224,10 +224,10 @@ class Runtime(object):
         traci.close()
 
         self._log.info(
-            "TraCI run of scenario %s, run %d completed.",
-            run_config.get("scenarioname"), run_config.get("runnumber")
+            'TraCI run of scenario %s, run %d completed.',
+            run_config.get('scenarioname'), run_config.get('runnumber')
         )
 
-        return run_config.get("vehicles")
+        return run_config.get('vehicles')
 
     # pylint: enable=too-few-public-methods

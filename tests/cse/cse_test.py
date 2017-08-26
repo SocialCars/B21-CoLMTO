@@ -21,9 +21,9 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""
+'''
 colmto: Test module for environment.cse.
-"""
+'''
 import random
 
 import numpy
@@ -38,22 +38,22 @@ import colmto.environment.vehicle
 
 
 class Namespace(object):
-    """Namespace similar to argparse"""
+    '''Namespace similar to argparse'''
     # pylint: disable=too-few-public-methods
     def __init__(self, **kwargs):
-        """C'tor."""
+        '''C'tor.'''
         self.__dict__.update(kwargs)
 
 
 def test_base_cse():
-    """
+    '''
     Test BaseCSE class
-    """
+    '''
     assert_is_instance(colmto.cse.cse.BaseCSE(), colmto.cse.cse.BaseCSE)
     assert_is_instance(
         colmto.cse.cse.BaseCSE(
             Namespace(
-                loglevel="debug", quiet=False, logfile="foo.log"
+                loglevel='debug', quiet=False, logfile='foo.log'
             )
         ),
         colmto.cse.cse.BaseCSE
@@ -61,13 +61,13 @@ def test_base_cse():
 
 
 def test_sumo_cse():
-    """
+    '''
     Test SumoCSE class
-    """
+    '''
     assert_is_instance(
         colmto.cse.cse.SumoCSE(
             Namespace(
-                loglevel="debug", quiet=False, logfile="foo.log"
+                loglevel='debug', quiet=False, logfile='foo.log'
             )
         ),
         colmto.cse.cse.SumoCSE
@@ -88,7 +88,7 @@ def test_sumo_cse():
     assert_in(l_rule_position, l_sumo_cse.rules)
 
     with assert_raises(TypeError):
-        l_sumo_cse.add_rule("foo")
+        l_sumo_cse.add_rule('foo')
 
     l_vehicles = [
         colmto.environment.vehicle.SUMOVehicle(
@@ -122,26 +122,26 @@ def test_sumo_cse():
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rules_from_cfg(
         [
             {
-                "type": "SUMOSpeedRule",
-                "behaviour": "deny",
-                "args": {
-                    "speed_range": (0., 30/3.6)
+                'type': 'SUMOSpeedRule',
+                'behaviour': 'deny',
+                'args': {
+                    'speed_range': (0., 30/3.6)
                 }
             },
             {
-                "type": "SUMOPositionRule",
-                "behaviour": "deny",
-                "args": {
-                    "position_bbox": ((1350., -2.), (2500., 2.))
+                'type': 'SUMOPositionRule',
+                'behaviour': 'deny',
+                'args': {
+                    'position_bbox': ((1350., -2.), (2500., 2.))
                 },
-                "vehicle_rules": {
-                    "rule": "any",
-                    "rules": [
+                'vehicle_rules': {
+                    'rule': 'any',
+                    'rules': [
                         {
-                            "type": "SUMOSpeedRule",
-                            "behaviour": "deny",
-                            "args": {
-                                "speed_range": (0., 85/3.6)
+                            'type': 'SUMOSpeedRule',
+                            'behaviour': 'deny',
+                            'args': {
+                                'speed_range': (0., 85/3.6)
                             },
                         }
                     ]

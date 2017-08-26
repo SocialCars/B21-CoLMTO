@@ -21,7 +21,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""Logging module"""
+'''Logging module'''
 import logging
 import logging.handlers
 from pathlib import Path
@@ -29,11 +29,11 @@ import sys
 
 
 def logger(name: str, loglevel=logging.NOTSET, quiet=False,
-           logfile=Path("~/.colmto/colmto.log").expanduser()) -> logging.Logger:
-    """Create a logger instance."""
+           logfile=Path('~/.colmto/colmto.log').expanduser()) -> logging.Logger:
+    '''Create a logger instance.'''
 
     if not isinstance(loglevel, (int, str)):
-        raise TypeError("Unknown log level type %s" % type(loglevel))
+        raise TypeError('Unknown log level type %s' % type(loglevel))
 
     # create logfile dir if not exist
     Path(logfile).expanduser().parent.mkdir(parents=True, exist_ok=True)
@@ -67,7 +67,7 @@ def logger(name: str, loglevel=logging.NOTSET, quiet=False,
     if l_add_qhandler:
         # create a stdout handler if not set to quiet
         if not isinstance(quiet, bool):
-            raise TypeError(f"quiet ({quiet}) is {type(quiet)}, but bool expected.")
+            raise TypeError(f'quiet ({quiet}) is {type(quiet)}, but bool expected.')
 
         if not quiet:
             l_shandler = logging.StreamHandler(sys.stdout)

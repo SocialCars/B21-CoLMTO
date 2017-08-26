@@ -21,9 +21,9 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""
+'''
 colmto: Test module for common.statistics.
-"""
+'''
 import numpy
 
 import colmto.common.statistics
@@ -31,7 +31,7 @@ import colmto.common.io
 try:
     import colmto.environment
 except ImportError:
-    print("Error importing colmto.environment, tests probably still run")
+    print('Error importing colmto.environment, tests probably still run')
 
 from nose.tools import assert_equal
 from nose.tools import assert_is_instance
@@ -40,15 +40,15 @@ from nose.tools import assert_raises
 
 
 class Namespace(object):
-    """Namespace similar to argparse"""
+    '''Namespace similar to argparse'''
     # pylint: disable=too-few-public-methods
     def __init__(self, **kwargs):
-        """C'tor."""
+        '''C'tor.'''
         self.__dict__.update(kwargs)
 
 
 def test_statistics():
-    """Test statistics class."""
+    '''Test statistics class.'''
     assert_is_instance(
         colmto.common.statistics.Statistics(None),
         colmto.common.statistics.Statistics
@@ -56,18 +56,18 @@ def test_statistics():
     assert_is_instance(
         colmto.common.statistics.Statistics(
             Namespace(
-                loglevel="debug", quiet=False, logfile="foo.log"
+                loglevel='debug', quiet=False, logfile='foo.log'
             )
         ),
         colmto.common.statistics.Statistics
     )
 
     with assert_raises(AttributeError):
-        colmto.common.statistics.Statistics("foo")
+        colmto.common.statistics.Statistics('foo')
 
 
 def test_closestpositiontodetector():
-    """Test closest_position_to_detector"""
+    '''Test closest_position_to_detector'''
     # pylint: disable=protected-access
     assert_equal(
         colmto.common.statistics.Statistics._closest_position_to_detector(
@@ -115,11 +115,11 @@ def test_closestpositiontodetector():
 
 
 def test_h_spread():
-    """
+    '''
     Test H-Spread function.
 
     Example data taken from http://mathworld.wolfram.com/Hinge.html
-    """
+    '''
 
     assert_equal(
         colmto.common.statistics.Statistics.h_spread(
@@ -144,15 +144,15 @@ def test_h_spread():
 
 
 def test_aggregate_hdf5():
-    """
+    '''
     Test aggregate_vehicle_grid_stats -> stats_to_hdf5_structure -> aggregate_run_stats_to_hdf5
     chain
-    """
+    '''
     l_statistics = colmto.common.statistics.Statistics()
 
     l_vehicles = {
         i_vid: colmto.environment.vehicle.SUMOVehicle(
-            vehicle_type="passenger",
+            vehicle_type='passenger',
             speed_deviation=0.0,
             speed_max=100.,
         ).update(
@@ -164,7 +164,7 @@ def test_aggregate_hdf5():
     l_vehicles.update(
         {
             i_vid: colmto.environment.vehicle.SUMOVehicle(
-                vehicle_type="truck",
+                vehicle_type='truck',
                 speed_deviation=0.0,
                 speed_max=100.,
             ).update(
@@ -177,7 +177,7 @@ def test_aggregate_hdf5():
     l_vehicles.update(
         {
             i_vid: colmto.environment.vehicle.SUMOVehicle(
-                vehicle_type="tractor",
+                vehicle_type='tractor',
                 speed_deviation=0.0,
                 speed_max=100.,
             ).update(
@@ -203,17 +203,17 @@ def test_aggregate_hdf5():
     l_statistics.aggregate_vehicle_grid_stats(l_vehicles)
 
     for i_vehicle in l_vehicles.values():
-        for i_element in i_vehicle.travel_stats.get("grid").get("pos_x"):
+        for i_element in i_vehicle.travel_stats.get('grid').get('pos_x'):
             assert_not_is_instance(i_element, list)
-        for i_element in i_vehicle.travel_stats.get("grid").get("pos_y"):
+        for i_element in i_vehicle.travel_stats.get('grid').get('pos_y'):
             assert_not_is_instance(i_element, list)
-        for i_element in i_vehicle.travel_stats.get("grid").get("speed"):
+        for i_element in i_vehicle.travel_stats.get('grid').get('speed'):
             assert_not_is_instance(i_element, list)
-        for i_element in i_vehicle.travel_stats.get("grid").get("time_loss"):
+        for i_element in i_vehicle.travel_stats.get('grid').get('time_loss'):
             assert_not_is_instance(i_element, list)
-        for i_element in i_vehicle.travel_stats.get("grid").get("relative_time_loss"):
+        for i_element in i_vehicle.travel_stats.get('grid').get('relative_time_loss'):
             assert_not_is_instance(i_element, list)
-        for i_element in i_vehicle.travel_stats.get("grid").get("dissatisfaction"):
+        for i_element in i_vehicle.travel_stats.get('grid').get('dissatisfaction'):
             assert_not_is_instance(i_element, list)
 
     l_statistics.aggregate_run_stats_to_hdf5(

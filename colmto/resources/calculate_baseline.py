@@ -21,7 +21,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""Configuration super class."""
+'''Configuration super class.'''
 
 
 import os
@@ -30,40 +30,40 @@ import h5py
 
 
 def main():
-    """
+    '''
     main
-    """
-    with h5py.File("Scenarios_baseline_time_loss.hdf5", "a") as f_hdf5:
+    '''
+    with h5py.File('Scenarios_baseline_time_loss.hdf5', 'a') as f_hdf5:
 
-        for i_scenario in ["NI-B210", "HE-B62", "NW-B1", "HE-B49", "BY-B20", "BY-B471"]:
-            for i_stat in ["dissatisfaction", "relative_time_loss", "time_loss"]:
-                for i_type in ["alltypes", "passenger", "tractor", "truck"]:
+        for i_scenario in ['NI-B210', 'HE-B62', 'NW-B1', 'HE-B49', 'BY-B20', 'BY-B471']:
+            for i_stat in ['dissatisfaction', 'relative_time_loss', 'time_loss']:
+                for i_type in ['alltypes', 'passenger', 'tractor', 'truck']:
                     f_hdf5.create_dataset(
                         name=os.path.join(
                             i_scenario,
-                            "8640",
-                            "best",
-                            "global",
-                            "driver",
+                            '8640',
+                            'best',
+                            'global',
+                            'driver',
                             i_type,
-                            "baseline_{}".format(i_stat)
+                            'baseline_{}'.format(i_stat)
                         ),
                         data=np.array(
                             [
                                 np.median(
                                     np.array(
-                                        f_hdf5.get(i_scenario).get("8640").get("best").get("global")
-                                        .get("driver").get(i_type).get("{}_end".format(i_stat))
+                                        f_hdf5.get(i_scenario).get('8640').get('best').get('global')
+                                        .get('driver').get(i_type).get('{}_end'.format(i_stat))
                                     ).T[i]
                                 )
-                                for i in range(len(f_hdf5.get(i_scenario).get("8640").get("best")
-                                                    .get("global").get("driver").get(i_type)
-                                                    .get("{}_end".format(i_stat))[0]))]),
-                        compression="gzip",
+                                for i in range(len(f_hdf5.get(i_scenario).get('8640').get('best')
+                                                    .get('global').get('driver').get(i_type)
+                                                    .get('{}_end'.format(i_stat))[0]))]),
+                        compression='gzip',
                         compression_opts=9,
                         fletcher32=True,
                         chunks=True
                     )
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

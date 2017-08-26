@@ -21,7 +21,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""Configuration super class."""
+'''Configuration super class.'''
 
 
 
@@ -30,17 +30,17 @@ import h5py
 
 
 def main(argv):
-    """
+    '''
     main
     @param argv: cmdline args
-    """
+    '''
     if len(sys.argv) != 3:
-        print("Usage: merge_scenario_hdf5.py hdf5-input-file hdf5-output-file")
+        print('Usage: merge_scenario_hdf5.py hdf5-input-file hdf5-output-file')
         return
 
-    with h5py.File(argv[1], "r") as f_src, h5py.File(argv[2], "a", libver="latest") as f_dest:
+    with h5py.File(argv[1], 'r') as f_src, h5py.File(argv[2], 'a', libver='latest') as f_dest:
         for i_key in f_src:
             f_src.copy(source=i_key, dest=f_dest)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main(sys.argv)

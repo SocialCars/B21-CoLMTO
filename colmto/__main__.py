@@ -22,7 +22,7 @@
 # #############################################################################
 # @endcond
 # pylint: disable=too-few-public-methods
-"""Colmto main module."""
+'''Colmto main module.'''
 import argparse
 import datetime
 
@@ -34,119 +34,119 @@ import colmto.sumo.sumosim
 
 
 class Colmto(object):
-    """Colmto main class"""
+    '''Colmto main class'''
 
     def __init__(self):
-        """C'tor."""
+        '''C'tor.'''
 
         # get config dir  ~/.colmto and create if not exist
-        l_config_dir = Path("~/.colmto").expanduser()
+        l_config_dir = Path('~/.colmto').expanduser()
         l_config_dir.mkdir(exist_ok=True)
 
         l_parser = argparse.ArgumentParser(
-            prog="colmto",
-            description="Process parameters for CoLMTO."
+            prog='colmto',
+            description='Process parameters for CoLMTO.'
         )
 
         l_parser.add_argument(
-            "--runconfigfile", dest="runconfigfile", type=Path,
-            default=l_config_dir / "runconfig.yaml"
+            '--runconfigfile', dest='runconfigfile', type=Path,
+            default=l_config_dir / 'runconfig.yaml'
         )
         l_parser.add_argument(
-            "--scenarioconfigfile", dest="scenarioconfigfile", type=Path,
-            default=l_config_dir / "scenarioconfig.yaml"
+            '--scenarioconfigfile', dest='scenarioconfigfile', type=Path,
+            default=l_config_dir / 'scenarioconfig.yaml'
         )
         l_parser.add_argument(
-            "--vtypesconfigfile", dest="vtypesconfigfile", type=Path,
-            default=l_config_dir / "vtypesconfig.yaml"
+            '--vtypesconfigfile', dest='vtypesconfigfile', type=Path,
+            default=l_config_dir / 'vtypesconfig.yaml'
         )
         l_parser.add_argument(
-            "--fresh-configs",
-            dest="freshconfigs",
-            action="store_true",
+            '--fresh-configs',
+            dest='freshconfigs',
+            action='store_true',
             default=False,
-            help=f"generate fresh config files (overwrite existing ones in {l_config_dir})"
+            help=f'generate fresh config files (overwrite existing ones in {l_config_dir})'
         )
         l_parser.add_argument(
-            "--output-dir", dest="output_dir", type=Path,
+            '--output-dir', dest='output_dir', type=Path,
             default=l_config_dir
         )
         l_parser.add_argument(
-            "--output-scenario-dir", dest="scenario_dir", type=Path,
-            default=l_config_dir, help="target directory scenario files will be written to"
+            '--output-scenario-dir', dest='scenario_dir', type=Path,
+            default=l_config_dir, help='target directory scenario files will be written to'
         )
         l_parser.add_argument(
-            "--output-results-dir", dest="results_dir", type=Path,
-            default=l_config_dir, help="target directory results will be written to"
+            '--output-results-dir', dest='results_dir', type=Path,
+            default=l_config_dir, help='target directory results will be written to'
         )
         l_parser.add_argument(
-            "--output-hdf5-file", dest="results_hdf5_file", type=Path,
-            default=None, help="target HDF5 file results will be written to"
+            '--output-hdf5-file', dest='results_hdf5_file', type=Path,
+            default=None, help='target HDF5 file results will be written to'
         )
 
         l_parser.add_argument(
-            "--scenarios", dest="scenarios", type=str, nargs="*",
+            '--scenarios', dest='scenarios', type=str, nargs='*',
             default=None
         )
         l_parser.add_argument(
-            "--runs", dest="runs", type=int,
+            '--runs', dest='runs', type=int,
             default=None
         )
         l_parser.add_argument(
-            "--run_prefix", dest="run_prefix", type=str,
-            default=datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            '--run_prefix', dest='run_prefix', type=str,
+            default=datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         )
         l_parser.add_argument(
-            "--logfile", dest="logfile", type=Path,
-            default=l_config_dir / "colmto.log"
+            '--logfile', dest='logfile', type=Path,
+            default=l_config_dir / 'colmto.log'
         )
         l_parser.add_argument(
-            "--loglevel", dest="loglevel", type=str,
-            default="INFO"
+            '--loglevel', dest='loglevel', type=str,
+            default='INFO'
         )
         l_parser.add_argument(
-            "-q", "--quiet", dest="quiet", action="store_true",
-            default=False, help="suppress log info output to stdout"
+            '-q', '--quiet', dest='quiet', action='store_true',
+            default=False, help='suppress log info output to stdout'
         )
         l_parser.add_argument(
-            "--debug",
-            dest="loglevel",
-            action="store_const",
-            const="DEBUG",
-            help="Equivalent to '--loglevel DEBUG'"
+            '--debug',
+            dest='loglevel',
+            action='store_const',
+            const='DEBUG',
+            help='Equivalent to \'--loglevel DEBUG\''
         )
 
         l_mutex_group_run_choice = l_parser.add_mutually_exclusive_group(required=False)
         l_mutex_group_run_choice.add_argument(
-            "--sumo", dest="runsumo", action="store_true",
-            default=False, help="run SUMO simulation"
+            '--sumo', dest='runsumo', action='store_true',
+            default=False, help='run SUMO simulation'
         )
 
-        l_sumo_group = l_parser.add_argument_group("SUMO")
+        l_sumo_group = l_parser.add_argument_group('SUMO')
 
         l_sumo_group.add_argument(
-            "--cse", dest="cse_enabled", action="store_true",
-            default=None, help="run SUMO simulation with central optimisation entity (CSE)"
+            '--cse', dest='cse_enabled', action='store_true',
+            default=None, help='run SUMO simulation with central optimisation entity (CSE)'
         )
 
         l_mutex_sumo_group = l_sumo_group.add_mutually_exclusive_group(required=False)
         l_mutex_sumo_group.add_argument(
-            "--headless", dest="headless", action="store_true",
-            default=None, help="run without SUMO GUI"
+            '--headless', dest='headless', action='store_true',
+            default=None, help='run without SUMO GUI'
         )
         l_mutex_sumo_group.add_argument(
-            "--gui", dest="gui", action="store_true",
-            default=None, help="run with SUMO GUI"
+            '--gui', dest='gui', action='store_true',
+            default=None, help='run with SUMO GUI'
         )
         l_sumo_group.add_argument(
-            "--force-rebuild-scenarios", dest="forcerebuildscenarios", action="store_true",
+            '--force-rebuild-scenarios', dest='forcerebuildscenarios', action='store_true',
             default=False,
-            help="Rebuild and overwrite existing SUMO scenarios in configuration directory "
-                 f"({l_config_dir})"
+            help='Rebuild and overwrite existing SUMO scenarios in configuration directory '
+                 f'({l_config_dir})'
         )
         l_sumo_group.add_argument(
-            "--only-one-otl-segment", dest="onlyoneotlsegment", action="store_true",
-            default=False, help="Generate SUMO scenarios with only on OTL segment"
+            '--only-one-otl-segment', dest='onlyoneotlsegment', action='store_true',
+            default=False, help='Generate SUMO scenarios with only on OTL segment'
         )
         self._args = l_parser.parse_args()
 
@@ -159,20 +159,20 @@ class Colmto(object):
         )
 
     def run(self):
-        """Run CoLMTO"""
-        self._log.info("---- Starting CoLMTO ----")
+        '''Run CoLMTO'''
+        self._log.info('---- Starting CoLMTO ----')
         l_configuration = colmto.common.configuration.Configuration(self._args)
-        self._log.debug("Initial loading of configuration done")
+        self._log.debug('Initial loading of configuration done')
 
-        if l_configuration.run_config.get("sumo").get("enabled") or self._args.runsumo:
-            self._log.info("---- Starting SUMO Baseline Simulation ----")
+        if l_configuration.run_config.get('sumo').get('enabled') or self._args.runsumo:
+            self._log.info('---- Starting SUMO Baseline Simulation ----')
             colmto.sumo.sumosim.SumoSim(self._args).run_scenarios()
 
 
 def main():
-    """main entry point"""
+    '''main entry point'''
     Colmto().run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
