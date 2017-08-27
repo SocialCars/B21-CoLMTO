@@ -55,7 +55,7 @@ class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
 class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
     __slots__ = ()
 
-    def contains(self, speed):
+    def contains(self, speed: float):
         '''checks whether speed lies between min and max (including)'''
         return self.min <= speed <= self.max
 
