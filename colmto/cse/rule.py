@@ -31,19 +31,21 @@ from typing import Generator
 from typing import Iterable
 
 import enum
-import numpy
 
 from colmto.environment import SUMOVehicle
 
 
 class Position(namedtuple('Position', ('x', 'y'))):
+    '''named tuple to represent positions on the road'''
     __slots__ = ()
 
 
 class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
+    '''named tuple to represent a bounding box'''
     __slots__ = ()
 
     def __new__(cls, p1, p2):
+        '''override to ensure Position named tuples'''
         # noinspection PyArgumentList
         return super(cls, BoundingBox).__new__(cls, p1=Position(*p1), p2=Position(*p2))
 
@@ -53,6 +55,7 @@ class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
 
 
 class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
+    '''named tuple to represent allowed speed range'''
     __slots__ = ()
 
     def contains(self, speed: float):

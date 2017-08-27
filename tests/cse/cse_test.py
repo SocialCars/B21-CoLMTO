@@ -26,7 +26,6 @@ colmto: Test module for environment.cse.
 '''
 import random
 
-import numpy
 from nose.tools import assert_equal
 from nose.tools import assert_is_instance
 from nose.tools import assert_raises
@@ -73,11 +72,11 @@ def test_sumo_cse():
         colmto.cse.cse.SumoCSE
     )
 
-    l_rule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=numpy.array((0., 80.)))
+    l_rule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 80.))
     l_rule_position = colmto.cse.rule.SUMOPositionRule(
-        position_bbox=numpy.array(((0., 0), (64.0, 1)))
+        position_bbox=((0., 0), (64.0, 1))
     )
-    l_subrule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=numpy.array((0., 60.)))
+    l_subrule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 60.))
     l_rule_position.add_rule(l_subrule_speed)
 
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_speed).add_rule(l_rule_position)
@@ -96,14 +95,14 @@ def test_sumo_cse():
         ) for _ in range(2342)
         ]
     for i_vehicle in l_vehicles:
-        i_vehicle.position = numpy.array((random.randrange(0, 120), random.randint(0, 1)))
+        i_vehicle.position = (random.randrange(0, 120), random.randint(0, 1))
 
     l_sumo_cse.apply(l_vehicles)
 
     for i, i_result in enumerate(l_vehicles):
-        if (0 <= l_vehicles[i].position[0] <= 64.0 and 0 <= l_vehicles[i].position[1] <= 1
-                and 0 <= l_vehicles[i].speed_max <= 60.0) \
-                or 0 <= l_vehicles[i].speed_max <= 80.0:
+        if (0 <= l_vehicles[i].position.x <= 64.0 and 0 <= l_vehicles[i].position.y <= 1
+                and 0. <= l_vehicles[i].speed_max <= 60.0) \
+                or 0. <= l_vehicles[i].speed_max <= 80.0:
             assert_equal(
                 i_result.vehicle_class,
                 colmto.cse.rule.SUMORule.to_disallowed_class()

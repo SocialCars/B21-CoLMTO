@@ -27,7 +27,6 @@ colmto: Test module for environment.vehicle.
 import numpy
 from nose.tools import assert_equal
 from nose.tools import assert_almost_equal
-from nose.tools import assert_true
 from nose.tools import assert_list_equal
 
 
@@ -43,27 +42,17 @@ def test_basevehicle():
     l_basevehicle = colmto.environment.vehicle.BaseVehicle()
 
     assert_equal(l_basevehicle.speed, 0.0)
-    assert_true(numpy.array_equal(l_basevehicle.position, numpy.array([0.0, 0])))
+    assert_equal(l_basevehicle.position, (0.0, 0))
 
     # test custom values
     l_basevehicle = colmto.environment.vehicle.BaseVehicle()
     l_basevehicle.position = numpy.array([23.0, 0])
     l_basevehicle.speed = 12.1
 
-    assert_equal(
-        l_basevehicle.speed,
-        12.1
-    )
-    assert_true(
-        numpy.array_equal(l_basevehicle.position, numpy.array([23.0, 0]))
-    )
-    assert_true(
-        numpy.array_equal(l_basevehicle.properties.get('position'), numpy.array([23.0, 0]))
-    )
-    assert_equal(
-        l_basevehicle.properties.get('speed'),
-        12.1
-    )
+    assert_equal(l_basevehicle.speed, 12.1)
+    assert_equal(l_basevehicle.position, (23.0, 0))
+    assert_equal(l_basevehicle.properties.get('position'), (23.0, 0))
+    assert_equal(l_basevehicle.properties.get('speed'), 12.1)
 
 
 def test_sumovehicle():
@@ -76,9 +65,9 @@ def test_sumovehicle():
 
     assert_equal(l_sumovehicle.speed_max, 0.0)
     assert_equal(l_sumovehicle.speed, 0.0)
-    assert_true(numpy.array_equal(l_sumovehicle.position, numpy.array((0.0, 0))))
+    assert_equal(l_sumovehicle.position, (0.0, 0))
     assert_equal(l_sumovehicle.vehicle_type, 'None')
-    assert_true(numpy.array_equal(l_sumovehicle.color, numpy.array((255, 255, 0, 255))))
+    assert_equal(l_sumovehicle.color, (255, 255, 0, 255))
 
     # test custom values
     l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
@@ -97,32 +86,17 @@ def test_sumovehicle():
 
     assert_equal(l_sumovehicle.speed_max, 27.777)
     assert_equal(l_sumovehicle.speed_current, 12.1)
-    assert_true(numpy.array_equal(l_sumovehicle.position, numpy.array([42.0, 0])))
+    assert_equal(l_sumovehicle.position, (42.0, 0))
     assert_equal(l_sumovehicle.vehicle_type, 'passenger')
-    assert_true(numpy.array_equal(l_sumovehicle.color, numpy.array((128, 64, 255, 255))))
+    assert_equal(l_sumovehicle.color, (128, 64, 255, 255))
     assert_equal(l_sumovehicle.start_time, 13)
-    assert_true(
-        numpy.array_equal(
-            l_sumovehicle.grid_position,
-            numpy.array((0, 0))
-        )
-    )
+    assert_equal(l_sumovehicle.grid_position, (0, 0))
+
     l_sumovehicle.grid_position = (1, 2)
-    assert_true(
-        numpy.array_equal(
-            l_sumovehicle.grid_position,
-            numpy.array((1, 2))
-        )
-    )
-    assert_true(
-        numpy.array_equal(
-            l_sumovehicle.properties.get('grid_position'), numpy.array((1, 2))
-        )
-    )
-    assert_equal(
-        l_sumovehicle.travel_time,
-        0.0
-    )
+
+    assert_equal(l_sumovehicle.grid_position, (1, 2))
+    assert_equal(l_sumovehicle.properties.get('grid_position'), (1, 2))
+    assert_equal(l_sumovehicle.travel_time, 0.0)
     assert_equal(
         l_sumovehicle.travel_stats,
         {
@@ -162,13 +136,11 @@ def test_dissatisfaction():
     )
     for i_time_loss in range(30):
         assert_almost_equal(
-            # pylint: disable=protected-access
-            l_sumovehicle._dissatisfaction(
+            l_sumovehicle.dissatisfaction(
                 time_loss=i_time_loss+10,
                 optimal_travel_time=100,
                 time_loss_threshold=0.2
             ),
-            # pylint: enable=protected-access
             l_data[i_time_loss]
         )
 
@@ -177,25 +149,21 @@ def test_update():
     '''Test update'''
     l_sumovehicle = colmto.environment.vehicle.SUMOVehicle()
     l_sumovehicle.update(
-        position=(1, 2),
+        position=colmto.environment.vehicle.Position(1, 2),
         lane_index=1,
         speed=12.1
     )
-    assert_true(
-        numpy.array_equal(
-            l_sumovehicle.position,
-            numpy.array((1, 2))
-        )
+    assert_equal(
+        l_sumovehicle.position,
+        (1, 2)
     )
     assert_equal(
         l_sumovehicle.speed,
         12.1
     )
-    assert_true(
-        numpy.array_equal(
-            l_sumovehicle.grid_position,
-            numpy.array((-1, 1))
-        )
+    assert_equal(
+        l_sumovehicle.grid_position,
+        (-1, 1)
     )
 
 
@@ -266,7 +234,11 @@ def test_record_travel_stats():
         l_sumovehicle.travel_stats.get('grid').get('relative_time_loss'),
         [[0.0]]
     )
-    l_sumovehicle.update(position=(3., 0.), lane_index=0, speed=3.)
+    l_sumovehicle.update(
+        position=colmto.environment.vehicle.Position(3., 0.),
+        lane_index=0,
+        speed=3.
+    )
     l_sumovehicle.record_travel_stats(3)
     assert_list_equal(
         l_sumovehicle.travel_stats.get('grid').get('dissatisfaction')[0],
@@ -280,7 +252,11 @@ def test_record_travel_stats():
         l_sumovehicle.travel_stats.get('grid').get('relative_time_loss')[0],
         [0.0]
     )
-    l_sumovehicle.update(position=(6., 0.), lane_index=0, speed=3.)
+    l_sumovehicle.update(
+        position=colmto.environment.vehicle.Position(6., 0.),
+        lane_index=0,
+        speed=3.
+    )
     l_sumovehicle.record_travel_stats(4)
     assert_almost_equal(
         l_sumovehicle.travel_stats.get('grid').get('dissatisfaction'),

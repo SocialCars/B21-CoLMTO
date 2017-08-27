@@ -23,23 +23,21 @@
 # @endcond
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
-from typing import NamedTuple
+from collections import namedtuple
 from types import MappingProxyType
 import numpy
 
 import colmto.cse.rule
 
 
-class Position(NamedTuple):
-    x: float = 0.0
-    y: float = 0.0
+class Position(namedtuple('Position', ('x', 'y'))):
+    '''named tuple to represent the vehicle position'''
+    __slots__ = ()
 
 
-class Colour(NamedTuple):
-    red: float = 0.0
-    green: float = 0.0
-    blue: float = 0.0
-    alpha: float = 0.0
+class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
+    '''named tuple to represent rgba values'''
+    __slots__ = ()
 
 
 class BaseVehicle(object):
@@ -49,7 +47,7 @@ class BaseVehicle(object):
         '''C'tor'''
 
         self._properties = {
-            'position': Position(),
+            'position': Position(x=0.0, y=0.0),
             'speed': 0.0,
         }
 
