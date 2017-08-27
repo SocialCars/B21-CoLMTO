@@ -23,10 +23,23 @@
 # @endcond
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
+from typing import NamedTuple
 from types import MappingProxyType
 import numpy
 
 import colmto.cse.rule
+
+
+class Position(NamedTuple):
+    x: float = 0.0
+    y: float = 0.0
+
+
+class Colour(NamedTuple):
+    red: float = 0.0
+    green: float = 0.0
+    blue: float = 0.0
+    alpha: float = 0.0
 
 
 class BaseVehicle(object):
@@ -36,7 +49,7 @@ class BaseVehicle(object):
         '''C'tor'''
 
         self._properties = {
-            'position': numpy.array((0.0, 0.0)),
+            'position': Position(),
             'speed': 0.0,
         }
 
@@ -63,20 +76,19 @@ class BaseVehicle(object):
         self._properties['speed'] = float(speed)
 
     @property
-    def position(self) -> numpy.ndarray:
+    def position(self) -> Position:
         '''
         @retval current position
         '''
-        # TODO: return named tuple
-        return numpy.array(self._properties.get('position'))
+        return self._properties.get('position')
 
     @position.setter
-    def position(self, position: numpy.ndarray):
+    def position(self, position: Position):
         '''
         Set vehicle position
         @param position current position
         '''
-        self._properties['position'] = numpy.array(position)
+        self._properties['position'] = Position(*position)
 
 
 class SUMOVehicle(BaseVehicle):
@@ -106,14 +118,14 @@ class SUMOVehicle(BaseVehicle):
 
         self._properties.update(
             {
-                'color': numpy.array((255, 255, 0, 255)),
+                'color': Colour(red=255, green=255, blue=0, alpha=255),
                 'start_time': 0.0,
                 'speedDev': speed_deviation,
                 'sigma': sigma,
                 'maxSpeed': speed_max,
                 'vType': vehicle_type,
                 'vClass': colmto.cse.rule.SUMORule.to_allowed_class(),
-                'grid_position': numpy.array((0, 0))
+                'grid_position': Position(x=0, y=0)
             }
         )
 
@@ -141,19 +153,19 @@ class SUMOVehicle(BaseVehicle):
         }
 
     @property
-    def grid_position(self) -> numpy.ndarray:
+    def grid_position(self) -> Position:
         '''
         @retval current grid position
         '''
-        return numpy.array(self._properties.get('grid_position'))
+        return Position(*self._properties.get('grid_position'))
 
     @grid_position.setter
-    def grid_position(self, position: numpy.ndarray):
+    def grid_position(self, position: Position):
         '''
         Updates current position
         @param position current grid position
         '''
-        self._properties['grid_position'] = numpy.array(position, dtype=int)
+        self._properties['grid_position'] = Position(*position)
 
     @property
     def vehicle_type(self) -> str:
@@ -181,20 +193,20 @@ class SUMOVehicle(BaseVehicle):
         self._properties['start_time'] = float(start_time)
 
     @property
-    def color(self) -> numpy.ndarray:
+    def color(self) -> Colour:
         '''
         Returns:
             color
         '''
-        return numpy.array(self._properties.get('color'))
+        return Colour(*self._properties.get('color'))
 
     @color.setter
-    def color(self, color: numpy.ndarray):
+    def color(self, color: Position):
         '''
         Update color
-        @param color Color (rgba-tuple, e.g. (255, 255, 0, 255))
+        @param color Color (rgba tuple, e.g. (255, 255, 0, 255))
         '''
-        self._properties['color'] = numpy.array(color)
+        self._properties['color'] = Colour(*color)
 
     @property
     def vehicle_class(self) -> str:
@@ -242,7 +254,7 @@ class SUMOVehicle(BaseVehicle):
         self._properties['dsat_threshold'] = float(threshold)
 
     @staticmethod
-    def _dissatisfaction(
+    def dissatisfaction(
             time_loss: float,
             optimal_travel_time: float,
             time_loss_threshold=0.2) -> float:
@@ -310,7 +322,7 @@ class SUMOVehicle(BaseVehicle):
             )
 
             self._travel_stats.get('grid').get('dissatisfaction')[-1].append(
-                self._dissatisfaction(
+                self.dissatisfaction(
                     time_step - self.start_time - self.position[0] / self.speed_max,
                     self.position[0] / self.speed_max,
                     self._properties.get('dsat_threshold')
@@ -332,7 +344,7 @@ class SUMOVehicle(BaseVehicle):
             )
             self._travel_stats.get('grid').get('dissatisfaction').append(
                 [
-                    self._dissatisfaction(
+                    self.dissatisfaction(
                         time_step - self.start_time - self.position[0] / self.speed_max,
                         self.position[0] / self.speed_max,
                         self._properties.get('dsat_threshold')
@@ -352,7 +364,7 @@ class SUMOVehicle(BaseVehicle):
         self._travel_stats.get('step').get('speed').append(self.speed)
 
         self._travel_stats.get('step').get('dissatisfaction').append(
-            self._dissatisfaction(
+            self.dissatisfaction(
                 time_step - self.start_time - self.position[0] / self.speed_max,
                 self.position[0] / self.speed_max,
                 self._properties.get('dsat_threshold')
@@ -388,7 +400,7 @@ class SUMOVehicle(BaseVehicle):
         self._properties['vClass'] = str(class_name)
         return self
 
-    def update(self, position: tuple, lane_index: int, speed: float) -> BaseVehicle:
+    def update(self, position: Position, lane_index: int, speed: float) -> BaseVehicle:
         '''
         Update current properties of vehicle providing data acquired from TraCI call.
 
@@ -402,16 +414,8 @@ class SUMOVehicle(BaseVehicle):
         @retval self Vehicle reference
         '''
 
-        # set current position
-        self._properties['position'] = numpy.array(position)
-        # set current grid position
-        self._properties['grid_position'] = numpy.array(
-            (
-                int(round(position[0]/4.)-1),
-                int(lane_index)
-            )
-        )
-        # set speed
+        self._properties['position'] = Position(*position)
+        self._properties['grid_position'] = Position(x=int(round(position.x/4.)-1), y=int(lane_index))
         self._properties['speed'] = float(speed)
 
         return self
