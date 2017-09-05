@@ -413,7 +413,10 @@ class SUMOVehicle(BaseVehicle):
         '''
 
         self._properties['position'] = Position(*position)
-        self._properties['grid_position'] = Position(x=int(round(position.x/4.)-1), y=int(lane_index))
+        self._properties['grid_position'] = Position(
+            x=int(round(self._properties.get('grid_position').x/4.)-1),
+            y=int(lane_index)
+        )
         self._properties['speed'] = float(speed)
 
         return self
