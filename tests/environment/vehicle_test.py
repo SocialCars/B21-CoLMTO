@@ -258,15 +258,15 @@ def test_record_travel_stats():
         speed=3.
     )
     l_sumovehicle.record_travel_stats(4)
-    assert_almost_equal(
+    assert_list_equal(
         l_sumovehicle.travel_stats.get('grid').get('dissatisfaction'),
-        [[0.0], [0.99036954025194568]]
+        [[0.0], [0.97498989541258152, 0.99036954025194568]]
     )
-    assert_almost_equal(
+    assert_list_equal(
         l_sumovehicle.travel_stats.get('grid').get('time_loss'),
-        [[0.0], [3.9399999999999999]]
+        [[0.0], [2.97, 3.9399999999999999]]
     )
-    assert_almost_equal(
+    assert_list_equal(
         l_sumovehicle.travel_stats.get('grid').get('relative_time_loss'),
-        [[0.0], [65.666666666666671]]
+        [[0.0], [99.00000000000001, 65.666666666666671]]
     )
