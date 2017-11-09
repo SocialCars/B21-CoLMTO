@@ -1,85 +1,192 @@
-general:
-    branches:
-        only:
-            - master
-        ignore:
-            - develop
-            - /dev-.*/
-            - /gh-.*/
-            - /sim-.*/
+version: 2
 
-machine:
-    timezone:
-        Europe/Berlin
+jobs:
+    build:
+        machine:
+            image: circleci/python:3.6.3
 
-    environment:
-        GIT_AUTHOR_NAME: CircleCI
-        GIT_AUTHOR_EMAIL: masc@tu-clausthal.de
-        GIT_COMMITTER_NAME: CircleCI
-        GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
-        SUMO_HOME: /usr/share/sumo
-        TEXINSTALL: minimal
-        DOCUMENT: CoLMTO-doc
-        PATH: $PATH:/tmp/texlive/bin/x86_64-linux
-    python:
-        version: 3.6.1
 
-dependencies:
-    cache_directories:
-        - "/tmp/texlive/"
+        branches:
+            ignore:
+                - develop
+                - /dev-.*/
+                - /gh-.*/
+                - /sim-.*/
 
-    pre:
-        - sudo add-apt-repository -y ppa:sumo/stable
-        - sudo apt-get update
-        - sudo apt-get install doxygen graphviz sumo libhdf5-dev pandoc tk-dev python-tk
-        - pip3 install pylint radon codecov doxypy
-        - if [ ! -d /tmp/texlive/ ]; then curl -L https://tesseract.in.tu-clausthal.de:8443/index.php/s/3ZKzReAc69yBNou/download | sudo tar xJp --strip 2 -C /tmp; fi
-        - sudo /tmp/texlive/bin/x86_64-linux/tlmgr update --self --all --reinstall-forcibly-removed
+        shell: /bin/bash
 
-checkout:
-  post:
-    - git submodule sync
-    - git submodule update --init
 
-test:
-    post:
-        - git checkout master
-        - python3 setup.py install
-        - python3 setup.py test
-        - SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
-        - SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
-        # codecov
-        - nosetests -w tests --with-coverage
-        - bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
-        - bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
-        - mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
-        - git checkout gh-pages
-        - mv -f circle.yml .gitignore /tmp
-        - git checkout master
-        - git push origin :gh-pages || true
-        - git branch -D gh-pages
-        - git checkout --orphan gh-pages
-        - rm -Rf *
-        - rm .pre-commit-config.yaml
-        - mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png /tmp/executionmodel.png .
-        - sh site/pylint.sh > pylint.md || true
-        - echo -e "\n## Import Graph\n" >> pylint.md
-        - cp pylint.md pylint_doc.md
-        - echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
-        - echo -e "\n# Code Statistics\n\n" > report.md
-        - echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > readme_doc.md
-        - sh site/radon.sh > radon.md
-        - cat radon.md >> report.md
-        - echo -e "\n# Pylint\n\n" >> report.md
-        - cat pylint.md >> report.md
-        - doxygen site/configuration.doxyfile
-        # build latex
-        - cd docs/latex/ && make && cd ..
-        - mv docs/latex/refman.pdf docs/$DOCUMENT.pdf
-        - rm -Rf docs/latex
-        - mv colmto-imports.png docs/sources
-        - rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
-        # add & commit
-        - git add --all .
-        - git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
-        - git push origin gh-pages
+        environment:
+            TZ: "/usr/share/zoneinfo/Europe/Berlin"
+            IT_AUTHOR_NAME: CircleCI
+            GIT_AUTHOR_EMAIL: masc@tu-clausthal.de
+            GIT_COMMITTER_NAME: CircleCI
+            GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
+            SUMO_HOME: /usr/share/sumo
+            # install current texlive and run update (installation scheme: full, medium, small, basic, minimal)
+            TEXINSTALL: "selected_scheme scheme-full\\nTEXDIR /home/circleci/.bin/texlive/\\nTEXMFLOCAL /home/circleci/.bin/texlive/texmf-local\\nTEXMFSYSCONFIG /home/circleci/.bin/texlive/texmf-config\\nTEXMFSYSVAR /home/circleci/.bin//texlive/texmf-var\\nTEXMFHOME ~/texmf\nTEXMFCONFIG ~/.texlive/texmf-config\\nTEXMFVAR ~/.texlive/texmf-var\\nbinary_x86_64-linux 1\\ninstopt_adjustpath 1\\ninstopt_adjustrepo 1\\ninstopt_letter 1\\ninstopt_portable 0\\ninstopt_write18_restricted 1\\ntlpdbopt_autobackup 1\\ntlpdbopt_backupdir tlpkg/backups\\ntlpdbopt_create_formats 1\\ntlpdbopt_desktop_integration 0\\ntlpdbopt_file_assocs 1\\ntlpdbopt_generate_updmap 0\\ntlpdbopt_install_docfiles 0\\ntlpdbopt_install_srcfiles 0\\ntlpdbopt_post_code 1\\ntlpdbopt_sys_bin /tmp\\ntlpdbopt_sys_info /tmp\\ntlpdbopt_sys_man /tmp\\ntlpdbopt_w32_multi_user 1\\n"
+            DOCUMENT: CoLMTO-doc
+
+        steps:
+            - restore_cache:
+                keys:
+                    - TeX-Installation-2017-10-31-16-00
+                    - TeX-Userdata-2017-10-31-16-00
+            - run:
+                name: Expand Path
+                command: echo 'export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux' >> $BASH_ENV        
+            - run:
+                name: Download LaTeX Installation
+                command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
+            - run:
+                name: LaTeX Installation
+                command: if [ ! -d ~/.bin/texlive ]; then echo -e "$TEXINSTALL" > /tmp/texinstall.profile; /tmp/tex/install-tl -profile /tmp/texinstall.profile; fi
+            - run:
+                name: TUC Draft Installation
+                command: if [ ! -d ~/texmf ]; then git clone https://mecdev.rz-housing.tu-clausthal.de/gitlab/tuc/tex-vorlagen.git ~/texmf/tex/latex/tuc; mkdir -p ~/texmf/bibtex/bst; cd ~/texmf/bibtex/bst; ln -s ../../tex/latex/tuc/externalpublication/llcns/splncs03.bst .; ln -s ../../tex/latex/mec/tuc/externalpublication/aamas/ACM-Reference-Format.bst .; fi    
+            - run:
+                name: LaTeX Update
+                command: tlmgr update --self --all --reinstall-forcibly-removed                
+            - save_cache:
+                key: TeX-Installation-2017-10-31-16-00
+                paths:
+                    - ~/.bin/texlive
+            - save_cache:
+                key: TeX-Userdata-2017-10-31-16-00
+                paths:
+                    - ~/texmf
+                    - ~/.texlive
+            - run:
+                name: Add SUMO Repository
+                command: sudo add-apt-repository -y ppa:sumo/stable
+            - run:
+                name: Update Package Repositories
+                command: sudo apt-get update
+            - run:
+                name: Add SUMO Repository
+                command: sudo add-apt-repository -y ppa:sumo/stable
+            - run:
+                name: Install SUMO and Dependencies
+                command: sudo apt-get install doxygen graphviz sumo libhdf5-dev pandoc tk-dev python-tk
+            - run:
+                name: Install Python Dependencies
+                command: pip3 install pylint radon codecov doxypy
+
+            - checkout
+            - run:
+                name: Git Submodule Sync
+                command: git submodule sync
+            - run:
+                name: Git Submodule Update
+                command: git submodule update --init
+            - run:
+            name: Git Checkout master
+            command: git checkout master
+            - run:
+                name: Install Python Package with Dependencies
+                command: python3 setup.py install
+            - run:
+                name: Run Tests
+                command: python3 setup.py test
+            - run:
+                name: Run Simulation for Scenario NI-B210
+                command: SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
+            - run:
+                name: Run Simulation for Scenario NI-B210 with CSE enabled
+                command: SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
+            - run:
+                name: Run Nosetests for Codecov 
+                command: nosetests -w tests --with-coverage
+            - run:
+                name: Upload Codecov Results (1/2)
+                command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
+            - run:
+                name: Upload Codecov Results (2/2)
+                command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
+            - run:
+                name: Move to /tmp
+                command: mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
+            - run:
+                name: Checkout gh-pages
+                command: git checkout gh-pages
+            - run:
+                name: Move to /tmp
+                command: mv -f circle.yml .gitignore /tmp
+            - run:
+                name: Checkout Master
+                command: git checkout master
+            - run:
+                name: Remove Remote gh-pages Branch
+                command: git push origin :gh-pages || true
+            - run:
+                name: Remove Local gh-pages Branch
+                command: git branch -D gh-pages
+            - run:
+                name: Checkout
+                command: git checkout --orphan gh-pages
+            - run:
+                name: Remove
+                command: rm -Rf *
+            - run:
+                name: Remove pre-commit-config
+                command: rm .pre-commit-config.yaml
+            - run:
+                name: Move Docs from /tmp
+                command: mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png /tmp/executionmodel.png .
+            - run:
+                name: Update pylint.md (1/4)
+                command: sh site/pylint.sh > pylint.md || true
+            - run:
+                name: Update pylint.md (2/4)
+                command: echo -e "\n## Import Graph\n" >> pylint.md
+            - run:
+                name: Update pylint.md (3/4)
+                command: cp pylint.md pylint_doc.md
+            - run:
+                name: Update pylint.md (4/4)
+                command: echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
+            - run:
+                name: Update report.md (1/4)
+                command: echo -e "\n# Code Statistics\n\n" > report.md
+            - run:
+                name: Update readme.md
+                command: echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > readme_doc.md
+            - run:
+                name: Update radon.md
+                command: sh site/radon.sh > radon.md
+            - run:
+                name: Update report.md (2/4)
+                command: cat radon.md >> report.md
+            - run:
+                name: Update report.md (3/4)
+                command: echo -e "\n# Pylint\n\n" >> report.md
+            - run:
+                name: Update report.md (4/4)
+                command: cat pylint.md >> report.md
+            - run:
+                name: Create Documentation (doxygen)
+                command: doxygen site/configuration.doxyfile
+            - run:
+                name: Build LaTeX (1/3)
+                command: cd docs/latex/ && make && cd ..
+            - run:
+                name: Build LaTeX (2/3)
+                command: mv docs/latex/refman.pdf docs/$DOCUMENT.pdf
+            - run:
+                name: Build LaTeX (3/3)
+                command: rm -Rf docs/latex
+            - run:
+                name: Move Figure
+                command: mv colmto-imports.png docs/sources
+            - run:
+                name: Cleanup
+                command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
+            - run:
+                name: Git Add All
+                command: git add --all .
+            - run:
+                name: Git Commit
+                command: git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
+            - run:
+                name: Git Push gh-pages
+                command: git push origin gh-pages            
