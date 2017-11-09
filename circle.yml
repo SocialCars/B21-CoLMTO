@@ -3,7 +3,7 @@ version: 2
 jobs:
     build:
         machine:
-            image: circleci/python:3.6.3
+            image: circleci/python:3.6.3-stretch
 
 
         branches:
