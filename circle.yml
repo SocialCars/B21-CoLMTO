@@ -80,8 +80,8 @@ jobs:
                 name: Git Submodule Update
                 command: git submodule update --init
             - run:
-            name: Git Checkout master
-            command: git checkout master
+                name: Git Checkout master
+                command: git checkout master
             - run:
                 name: Install Python Package with Dependencies
                 command: python3 setup.py install
