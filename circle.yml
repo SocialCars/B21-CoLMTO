@@ -12,7 +12,6 @@ jobs:
                 GIT_COMMITTER_NAME: CircleCI
                 GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
                 SUMO_HOME: /usr/share/sumo
-                PATH: "$PATH:~/.bin/texlive/bin/x86_64-linux"
                 # install current texlive and run update (installation scheme: full, medium, small, basic, minimal)
                 TEXINSTALL: "selected_scheme scheme-full\\nTEXDIR /home/circleci/.bin/texlive/\\nTEXMFLOCAL /home/circleci/.bin/texlive/texmf-local\\nTEXMFSYSCONFIG /home/circleci/.bin/texlive/texmf-config\\nTEXMFSYSVAR /home/circleci/.bin//texlive/texmf-var\\nTEXMFHOME ~/texmf\nTEXMFCONFIG ~/.texlive/texmf-config\\nTEXMFVAR ~/.texlive/texmf-var\\nbinary_x86_64-linux 1\\ninstopt_adjustpath 1\\ninstopt_adjustrepo 1\\ninstopt_letter 1\\ninstopt_portable 0\\ninstopt_write18_restricted 1\\ntlpdbopt_autobackup 1\\ntlpdbopt_backupdir tlpkg/backups\\ntlpdbopt_create_formats 1\\ntlpdbopt_desktop_integration 0\\ntlpdbopt_file_assocs 1\\ntlpdbopt_generate_updmap 0\\ntlpdbopt_install_docfiles 0\\ntlpdbopt_install_srcfiles 0\\ntlpdbopt_post_code 1\\ntlpdbopt_sys_bin /tmp\\ntlpdbopt_sys_info /tmp\\ntlpdbopt_sys_man /tmp\\ntlpdbopt_w32_multi_user 1\\n"
                 DOCUMENT: CoLMTO-doc
@@ -31,9 +30,12 @@ jobs:
                 keys:
                     - TeX-Installation-2017-10-31-16-00
                     - TeX-Userdata-2017-10-31-16-00
-            #- run:
-            #    name: Expand Path
-            #    command: echo 'export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux' >> $BASH_ENV        
+            - run:
+                name: Expand Path to $BASH_ENV
+                command: echo 'export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux' >> $BASH_ENV
+            - run:
+                name: Add TeX to Path
+                command: export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux
             - run:
                 name: Download LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
