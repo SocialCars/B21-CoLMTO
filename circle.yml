@@ -34,9 +34,6 @@ jobs:
                 name: Expand Path to $BASH_ENV
                 command: echo 'export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux' >> $BASH_ENV
             - run:
-                name: Add TeX to Path
-                command: export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux
-            - run:
                 name: Download LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
             - run:
@@ -47,7 +44,7 @@ jobs:
                 command: if [ ! -d ~/texmf ]; then git clone https://mecdev.rz-housing.tu-clausthal.de/gitlab/tuc/tex-vorlagen.git ~/texmf/tex/latex/tuc; mkdir -p ~/texmf/bibtex/bst; cd ~/texmf/bibtex/bst; ln -s ../../tex/latex/tuc/externalpublication/llcns/splncs03.bst .; ln -s ../../tex/latex/mec/tuc/externalpublication/aamas/ACM-Reference-Format.bst .; fi    
             - run:
                 name: LaTeX Update
-                command: tlmgr update --self --all --reinstall-forcibly-removed                
+                command: ~/.bin/texlive/bin/x86_64-linux/tlmgr update --self --all --reinstall-forcibly-removed                
             - save_cache:
                 key: TeX-Installation-2017-10-31-16-00
                 paths:
