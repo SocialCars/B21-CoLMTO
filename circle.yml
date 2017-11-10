@@ -4,7 +4,7 @@ jobs:
     build:
         working_directory: ~/colmto
         docker:
-            - image: circleci/python:3.6.3-stretch
+            - image: 1masc/sumo-docker:latest
               environment:
                 TZ: "/usr/share/zoneinfo/Europe/Berlin"
                 IT_AUTHOR_NAME: CircleCI
@@ -54,15 +54,6 @@ jobs:
                 paths:
                     - ~/texmf
                     - ~/.texlive
-            - run:
-                name: Add SUMO Repository
-                command: add-apt-repository -y ppa:sumo/stable
-            - run:
-                name: Update Package Repositories
-                command: sudo apt-get update
-            - run:
-                name: Add SUMO Repository
-                command: sudo add-apt-repository -y ppa:sumo/stable
             - run:
                 name: Install SUMO and Dependencies
                 command: sudo apt-get install doxygen graphviz sumo libhdf5-dev pandoc tk-dev python-tk
