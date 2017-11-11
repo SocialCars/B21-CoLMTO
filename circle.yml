@@ -78,6 +78,9 @@ jobs:
                 name: Run Tests
                 command: sudo python3 setup.py test
             - run:
+                name: Chown
+                command: sudo chown -R ~/colmto
+            - run:
                 name: Run Simulation for Scenario NI-B210
                 command: SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
             - run:
