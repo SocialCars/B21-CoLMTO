@@ -56,11 +56,10 @@ jobs:
                     - ~/.texlive
             - run:
                 name: Install SUMO and Dependencies
-                command: sudo apt-get install doxygen graphviz sumo libhdf5-dev pandoc tk-dev python-tk
+                command: sudo apt-get install doxygen graphviz libhdf5-dev pandoc tk-dev python-tk
             - run:
                 name: Install Python Dependencies
-                command: sudo pip3 install pylint radon codecov doxypy
-
+                command: pip3 install --user --prefix= pylint radon codecov doxypy
             - checkout
             - run:
                 name: Git Submodule Sync
@@ -72,14 +71,14 @@ jobs:
                 name: Git Checkout master
                 command: git checkout master
             - run:
-                name: Install Python Package with Dependencies
-                command: sudo python3 setup.py install
+                name: Install Dependencies
+                command: pip3 install -U -r requirements.txt --user --prefix=
+            - run:
+                name: Install Python Package
+                command: python3 setup.py install --user --prefix=
             - run:
                 name: Run Tests
-                command: sudo python3 setup.py test
-            - run:
-                name: Chown
-                command: sudo chown -R cicleci ~/colmto
+                command: python3 setup.py test
             - run:
                 name: Run Simulation for Scenario NI-B210
                 command: SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
