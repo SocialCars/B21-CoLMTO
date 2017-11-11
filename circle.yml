@@ -73,7 +73,7 @@ jobs:
                 command: git checkout master
             - run:
                 name: Install Python Package with Dependencies
-                command: python3 setup.py install
+                command: sudo python3 setup.py install
             - run:
                 name: Run Tests
                 command: python3 setup.py test
