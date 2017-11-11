@@ -59,7 +59,7 @@ jobs:
                 command: sudo apt-get install doxygen graphviz sumo libhdf5-dev pandoc tk-dev python-tk
             - run:
                 name: Install Python Dependencies
-                command: pip3 install pylint radon codecov doxypy
+                command: sudo pip3 install pylint radon codecov doxypy
 
             - checkout
             - run:
