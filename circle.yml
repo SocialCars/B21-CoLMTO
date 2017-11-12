@@ -12,11 +12,7 @@ jobs:
             GIT_COMMITTER_NAME: CircleCI
             GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
             SUMO_HOME: /usr/share/sumo
-            # install current texlive and run update (installation scheme: full, medium, small, basic, minimal)
-            TEXINSTALL: "selected_scheme scheme-full\\nTEXDIR /home/circleci/.bin/texlive/\\nTEXMFLOCAL /home/circleci/.bin/texlive/texmf-local\\nTEXMFSYSCONFIG /home/circleci/.bin/texlive/texmf-config\\nTEXMFSYSVAR /home/circleci/.bin//texlive/texmf-var\\nTEXMFHOME ~/texmf\nTEXMFCONFIG ~/.texlive/texmf-config\\nTEXMFVAR ~/.texlive/texmf-var\\nbinary_x86_64-linux 1\\ninstopt_adjustpath 1\\ninstopt_adjustrepo 1\\ninstopt_letter 1\\ninstopt_portable 0\\ninstopt_write18_restricted 1\\ntlpdbopt_autobackup 1\\ntlpdbopt_backupdir tlpkg/backups\\ntlpdbopt_create_formats 1\\ntlpdbopt_desktop_integration 0\\ntlpdbopt_file_assocs 1\\ntlpdbopt_generate_updmap 0\\ntlpdbopt_install_docfiles 0\\ntlpdbopt_install_srcfiles 0\\ntlpdbopt_post_code 1\\ntlpdbopt_sys_bin /tmp\\ntlpdbopt_sys_info /tmp\\ntlpdbopt_sys_man /tmp\\ntlpdbopt_w32_multi_user 1\\n"
-            DOCUMENT: CoLMTO-doc
-        parallelism: 2
-
+            
         branches:
             ignore:
                 - develop
@@ -29,33 +25,10 @@ jobs:
         steps:
             - restore_cache:
                 keys:
-                    - TeX-Installation-2017-10-31-16-00
-                    - TeX-Userdata-2017-10-31-16-00
                     - Local-2017-11-12-13-00
             - run:
                 name: Expand Path to $BASH_ENV
-                command: echo 'export PATH=~/.bin/texlive/bin/x86_64-linux:~/.local/bin:$PATH' >> $BASH_ENV
-            - run:
-                name: Download LaTeX Installation
-                command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
-            - run:
-                name: LaTeX Installation
-                command: if [ ! -d ~/.bin/texlive ]; then echo -e "$TEXINSTALL" > /tmp/texinstall.profile; /tmp/tex/install-tl -profile /tmp/texinstall.profile; fi
-            - run:
-                name: TUC Draft Installation
-                command: if [ ! -d ~/texmf ]; then git clone https://mecdev.rz-housing.tu-clausthal.de/gitlab/tuc/tex-vorlagen.git ~/texmf/tex/latex/tuc; mkdir -p ~/texmf/bibtex/bst; cd ~/texmf/bibtex/bst; ln -s ../../tex/latex/tuc/externalpublication/llcns/splncs03.bst .; ln -s ../../tex/latex/mec/tuc/externalpublication/aamas/ACM-Reference-Format.bst .; fi    
-            - run:
-                name: LaTeX Update
-                command: tlmgr update --self --all --reinstall-forcibly-removed                
-            - save_cache:
-                key: TeX-Installation-2017-10-31-16-00
-                paths:
-                    - ~/.bin/texlive
-            - save_cache:
-                key: TeX-Userdata-2017-10-31-16-00
-                paths:
-                    - ~/texmf
-                    - ~/.texlive
+                command: echo 'export PATH=~/.local/bin:$PATH' >> $BASH_ENV
             - checkout
             - run:
                 name: Git Submodule Sync
@@ -85,96 +58,87 @@ jobs:
             - run:
                 name: Run Simulation for Scenario NI-B210 with CSE enabled
                 command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
-            - deploy:
+            - run:
                 name: Run Nosetests for Codecov 
                 command: nosetests -w tests --with-coverage
-            - deploy:
+            - run:
                 name: Upload Codecov Results (1/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
-            - deploy:
+            - run:
                 name: Upload Codecov Results (2/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
-            - deploy:
+            - run:
                 name: Move to /tmp
                 command: mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
-            - deploy:
+            - run:
                 name: Checkout gh-pages
                 command: git checkout gh-pages || git checkout -b gh-pages
-            - deploy:
+            - run:
                 name: Move to /tmp
                 command: mv -f circle.yml .gitignore /tmp
-            - deploy:
+            - run:
                 name: Checkout Master
                 command: git checkout master
-            - deploy:
+            - run:
                 name: Remove Remote gh-pages Branch
                 command: git push origin :gh-pages || true
-            - deploy:
+            - run:
                 name: Remove Local gh-pages Branch
                 command: git branch -D gh-pages
-            - deploy:
+            - run:
                 name: Checkout
                 command: git checkout --orphan gh-pages
-            - deploy:
+            - run:
                 name: Remove
                 command: rm -Rf *
-            - deploy:
+            - run:
                 name: Remove pre-commit-config
                 command: rm .pre-commit-config.yaml
-            - deploy:
+            - run:
                 name: Move Docs from /tmp
                 command: mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png /tmp/executionmodel.png .
-            - deploy:
+            - run:
                 name: Update pylint.md (1/4)
                 command: sh site/pylint.sh > pylint.md || true
-            - deploy:
+            - run:
                 name: Update pylint.md (2/4)
                 command: echo -e "\n## Import Graph\n" >> pylint.md
-            - deploy:
+            - run:
                 name: Update pylint.md (3/4)
                 command: cp pylint.md pylint_doc.md
-            - deploy:
+            - run:
                 name: Update pylint.md (4/4)
                 command: echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
-            - deploy:
+            - run:
                 name: Update report.md (1/4)
                 command: echo -e "\n# Code Statistics\n\n" > report.md
-            - deploy:
+            - run:
                 name: Update readme.md
                 command: echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > readme_doc.md
-            - deploy:
+            - run:
                 name: Update radon.md
                 command: sh site/radon.sh > radon.md
-            - deploy:
+            - run:
                 name: Update report.md (2/4)
                 command: cat radon.md >> report.md
-            - deploy:
+            - run:
                 name: Update report.md (3/4)
                 command: echo -e "\n# Pylint\n\n" >> report.md
-            - deploy:
+            - run:
                 name: Update report.md (4/4)
                 command: cat pylint.md >> report.md
-            - deploy:
+            - run:
                 name: Create Documentation (doxygen)
                 command: doxygen site/configuration.doxyfile
-            - deploy:
-                name: Build LaTeX (1/3)
-                command: cd docs/latex/ && make && cd ..
-            - deploy:
-                name: Build LaTeX (2/3)
-                command: mv docs/latex/refman.pdf docs/$DOCUMENT.pdf
-            - deploy:
-                name: Build LaTeX (3/3)
-                command: rm -Rf docs/latex
-            - deploy:
+            - run:
                 name: Cleanup
                 command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
-            - deploy:
+            - run:
                 name: Git Add All
                 command: git add --all .
-            - deploy:
+            - run:
                 name: Git Commit
                 command: git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
-            - deploy:
+            - run:
                 name: Git Push gh-pages
                 command: git push origin gh-pages            
