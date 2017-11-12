@@ -13,7 +13,6 @@ jobs:
             GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
             SUMO_HOME: /usr/share/sumo
             DOCUMENT: CoLMTO-doc
-        parallelism: 2
 
         branches:
             ignore:
@@ -49,13 +48,11 @@ jobs:
                 name: Run Tests
                 command: python3 setup.py test
             - run:
-                name: Run Simulation for Scenario NI-B210
-                command: |
-                  if [ "$CIRCLE_NODE_INDEX" -eq "0" ]; then
-                    python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
-                  else
-                    python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
-                  fi
+                name: Run Simulation for Scenario NI-B210 (1/2)
+                command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
+            - run:
+                name: Run Simulation for Scenario NI-B210 with CSE (2/2)
+                command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
             - deploy:
                 name: Run Nosetests for Codecov 
                 command: nosetests -w tests --with-coverage
