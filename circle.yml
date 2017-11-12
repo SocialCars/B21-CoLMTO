@@ -29,21 +29,21 @@ jobs:
             - restore_cache:
                 keys:
                     - TeX-Installation-2017-10-31-16-00
-                    - TeX-Userdata-2017-11-12-13-00
+                    - TeX-Userdata-2017-10-31-16-00
                     - Local-2017-11-12-13-00
-            - run:
+            - deploy:
                 name: Expand Path to $BASH_ENV
                 command: echo 'export PATH=~/.bin/texlive/bin/x86_64-linux:~/.local/bin:$PATH' >> $BASH_ENV
-            - run:
+            - deploy:
                 name: Download LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
-            - run:
+            - deploy:
                 name: LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then echo -e "$TEXINSTALL" > /tmp/texinstall.profile; /tmp/tex/install-tl -profile /tmp/texinstall.profile; fi
-            - run:
+            - deploy:
                 name: TUC Draft Installation
                 command: if [ ! -d ~/texmf ]; then git clone https://mecdev.rz-housing.tu-clausthal.de/gitlab/tuc/tex-vorlagen.git ~/texmf/tex/latex/tuc; mkdir -p ~/texmf/bibtex/bst; cd ~/texmf/bibtex/bst; ln -s ../../tex/latex/tuc/externalpublication/llcns/splncs03.bst .; ln -s ../../tex/latex/mec/tuc/externalpublication/aamas/ACM-Reference-Format.bst .; fi    
-            - run:
+            - deploy:
                 name: LaTeX Update
                 command: tlmgr update --self --all --reinstall-forcibly-removed                
             - save_cache:
@@ -51,28 +51,28 @@ jobs:
                 paths:
                     - ~/.bin/texlive
             - save_cache:
-                key: TeX-Userdata-2017-11-12-13-00
+                key: TeX-Userdata-2017-10-31-16-00
                 paths:
                     - ~/texmf
                     - ~/.texlive
             - checkout
-            - run:
+            - deploy:
                 name: Git Submodule Sync
                 command: git submodule sync
-            - run:
+            - deploy:
                 name: Git Submodule Update
                 command: git submodule update --init
-            - run:
+            - deploy:
                 name: Git Checkout master
                 command: git checkout master
-            - run:
+            - deploy:
                 name: Upgrade to Latest Dependencies
                 command: pip3 install -U -r requirements.txt --user
             - save_cache:
                 key: Local-2017-11-12-13-00
                 paths:
                     - ~/.local
-            - run:
+            - deploy:
                 name: Install Colmto Package
                 command: python3 setup.py install --user
             - run:
@@ -93,87 +93,87 @@ jobs:
             - run:
                 name: Upload Codecov Results (2/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
-            - run:
+            - deploy:
                 name: Move to /tmp
                 command: mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
-            - run:
+            - deploy:
                 name: Checkout gh-pages
                 command: git checkout gh-pages || git checkout -b gh-pages
-            - run:
+            - deploy:
                 name: Move to /tmp
                 command: mv -f circle.yml .gitignore /tmp
-            - run:
+            - deploy:
                 name: Checkout Master
                 command: git checkout master
-            - run:
+            - deploy:
                 name: Remove Remote gh-pages Branch
                 command: git push origin :gh-pages || true
-            - run:
+            - deploy:
                 name: Remove Local gh-pages Branch
                 command: git branch -D gh-pages
-            - run:
+            - deploy:
                 name: Checkout
                 command: git checkout --orphan gh-pages
-            - run:
+            - deploy:
                 name: Remove
                 command: rm -Rf *
-            - run:
+            - deploy:
                 name: Remove pre-commit-config
                 command: rm .pre-commit-config.yaml
-            - run:
+            - deploy:
                 name: Move Docs from /tmp
                 command: mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png /tmp/executionmodel.png .
-            - run:
+            - deploy:
                 name: Update pylint.md (1/4)
                 command: sh site/pylint.sh > pylint.md || true
-            - run:
+            - deploy:
                 name: Update pylint.md (2/4)
                 command: echo -e "\n## Import Graph\n" >> pylint.md
-            - run:
+            - deploy:
                 name: Update pylint.md (3/4)
                 command: cp pylint.md pylint_doc.md
-            - run:
+            - deploy:
                 name: Update pylint.md (4/4)
                 command: echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
-            - run:
+            - deploy:
                 name: Update report.md (1/4)
                 command: echo -e "\n# Code Statistics\n\n" > report.md
-            - run:
+            - deploy:
                 name: Update readme.md
                 command: echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > readme_doc.md
-            - run:
+            - deploy:
                 name: Update radon.md
                 command: sh site/radon.sh > radon.md
-            - run:
+            - deploy:
                 name: Update report.md (2/4)
                 command: cat radon.md >> report.md
-            - run:
+            - deploy:
                 name: Update report.md (3/4)
                 command: echo -e "\n# Pylint\n\n" >> report.md
-            - run:
+            - deploy:
                 name: Update report.md (4/4)
                 command: cat pylint.md >> report.md
-            - run:
+            - deploy:
                 name: Create Documentation (doxygen)
                 command: doxygen site/configuration.doxyfile
-            - run:
+            - deploy:
                 name: Build LaTeX (1/3)
                 command: cd docs/latex/ && make && cd ..
-            - run:
+            - deploy:
                 name: Build LaTeX (2/3)
                 command: mv docs/latex/refman.pdf docs/$DOCUMENT.pdf
-            - run:
+            - deploy:
                 name: Build LaTeX (3/3)
                 command: rm -Rf docs/latex
-            - run:
+            - deploy:
                 name: Cleanup
                 command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
-            - run:
+            - deploy:
                 name: Git Add All
                 command: git add --all .
-            - run:
+            - deploy:
                 name: Git Commit
                 command: git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
-            - run:
+            - deploy:
                 name: Git Push gh-pages
                 command: git push origin gh-pages            
