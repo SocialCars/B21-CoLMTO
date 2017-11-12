@@ -12,7 +12,7 @@ jobs:
             GIT_COMMITTER_NAME: CircleCI
             GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
             SUMO_HOME: /usr/share/sumo
-        parallelism: 3
+        parallelism: 2
 
         branches:
             ignore:
