@@ -30,6 +30,7 @@ jobs:
                 keys:
                     - TeX-Installation-2017-10-31-16-00
                     - TeX-Userdata-2017-10-31-16-00
+                    - Local-2017-11-12-13-00
             - run:
                 name: Expand Path to $BASH_ENV
                 command: echo 'export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux' >> $BASH_ENV
@@ -54,6 +55,10 @@ jobs:
                 paths:
                     - ~/texmf
                     - ~/.texlive
+            - save_cache:
+                key: Local-2017-11-12-13-00
+                paths:
+                    - ~/.local
             - checkout
             - run:
                 name: Git Submodule Sync
