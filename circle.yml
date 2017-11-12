@@ -47,9 +47,6 @@ jobs:
             - run:
                 name: Run Tests
                 command: python3 setup.py test
-            - run:
-                name: Run Simulation for Scenario NI-B210
-                command: 
             - type: shell
                 name: Run Simulation for Scenario NI-B210
                 command: |
