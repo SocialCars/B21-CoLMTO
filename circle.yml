@@ -93,7 +93,7 @@ jobs:
                 command: mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
             - run:
                 name: Checkout gh-pages
-                command: git checkout gh-pages
+                command: git checkout gh-pages || git checkout -b gh-pages
             - run:
                 name: Move to /tmp
                 command: mv -f circle.yml .gitignore /tmp
