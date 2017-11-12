@@ -47,7 +47,7 @@ jobs:
             - run:
                 name: Run Tests
                 command: python3 setup.py test
-            - type: shell
+            - run:
                 name: Run Simulation for Scenario NI-B210
                 command: |
                 python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
