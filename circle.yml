@@ -29,11 +29,11 @@ jobs:
             - restore_cache:
                 keys:
                     - TeX-Installation-2017-10-31-16-00
-                    - TeX-Userdata-2017-10-31-16-00
+                    - TeX-Userdata-2017-11-12-13-00
                     - Local-2017-11-12-13-00
             - run:
                 name: Expand Path to $BASH_ENV
-                command: echo 'export PATH=$PATH:~/.bin/texlive/bin/x86_64-linux' >> $BASH_ENV
+                command: echo 'export PATH=~/.bin/texlive/bin/x86_64-linux:~/.local/bin:$PATH' >> $BASH_ENV
             - run:
                 name: Download LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
@@ -45,20 +45,16 @@ jobs:
                 command: if [ ! -d ~/texmf ]; then git clone https://mecdev.rz-housing.tu-clausthal.de/gitlab/tuc/tex-vorlagen.git ~/texmf/tex/latex/tuc; mkdir -p ~/texmf/bibtex/bst; cd ~/texmf/bibtex/bst; ln -s ../../tex/latex/tuc/externalpublication/llcns/splncs03.bst .; ln -s ../../tex/latex/mec/tuc/externalpublication/aamas/ACM-Reference-Format.bst .; fi    
             - run:
                 name: LaTeX Update
-                command: ~/.bin/texlive/bin/x86_64-linux/tlmgr update --self --all --reinstall-forcibly-removed                
+                command: tlmgr update --self --all --reinstall-forcibly-removed                
             - save_cache:
                 key: TeX-Installation-2017-10-31-16-00
                 paths:
                     - ~/.bin/texlive
             - save_cache:
-                key: TeX-Userdata-2017-10-31-16-00
+                key: TeX-Userdata-2017-11-12-13-00
                 paths:
                     - ~/texmf
                     - ~/.texlive
-            - save_cache:
-                key: Local-2017-11-12-13-00
-                paths:
-                    - ~/.local
             - checkout
             - run:
                 name: Git Submodule Sync
@@ -71,22 +67,26 @@ jobs:
                 command: git checkout master
             - run:
                 name: Upgrade to Latest Dependencies
-                command: pip3 install -U -r requirements.txt --user --prefix=
+                command: pip3 install -U -r requirements.txt --user
+            - save_cache:
+                key: Local-2017-11-12-13-00
+                paths:
+                    - ~/.local
             - run:
                 name: Install Colmto Package
-                command: python3 setup.py install --user --prefix=
+                command: python3 setup.py install --user
             - run:
                 name: Run Tests
                 command: python3 setup.py test
             - run:
                 name: Run Simulation for Scenario NI-B210
-                command: SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
+                command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
             - run:
                 name: Run Simulation for Scenario NI-B210 with CSE enabled
-                command: SUMO_HOME=/usr/share/sumo python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
+                command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
             - run:
                 name: Run Nosetests for Codecov 
-                command: ~/.local/bin/nosetests -w tests --with-coverage
+                command: nosetests -w tests --with-coverage
             - run:
                 name: Upload Codecov Results (1/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
