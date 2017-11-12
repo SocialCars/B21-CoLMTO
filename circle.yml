@@ -33,12 +33,6 @@ jobs:
                 command: echo 'export PATH=~/.local/bin:$PATH' >> $BASH_ENV
             - checkout
             - run:
-                name: Git Submodule Sync
-                command: git submodule sync
-            - run:
-                name: Git Submodule Update
-                command: git submodule update --init
-            - run:
                 name: Git Checkout master
                 command: git checkout master
             - run:
