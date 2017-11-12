@@ -31,19 +31,19 @@ jobs:
             - restore_cache:
                 keys:
                     - Local-2017-11-12-13-00
-            - deploy:
+            - run:
                 name: Expand Path to $BASH_ENV
                 command: echo 'export PATH=~/.bin/texlive/bin/x86_64-linux:~/.local/bin:$PATH' >> $BASH_ENV
-            - deploy:
+            - run:
                 name: Download LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
-            - deploy:
+            - run:
                 name: LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then echo -e "$TEXINSTALL" > /tmp/texinstall.profile; /tmp/tex/install-tl -profile /tmp/texinstall.profile; fi
-            - deploy:
+            - run:
                 name: TUC Draft Installation
                 command: if [ ! -d ~/texmf ]; then git clone https://mecdev.rz-housing.tu-clausthal.de/gitlab/tuc/tex-vorlagen.git ~/texmf/tex/latex/tuc; mkdir -p ~/texmf/bibtex/bst; cd ~/texmf/bibtex/bst; ln -s ../../tex/latex/tuc/externalpublication/llcns/splncs03.bst .; ln -s ../../tex/latex/mec/tuc/externalpublication/aamas/ACM-Reference-Format.bst .; fi    
-            - deploy:
+            - run:
                 name: LaTeX Update
                 command: tlmgr update --self --all --reinstall-forcibly-removed                
             - save_cache:
@@ -56,23 +56,23 @@ jobs:
                     - ~/texmf
                     - ~/.texlive
             - checkout
-            - deploy:
+            - run:
                 name: Git Submodule Sync
                 command: git submodule sync
-            - deploy:
+            - run:
                 name: Git Submodule Update
                 command: git submodule update --init
-            - deploy:
+            - run:
                 name: Git Checkout master
                 command: git checkout master
-            - deploy:
+            - run:
                 name: Upgrade to Latest Dependencies
                 command: pip3 install -U -r requirements.txt --user
             - save_cache:
                 key: Local-2017-11-12-13-00
                 paths:
                     - ~/.local
-            - deploy:
+            - run:
                 name: Install Colmto Package
                 command: python3 setup.py install --user
             - run:
@@ -80,17 +80,16 @@ jobs:
                 command: python3 setup.py test
             - run:
                 name: Run Simulation for Scenario NI-B210
-                command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
-            - run:
-                name: Run Simulation for Scenario NI-B210 with CSE enabled
-                command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
-            - run:
+                command: |
+                python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
+                python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
+            - deploy:
                 name: Run Nosetests for Codecov 
                 command: nosetests -w tests --with-coverage
-            - run:
+            - deploy:
                 name: Upload Codecov Results (1/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
-            - run:
+            - deploy:
                 name: Upload Codecov Results (2/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
             - deploy:
