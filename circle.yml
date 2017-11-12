@@ -4,7 +4,7 @@ jobs:
     build:
         working_directory: ~/colmto
         docker:
-            - image: 1masc/sumo-docker:latest
+            - image: 1masc/colmto-docker:latest
               environment:
                 TZ: "/usr/share/zoneinfo/Europe/Berlin"
                 IT_AUTHOR_NAME: CircleCI
@@ -54,12 +54,6 @@ jobs:
                 paths:
                     - ~/texmf
                     - ~/.texlive
-            - run:
-                name: Install SUMO and Dependencies
-                command: sudo apt-get install doxygen graphviz libhdf5-dev pandoc tk-dev python-tk
-            - run:
-                name: Install Python Dependencies
-                command: pip3 install --user --prefix= pylint radon codecov doxypy
             - checkout
             - run:
                 name: Git Submodule Sync
@@ -71,10 +65,10 @@ jobs:
                 name: Git Checkout master
                 command: git checkout master
             - run:
-                name: Install Dependencies
+                name: Upgrade to Latest Dependencies
                 command: pip3 install -U -r requirements.txt --user --prefix=
             - run:
-                name: Install Python Package
+                name: Install Colmto Package
                 command: python3 setup.py install --user --prefix=
             - run:
                 name: Run Tests
