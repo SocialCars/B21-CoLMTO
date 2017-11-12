@@ -161,9 +161,6 @@ jobs:
                 name: Build LaTeX (3/3)
                 command: rm -Rf docs/latex
             - run:
-                name: Move Figure
-                command: mv colmto-imports.png docs/sources
-            - run:
                 name: Cleanup
                 command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
             - run:
