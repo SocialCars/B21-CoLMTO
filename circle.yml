@@ -28,112 +28,118 @@ jobs:
                 keys:
                     - Local-2017-11-12-13-00
             - run:
-                name: Expand Path to $BASH_ENV
-                command: echo 'export PATH=~/.local/bin:$PATH' >> $BASH_ENV
+                  name: Expand Path to $BASH_ENV
+                  command: echo 'export PATH=~/.local/bin:$PATH' >> $BASH_ENV
             - checkout
             - run:
-                name: Git Checkout master
-                command: git checkout master
+                  name: Git Submodule Sync
+                  command: git submodule sync
             - run:
-                name: Upgrade to Latest Dependencies
-                command: pip3 install -U -r requirements.txt --user
+                  name: Git Submodule Update
+                  command: git submodule update --init
+            - run:
+                  name: Git Checkout master
+                  command: git checkout master
+            - run:
+                  name: Upgrade to Latest Dependencies
+                  command: pip3 install -U -r requirements.txt --user
             - save_cache:
-                key: Local-2017-11-12-13-00
-                paths:
-                    - ~/.local
+                  key: Local-2017-11-12-13-00
+                  paths:
+                      - ~/.local
             - run:
-                name: Install Colmto Package
-                command: python3 setup.py install --user
+                  name: Install Colmto Package
+                  command: python3 setup.py install --user
             - run:
-                name: Run Tests
-                command: python3 setup.py test
+                  name: Run Tests
+                  command: python3 setup.py test
             - run:
-                name: Run Simulation for Scenario NI-B210 (1/2)
-                command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
+                  name: Run Simulation for Scenario NI-B210 (1/2)
+                  command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
             - run:
-                name: Run Simulation for Scenario NI-B210 with CSE (2/2)
-                command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
-            - deploy:
-                name: Run Nosetests for Codecov 
-                command: nosetests -w tests --with-coverage
-            - deploy:
-                name: Upload Codecov Results (1/2)
-                command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
-            - deploy:
-                name: Upload Codecov Results (2/2)
-                command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
-            - deploy:
-                name: Move to /tmp
-                command: mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
-            - deploy:
-                name: Checkout gh-pages
-                command: git checkout gh-pages || git checkout -b gh-pages
-            - deploy:
-                name: Move to /tmp
-                command: mv -f circle.yml .gitignore /tmp
-            - deploy:
-                name: Checkout Master
-                command: git checkout master
-            - deploy:
-                name: Remove Remote gh-pages Branch
-                command: git push origin :gh-pages || true
-            - deploy:
-                name: Remove Local gh-pages Branch
-                command: git branch -D gh-pages
-            - deploy:
-                name: Checkout
-                command: git checkout --orphan gh-pages
-            - deploy:
-                name: Remove
-                command: rm -Rf *
-            - deploy:
-                name: Remove pre-commit-config
-                command: rm .pre-commit-config.yaml
-            - deploy:
-                name: Move Docs from /tmp
-                command: mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png /tmp/executionmodel.png .
-            - deploy:
-                name: Update pylint.md (1/4)
-                command: sh site/pylint.sh > pylint.md || true
-            - deploy:
-                name: Update pylint.md (2/4)
-                command: echo -e "\n## Import Graph\n" >> pylint.md
-            - deploy:
-                name: Update pylint.md (3/4)
-                command: cp pylint.md pylint_doc.md
-            - deploy:
-                name: Update pylint.md (4/4)
-                command: echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
-            - deploy:
-                name: Update report.md (1/4)
-                command: echo -e "\n# Code Statistics\n\n" > report.md
-            - deploy:
-                name: Update readme.md
-                command: echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > readme_doc.md
-            - deploy:
-                name: Update radon.md
-                command: sh site/radon.sh > radon.md
-            - deploy:
-                name: Update report.md (2/4)
-                command: cat radon.md >> report.md
-            - deploy:
-                name: Update report.md (3/4)
-                command: echo -e "\n# Pylint\n\n" >> report.md
-            - deploy:
-                name: Update report.md (4/4)
-                command: cat pylint.md >> report.md
-            - deploy:
-                name: Create Documentation (doxygen)
-                command: doxygen site/configuration.doxyfile
-            - deploy:
-                name: Cleanup
-                command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
-            - deploy:
-                name: Git Add All
-                command: git add --all .
-            - deploy:
-                name: Git Commit
-                command: git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
-            - deploy:
-                name: Git Push gh-pages
-                command: git push origin gh-pages            
+                  name: Run Simulation for Scenario NI-B210 with CSE (2/2)
+                  command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
+            - run:
+                  name: Run Nosetests for Codecov 
+                  command: nosetests -w tests --with-coverage
+            - run:
+                  name: Upload Codecov Results (1/2)
+                  command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
+            - run:
+                  name: Upload Codecov Results (2/2)
+                  command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
+            - run:
+                  name: Move to /tmp
+                  command: mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
+            - run:
+                  name: Checkout gh-pages
+                  command: git checkout gh-pages || git checkout -b gh-pages
+            - run:
+                  name: Move to /tmp
+                  command: mv -f circle.yml .gitignore /tmp
+            - run:
+                  name: Checkout Master
+                  command: git checkout master
+            - run:
+                  name: Remove Remote gh-pages Branch
+                  command: git push origin :gh-pages || true
+            - run:
+                  name: Remove Local gh-pages Branch
+                  command: git branch -D gh-pages
+            - run:
+                  name: Checkout
+                  command: git checkout --orphan gh-pages
+            - run:
+                  name: Remove
+                  command: rm -Rf *
+            - run:
+                  name: Remove pre-commit-config
+                  command: rm .pre-commit-config.yaml
+            - run:
+                  name: Move Docs from /tmp
+                  command: mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/readme.md /tmp/license.md /tmp/architecture.png /tmp/executionmodel.png .
+            - run:
+                  name: Update pylint.md (1/4)
+                  command: sh site/pylint.sh > pylint.md || true
+            - run:
+                  name: Update pylint.md (2/4)
+                  command: echo -e "\n## Import Graph\n" >> pylint.md
+            - run:
+                  name: Update pylint.md (3/4)
+                  command: cp pylint.md pylint_doc.md
+            - run:
+                  name: Update pylint.md (4/4)
+                  command: echo -e "\n![ImportGraph](https://github.com/SocialCars/colmto/blob/gh-pages/docs/sources/colmto-imports.png)" >> pylint.md
+            - run:
+                  name: Update report.md (1/4)
+                  command: echo -e "\n# Code Statistics\n\n" > report.md
+            - run:
+                  name: Update readme.md
+                  command: echo -e "## Copyright & License\n\n- Copyright 2017, Malte Aschermann\n- License LGPL\n\n" > readme_doc.md
+            - run:
+                  name: Update radon.md
+                  command: sh site/radon.sh > radon.md
+            - run:
+                  name: Update report.md (2/4)
+                  command: cat radon.md >> report.md
+            - run:
+                  name: Update report.md (3/4)
+                  command: echo -e "\n# Pylint\n\n" >> report.md
+            - run:
+                  name: Update report.md (4/4)
+                  command: cat pylint.md >> report.md
+            - run:
+                  name: Create Documentation (doxygen)
+                  command: doxygen site/configuration.doxyfile
+            - run:
+                  name: Cleanup
+                  command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
+            - run:
+                  name: Git Add All
+                  command: git add --all .
+            - run:
+                  name: Git Commit
+                  command: git commit -m "CircleCI run complete. Report https://github.com/SocialCars/colmto/blob/gh-pages/report.md , Doku http://socialcars.github.io/colmto/docs/sources/index.html"
+            - run:
+                  name: Git Push gh-pages
+                  command: git push origin gh-pages            
