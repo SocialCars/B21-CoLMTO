@@ -15,8 +15,7 @@ jobs:
             # install current texlive and run update (installation scheme: full, medium, small, basic, minimal)
             TEXINSTALL: "selected_scheme scheme-full\\nTEXDIR /home/circleci/.bin/texlive/\\nTEXMFLOCAL /home/circleci/.bin/texlive/texmf-local\\nTEXMFSYSCONFIG /home/circleci/.bin/texlive/texmf-config\\nTEXMFSYSVAR /home/circleci/.bin//texlive/texmf-var\\nTEXMFHOME ~/texmf\nTEXMFCONFIG ~/.texlive/texmf-config\\nTEXMFVAR ~/.texlive/texmf-var\\nbinary_x86_64-linux 1\\ninstopt_adjustpath 1\\ninstopt_adjustrepo 1\\ninstopt_letter 1\\ninstopt_portable 0\\ninstopt_write18_restricted 1\\ntlpdbopt_autobackup 1\\ntlpdbopt_backupdir tlpkg/backups\\ntlpdbopt_create_formats 1\\ntlpdbopt_desktop_integration 0\\ntlpdbopt_file_assocs 1\\ntlpdbopt_generate_updmap 0\\ntlpdbopt_install_docfiles 0\\ntlpdbopt_install_srcfiles 0\\ntlpdbopt_post_code 1\\ntlpdbopt_sys_bin /tmp\\ntlpdbopt_sys_info /tmp\\ntlpdbopt_sys_man /tmp\\ntlpdbopt_w32_multi_user 1\\n"
             DOCUMENT: CoLMTO-doc
-        parallelism: 3
-        resource_class: large
+        parallelism: 2
 
         branches:
             ignore:
@@ -33,19 +32,19 @@ jobs:
                     - TeX-Installation-2017-10-31-16-00
                     - TeX-Userdata-2017-10-31-16-00
                     - Local-2017-11-12-13-00
-            - deploy:
+            - run:
                 name: Expand Path to $BASH_ENV
                 command: echo 'export PATH=~/.bin/texlive/bin/x86_64-linux:~/.local/bin:$PATH' >> $BASH_ENV
-            - deploy:
+            - run:
                 name: Download LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then mkdir -p /tmp/tex && curl -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz --strip 1 -C /tmp/tex; fi
-            - deploy:
+            - run:
                 name: LaTeX Installation
                 command: if [ ! -d ~/.bin/texlive ]; then echo -e "$TEXINSTALL" > /tmp/texinstall.profile; /tmp/tex/install-tl -profile /tmp/texinstall.profile; fi
-            - deploy:
+            - run:
                 name: TUC Draft Installation
                 command: if [ ! -d ~/texmf ]; then git clone https://mecdev.rz-housing.tu-clausthal.de/gitlab/tuc/tex-vorlagen.git ~/texmf/tex/latex/tuc; mkdir -p ~/texmf/bibtex/bst; cd ~/texmf/bibtex/bst; ln -s ../../tex/latex/tuc/externalpublication/llcns/splncs03.bst .; ln -s ../../tex/latex/mec/tuc/externalpublication/aamas/ACM-Reference-Format.bst .; fi    
-            - deploy:
+            - run:
                 name: LaTeX Update
                 command: tlmgr update --self --all --reinstall-forcibly-removed                
             - save_cache:
@@ -58,23 +57,23 @@ jobs:
                     - ~/texmf
                     - ~/.texlive
             - checkout
-            - deploy:
+            - run:
                 name: Git Submodule Sync
                 command: git submodule sync
-            - deploy:
+            - run:
                 name: Git Submodule Update
                 command: git submodule update --init
-            - deploy:
+            - run:
                 name: Git Checkout master
                 command: git checkout master
-            - deploy:
+            - run:
                 name: Upgrade to Latest Dependencies
                 command: pip3 install -U -r requirements.txt --user
             - save_cache:
                 key: Local-2017-11-12-13-00
                 paths:
                     - ~/.local
-            - deploy:
+            - run:
                 name: Install Colmto Package
                 command: python3 setup.py install --user
             - run:
@@ -86,13 +85,13 @@ jobs:
             - run:
                 name: Run Simulation for Scenario NI-B210 with CSE enabled
                 command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
-            - run:
+            - deploy:
                 name: Run Nosetests for Codecov 
                 command: nosetests -w tests --with-coverage
-            - run:
+            - deploy:
                 name: Upload Codecov Results (1/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
-            - run:
+            - deploy:
                 name: Upload Codecov Results (2/2)
                 command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
             - deploy:
