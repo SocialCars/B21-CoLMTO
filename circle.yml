@@ -31,9 +31,6 @@ jobs:
                 keys:
                     - deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
             - run:
-                  name: Git Checkout master
-                  command: git checkout master
-            - run:
                   name: Upgrade to Latest Dependencies
                   command: pip3 install -U -r requirements.txt --user
             - save_cache:
