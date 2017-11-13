@@ -4,15 +4,14 @@ jobs:
     build:
         working_directory: ~/colmto
         docker:
-            - image: 1masc/colmto-docker:latest
+            - image: socialcars/colmto-docker:latest
         environment:
             TZ: "/usr/share/zoneinfo/Europe/Berlin"
             GIT_AUTHOR_NAME: CircleCI
             GIT_AUTHOR_EMAIL: masc@tu-clausthal.de
             GIT_COMMITTER_NAME: CircleCI
             GIT_COMMITTER_EMAIL: masc@tu-clausthal.de
-            SUMO_HOME: /usr/share/sumo
-            DOCUMENT: CoLMTO-doc
+            SUMO_HOME: /opt/sumo
 
         branches:
             ignore:
@@ -24,13 +23,13 @@ jobs:
         shell: /bin/bash
 
         steps:
-            - restore_cache:
-                keys:
-                    - Local-2017-11-12-13-00
             - run:
                   name: Expand Path to $BASH_ENV
                   command: echo 'export PATH=~/.local/bin:$PATH' >> $BASH_ENV
             - checkout
+            - restore_cache:
+                keys:
+                    - deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
             - run:
                   name: Git Submodule Sync
                   command: git submodule sync
@@ -44,7 +43,7 @@ jobs:
                   name: Upgrade to Latest Dependencies
                   command: pip3 install -U -r requirements.txt --user
             - save_cache:
-                  key: Local-2017-11-12-13-00
+                  key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
                   paths:
                       - ~/.local
             - run:
