@@ -21,12 +21,11 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""
+'''
 colmto: Test module for environment.cse.
-"""
+'''
 import random
 
-import numpy
 from nose.tools import assert_equal
 from nose.tools import assert_is_instance
 from nose.tools import assert_raises
@@ -38,22 +37,22 @@ import colmto.environment.vehicle
 
 
 class Namespace(object):
-    """Namespace similar to argparse"""
+    '''Namespace similar to argparse'''
     # pylint: disable=too-few-public-methods
     def __init__(self, **kwargs):
-        """C'tor."""
+        '''C'tor.'''
         self.__dict__.update(kwargs)
 
 
 def test_base_cse():
-    """
+    '''
     Test BaseCSE class
-    """
+    '''
     assert_is_instance(colmto.cse.cse.BaseCSE(), colmto.cse.cse.BaseCSE)
     assert_is_instance(
         colmto.cse.cse.BaseCSE(
             Namespace(
-                loglevel="debug", quiet=False, logfile="foo.log"
+                loglevel='debug', quiet=False, logfile='foo.log'
             )
         ),
         colmto.cse.cse.BaseCSE
@@ -61,24 +60,24 @@ def test_base_cse():
 
 
 def test_sumo_cse():
-    """
+    '''
     Test SumoCSE class
-    """
+    '''
     assert_is_instance(
         colmto.cse.cse.SumoCSE(
             Namespace(
-                loglevel="debug", quiet=False, logfile="foo.log"
+                loglevel='debug', quiet=False, logfile='foo.log'
             )
         ),
         colmto.cse.cse.SumoCSE
     )
 
-    l_rule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=numpy.array((0., 80.)))
+    l_rule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 80.))
     l_rule_position = colmto.cse.rule.SUMOPositionRule(
-        position_bbox=numpy.array(((0., 0), (64.0, 1)))
+        position_bbox=((0., 0), (64.0, 1))
     )
-    l_subrule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=numpy.array((0., 60.)))
-    l_rule_position.add_subrule(l_subrule_speed)
+    l_subrule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 60.))
+    l_rule_position.add_rule(l_subrule_speed)
 
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_speed).add_subrule(l_rule_position)
 
@@ -88,7 +87,7 @@ def test_sumo_cse():
     assert_in(l_rule_position, l_sumo_cse.rules)
 
     with assert_raises(TypeError):
-        l_sumo_cse.add_subrule("foo")
+        l_sumo_cse.add_rule('foo')
 
     l_vehicles = [
         colmto.environment.vehicle.SUMOVehicle(
@@ -96,14 +95,14 @@ def test_sumo_cse():
         ) for _ in range(2342)
         ]
     for i_vehicle in l_vehicles:
-        i_vehicle.position = numpy.array((random.randrange(0, 120), random.randint(0, 1)))
+        i_vehicle.position = (random.randrange(0, 120), random.randint(0, 1))
 
     l_sumo_cse.apply(l_vehicles)
 
     for i, i_result in enumerate(l_vehicles):
-        if (0 <= l_vehicles[i].position[0] <= 64.0 and 0 <= l_vehicles[i].position[1] <= 1
-                and 0 <= l_vehicles[i].speed_max <= 60.0) \
-                or 0 <= l_vehicles[i].speed_max <= 80.0:
+        if (0 <= l_vehicles[i].position.x <= 64.0 and 0 <= l_vehicles[i].position.y <= 1
+                and 0. <= l_vehicles[i].speed_max <= 60.0) \
+                or 0. <= l_vehicles[i].speed_max <= 80.0:
             assert_equal(
                 i_result.vehicle_class,
                 colmto.cse.rule.SUMORule.to_disallowed_class()
@@ -122,26 +121,26 @@ def test_sumo_cse():
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rules_from_cfg(
         [
             {
-                "type": "SUMOSpeedRule",
-                "behaviour": "deny",
-                "args": {
-                    "speed_range": (0., 30/3.6)
+                'type': 'SUMOSpeedRule',
+                'behaviour': 'deny',
+                'args': {
+                    'speed_range': (0., 30/3.6)
                 }
             },
             {
-                "type": "SUMOPositionRule",
-                "behaviour": "deny",
-                "args": {
-                    "position_bbox": ((1350., -2.), (2500., 2.))
+                'type': 'SUMOPositionRule',
+                'behaviour': 'deny',
+                'args': {
+                    'position_bbox': ((1350., -2.), (2500., 2.))
                 },
-                "subrules": {
-                    "rule": "any",
-                    "rules": [
+                'vehicle_rules': {
+                    'rule': 'any',
+                    'rules': [
                         {
-                            "type": "SUMOSpeedRule",
-                            "behaviour": "deny",
-                            "args": {
-                                "speed_range": (0., 85/3.6)
+                            'type': 'SUMOSpeedRule',
+                            'behaviour': 'deny',
+                            'args': {
+                                'speed_range': (0., 85/3.6)
                             },
                         }
                     ]

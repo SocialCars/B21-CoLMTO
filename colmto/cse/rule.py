@@ -24,14 +24,44 @@
 # pylint: disable=too-few-public-methods
 '''Rule related classes'''
 
-from abc import ABCMeta
+from collections import namedtuple
 
-import typing
+from typing import Any
+from typing import Generator
+from typing import Iterable
 
 import enum
-import numpy
 
 from colmto.environment import SUMOVehicle
+
+
+class Position(namedtuple('Position', ('x', 'y'))):
+    '''named tuple to represent positions on the road'''
+    __slots__ = ()
+
+
+class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
+    '''named tuple to represent a bounding box'''
+    __slots__ = ()
+
+    def __new__(cls, p1, p2):
+        '''override to ensure Position named tuples'''
+        # noinspection PyArgumentList
+        return super(cls, BoundingBox).__new__(cls, p1=Position(*p1), p2=Position(*p2))
+
+    def contains(self, position: Position) -> bool:
+        '''checks whether position is inside bounding box'''
+        return self.p1.x <= position.x <= self.p2.x and self.p1.y <= position.y <= self.p2.y
+
+
+class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
+    '''named tuple to represent allowed speed range'''
+    __slots__ = ()
+
+    def contains(self, speed: float):
+        '''checks whether speed lies between min and max (including)'''
+        return self.min <= speed <= self.max
+
 
 @enum.unique
 class Behaviour(enum.Enum):
@@ -71,7 +101,7 @@ class RuleOperator(enum.Enum):
     ALL = all
     ANY = any
 
-    def evaluate(self, args: typing.Iterable):
+    def evaluate(self, args: Iterable):
         '''evaluate iterable args'''
         return self.value(args)  # pylint: disable=too-many-function-args
 
@@ -352,10 +382,10 @@ class SUMOVTypeRule(SUMOVehicleRule):
 class SUMOSpeedRule(SUMOVehicleRule):
     '''Speed based rule: Applies to vehicles within a given speed range'''
 
-    def __init__(self, speed_range=(0, 120), behaviour=Behaviour.DENY):
+    def __init__(self, speed_range=SpeedRange(0, 120), behaviour=Behaviour.DENY):
         '''C'tor.'''
         super().__init__(behaviour)
-        self._speed_range = numpy.array(speed_range)
+        self._speed_range = SpeedRange(*speed_range)
 
     def __str__(self):
         return f'{self.__class__}: ' \
@@ -370,10 +400,8 @@ class SUMOSpeedRule(SUMOVehicleRule):
         @param vehicle Vehicle
         @retval boolean
         '''
-        if (self._speed_range[0] <= vehicle.speed_max <= self._speed_range[1]) and \
-                (self.subrules_apply_to(vehicle) if self._vehicle_rules else True):
-            return True
-        return False
+        return self._speed_range.contains(vehicle.speed_max) and \
+                self.subrules_apply_to(vehicle) if self._vehicle_rules else True
 
     def apply(self, vehicles: typing.Iterable[SUMOVehicle]) -> typing.Generator[SUMOVehicle, typing.Any, None]:
         '''
@@ -396,10 +424,11 @@ class SUMOPositionRule(SUMOVehicleRule):
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)]
     '''
 
-    def __init__(self, position_bbox=numpy.array(((0.0, 0), (100.0, 1))), behaviour=Behaviour.DENY):
+    def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
+                 behaviour=Behaviour.DENY):
         '''C'tor.'''
         super().__init__(behaviour)
-        self._position_bbox = position_bbox
+        self._position_bbox = BoundingBox(*position_bbox)
 
     def __str__(self):
         return f'{self.__class__}: ' \
@@ -409,12 +438,12 @@ class SUMOPositionRule(SUMOVehicleRule):
                f'subrules: {self.subrules_as_str}'
 
     @property
-    def position_bbox(self) -> numpy.array:
+    def position_bbox(self) -> BoundingBox:
         '''
         Returns position bounding box.
         @retval position bounding box
         '''
-        return self._position_bbox
+        return BoundingBox(*self._position_bbox)
 
     def applies_to(self, vehicle: SUMOVehicle) -> bool:
         '''
@@ -422,13 +451,8 @@ class SUMOPositionRule(SUMOVehicleRule):
         @param vehicle Vehicle
         @retval boolean
         '''
-        # pylint: disable=no-member
-        if numpy.all(numpy.logical_and(self._position_bbox[0] <= vehicle.position,
-                                       vehicle.position <= self._position_bbox[1])) and \
-                (self.subrules_apply_to(vehicle) if self._vehicle_rules else True):
-            return True
-        return False
-        # pylint: enable=no-member
+        return self._position_bbox.contains(vehicle.position) \
+               and self.subrules_apply_to(vehicle) if self._vehicle_rules else True
 
     def apply(self,
               vehicles: typing.Iterable[SUMOVehicle]

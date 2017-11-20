@@ -21,9 +21,9 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""
+'''
 colmto: Test module for colmto.common.log.
-"""
+'''
 import logging
 
 import os
@@ -37,19 +37,19 @@ import colmto.common.log
 
 
 def test_logger():
-    """Test logger"""
+    '''Test logger'''
 
     f_temp_log = tempfile.NamedTemporaryFile()
 
     l_logs = [
         colmto.common.log.logger(
-            name="foo",
+            name='foo',
             logfile=f_temp_log.name,
             quiet=True,
             loglevel=logging.INFO
         ),
         colmto.common.log.logger(
-            name="foo",
+            name='foo',
             logfile=f_temp_log.name,
             quiet=False,
             loglevel=logging.INFO
@@ -57,11 +57,11 @@ def test_logger():
     ]
 
     for i_logger in l_logs:
-        i_logger.info("foo")
+        i_logger.info('foo')
 
-    for i_level in ("NOTSET", "INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"):
+    for i_level in ('NOTSET', 'INFO', 'DEBUG', 'WARNING', 'ERROR', 'CRITICAL'):
         l_log = colmto.common.log.logger(
-            name="foo{}".format(i_level),
+            name='foo{}'.format(i_level),
             logfile=f_temp_log.name,
             quiet=True,
             loglevel=i_level
@@ -71,7 +71,7 @@ def test_logger():
         )
         assert_true(
             l_log.name,
-            "foo{}".format(i_level)
+            'foo{}'.format(i_level)
         )
         assert_equal(
             logging.getLevelName(l_log.level),
@@ -79,24 +79,24 @@ def test_logger():
         )
     with assert_raises(ValueError):
         colmto.common.log.logger(
-            name="bar",
+            name='bar',
             logfile=f_temp_log.name,
             quiet=True,
-            loglevel="this should raise value error: Unknown level"
+            loglevel='this should raise value error: Unknown level'
         )
 
     with assert_raises(TypeError):
         colmto.common.log.logger(
-            name="bar",
+            name='bar',
             logfile=f_temp_log.name,
             quiet=True,
-            loglevel=["this should fail"]
+            loglevel=['this should fail']
         )
 
     with assert_raises(TypeError):
         colmto.common.log.logger(
-            name="barz",
+            name='barz',
             logfile=f_temp_log.name,
-            quiet="foo",
-            loglevel="info"
+            quiet='foo',
+            loglevel='info'
         )

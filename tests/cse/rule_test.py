@@ -21,9 +21,9 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""
+'''
 colmto: Test module for environment.rule.
-"""
+'''
 import random
 
 import colmto.cse.rule
@@ -40,19 +40,19 @@ from nose.tools import assert_tuple_equal
 
 
 def test_behaviour():
-    """
+    '''
     Test Behaviour enum
-    """
+    '''
     assert_equal(colmto.cse.rule.Behaviour.ALLOW.vclass, colmto.cse.rule.Behaviour.ALLOW.value)
     assert_equal(colmto.cse.rule.Behaviour.DENY.vclass, colmto.cse.rule.Behaviour.DENY.value)
-    assert_equal(colmto.cse.rule.Behaviour.ALLOW.value, "custom2")
-    assert_equal(colmto.cse.rule.Behaviour.DENY.value, "custom1")
+    assert_equal(colmto.cse.rule.Behaviour.ALLOW.value, 'custom2')
+    assert_equal(colmto.cse.rule.Behaviour.DENY.value, 'custom1')
 
 
 def test_ruleoperator():
-    """
+    '''
     Test RuleOperator enum
-    """
+    '''
     assert_equal(colmto.cse.rule.RuleOperator.ANY.value, any)
     assert_equal(colmto.cse.rule.RuleOperator.ALL.value, all)
     assert_equal(colmto.cse.rule.RuleOperator.ANY.evaluate([True, True]), True)
@@ -66,9 +66,9 @@ def test_ruleoperator():
 
 
 def test_base_rule():
-    """
+    '''
     Test BaseRule class
-    """
+    '''
     l_base_rule = colmto.cse.rule.BaseRule(
         colmto.cse.rule.Behaviour.DENY
     )
@@ -76,69 +76,69 @@ def test_base_rule():
 
 
 def test_behaviourfromstringorelse():
-    """Test colmto.cse.rule.BaseRule.behaviour_from_string."""
+    '''Test colmto.cse.rule.BaseRule.behaviour_from_string.'''
     assert_equal(
         colmto.cse.rule.BaseRule(
             colmto.cse.rule.Behaviour.DENY
-        ).behaviour_from_string("Allow", colmto.cse.rule.Behaviour.DENY),
+        ).behaviour_from_string('Allow', colmto.cse.rule.Behaviour.DENY),
         colmto.cse.rule.Behaviour.ALLOW
     )
     assert_equal(
         colmto.cse.rule.BaseRule(
             colmto.cse.rule.Behaviour.DENY
-        ).behaviour_from_string("Deny", colmto.cse.rule.Behaviour.ALLOW),
+        ).behaviour_from_string('Deny', colmto.cse.rule.Behaviour.ALLOW),
         colmto.cse.rule.Behaviour.DENY
     )
     assert_equal(
         colmto.cse.rule.BaseRule(
             colmto.cse.rule.Behaviour.DENY
-        ).behaviour_from_string("Meh", colmto.cse.rule.Behaviour.ALLOW),
+        ).behaviour_from_string('Meh', colmto.cse.rule.Behaviour.ALLOW),
         colmto.cse.rule.Behaviour.ALLOW
     )
 
 
 def test_ruleoperatorfromstring():
-    """Test colmto.cse.rule.BaseRule.ruleoperator_from_string."""
+    '''Test colmto.cse.rule.BaseRule.ruleoperator_from_string.'''
     assert_equal(
         colmto.cse.rule.SUMOVehicleRule(
             behaviour=colmto.cse.rule.Behaviour.DENY,
-            subrule_operator=colmto.cse.rule.RuleOperator.ANY
-        ).ruleoperator_from_string("All", colmto.cse.rule.RuleOperator.ANY),
+            rule_operator=colmto.cse.rule.RuleOperator.ANY
+        ).ruleoperator_from_string('All', colmto.cse.rule.RuleOperator.ANY),
         colmto.cse.rule.RuleOperator.ALL
     )
     assert_equal(
         colmto.cse.rule.SUMOVehicleRule(
             behaviour=colmto.cse.rule.Behaviour.DENY,
-            subrule_operator=colmto.cse.rule.RuleOperator.ANY
-        ).ruleoperator_from_string("Any", colmto.cse.rule.RuleOperator.ALL),
+            rule_operator=colmto.cse.rule.RuleOperator.ANY
+        ).ruleoperator_from_string('Any', colmto.cse.rule.RuleOperator.ALL),
         colmto.cse.rule.RuleOperator.ANY
     )
     assert_equal(
         colmto.cse.rule.SUMOVehicleRule(
             behaviour=colmto.cse.rule.Behaviour.DENY,
-            subrule_operator=colmto.cse.rule.RuleOperator.ANY
-        ).ruleoperator_from_string("Meh", colmto.cse.rule.RuleOperator.ALL),
+            rule_operator=colmto.cse.rule.RuleOperator.ANY
+        ).ruleoperator_from_string('Meh', colmto.cse.rule.RuleOperator.ALL),
         colmto.cse.rule.RuleOperator.ALL
     )
 
 
 def test_sumo_rule():
-    """
+    '''
     Test SumoRule class
-    """
+    '''
     l_sumo_rule = colmto.cse.rule.SUMORule(
         colmto.cse.rule.Behaviour.DENY
     )
     assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMORule)
 
-    assert_equal(l_sumo_rule.to_disallowed_class(), "custom1")
-    assert_equal(l_sumo_rule.to_allowed_class(), "custom2")
+    assert_equal(l_sumo_rule.to_disallowed_class(), 'custom1')
+    assert_equal(l_sumo_rule.to_allowed_class(), 'custom2')
 
 
 def test_sumo_null_rule():
-    """
+    '''
     Test SumoNullRule class
-    """
+    '''
     l_sumo_rule = colmto.cse.rule.SUMONullRule()
     assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMONullRule)
 
@@ -163,13 +163,13 @@ def test_sumo_null_rule():
 
 
 def test_sumo_vtype_rule():
-    """Test SUMOVTypeRule class"""
+    '''Test SUMOVTypeRule class'''
     assert_is_instance(colmto.cse.rule.SUMOVTypeRule(), colmto.cse.rule.SUMOVTypeRule)
 
     assert_equal(
         str(
             colmto.cse.rule.SUMOVTypeRule(
-                vehicle_type="passenger",
+                vehicle_type='passenger',
                 behaviour=colmto.cse.rule.Behaviour.DENY
             ).add_subrule(
                 colmto.cse.rule.SUMOPositionRule(
@@ -177,28 +177,28 @@ def test_sumo_vtype_rule():
                 )
             )
         ),
-        "<class 'colmto.cse.rule.SUMOVTypeRule'>: vehicle_type = passenger, behaviour = custom1, ru"
-        "le_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
+        '<class \'colmto.cse.rule.SUMOVTypeRule\'>: vehicle_type = passenger, behaviour = custom1, '
+        'rule_operator: RuleOperator.ANY, subrules: <class \'colmto.cse.rule.SUMOPositionRule\'>'
     )
 
     assert_true(
         colmto.cse.rule.SUMOVTypeRule(
-            vehicle_type="passenger",
+            vehicle_type='passenger',
             behaviour=colmto.cse.rule.Behaviour.DENY
         ).applies_to(
             colmto.environment.vehicle.SUMOVehicle(
-                vehicle_type="passenger"
+                vehicle_type='passenger'
             )
         )
     )
 
     assert_false(
         colmto.cse.rule.SUMOVTypeRule(
-            vehicle_type="truck",
+            vehicle_type='truck',
             behaviour=colmto.cse.rule.Behaviour.ALLOW
         ).applies_to(
             colmto.environment.vehicle.SUMOVehicle(
-                vehicle_type="passenger"
+                vehicle_type='passenger'
             )
         )
     )
@@ -206,10 +206,10 @@ def test_sumo_vtype_rule():
     assert_equal(
         next(
             colmto.cse.rule.SUMOVTypeRule(
-                vehicle_type="passenger",
+                vehicle_type='passenger',
                 behaviour=colmto.cse.rule.Behaviour.DENY
             ).apply(
-                [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
+                [colmto.environment.vehicle.SUMOVehicle(vehicle_type='passenger')]
             )
         ).vehicle_class,
         colmto.cse.rule.Behaviour.DENY.value
@@ -218,10 +218,10 @@ def test_sumo_vtype_rule():
     assert_equal(
         next(
             colmto.cse.rule.SUMOVTypeRule(
-                vehicle_type="passenger",
+                vehicle_type='passenger',
                 behaviour=colmto.cse.rule.Behaviour.ALLOW
             ).apply(
-                [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
+                [colmto.environment.vehicle.SUMOVehicle(vehicle_type='passenger')]
             )
         ).vehicle_class,
         colmto.cse.rule.Behaviour.ALLOW.value
@@ -230,10 +230,10 @@ def test_sumo_vtype_rule():
     assert_equal(
         next(
             colmto.cse.rule.SUMOVTypeRule(
-                vehicle_type="truck",
+                vehicle_type='truck',
                 behaviour=colmto.cse.rule.Behaviour.DENY
             ).apply(
-                [colmto.environment.vehicle.SUMOVehicle(vehicle_type="passenger")]
+                [colmto.environment.vehicle.SUMOVehicle(vehicle_type='passenger')]
             )
         ).vehicle_class,
         colmto.cse.rule.Behaviour.ALLOW.value
@@ -241,17 +241,17 @@ def test_sumo_vtype_rule():
 
 
 def test_sumo_extendable_rule():
-    """Test SUMOExtendableRule class"""
+    '''Test SUMOExtendableRule class'''
     with assert_raises(ValueError):
         colmto.cse.rule.SUMOExtendableRule(
-            subrules=[colmto.cse.rule.SUMONullRule()],
-            subrule_operator="any"
+            rules=[colmto.cse.rule.SUMONullRule()],
+            rule_operator='any'
         )
 
     with assert_raises(ValueError):
         colmto.cse.rule.SUMOExtendableRule(
-            subrules=[colmto.cse.rule.SUMOSpeedRule()],
-            subrule_operator="foo"
+            rules=[colmto.cse.rule.SUMOSpeedRule()],
+            rule_operator='foo'
         )
 
     l_sumo_rule = colmto.cse.rule.SUMOExtendableRule(
@@ -264,7 +264,7 @@ def test_sumo_extendable_rule():
     assert_equal(l_sumo_rule.subrule_operator, colmto.cse.rule.RuleOperator.ALL)
 
     with assert_raises(ValueError):
-        l_sumo_rule.subrule_operator = "foo"
+        l_sumo_rule.rule_operator = 'foo'
 
     l_sumo_rule.add_subrule(colmto.cse.rule.SUMOPositionRule())
 
@@ -315,7 +315,7 @@ def test_sumo_extendable_rule():
 
 
 def test_sumo_universal_rule():
-    """Test SUMOUniversalRule class"""
+    '''Test SUMOUniversalRule class'''
 
     assert_true(
         colmto.cse.rule.SUMOUniversalRule().applies_to(
@@ -329,14 +329,14 @@ def test_sumo_universal_rule():
                 (colmto.environment.vehicle.SUMOVehicle(),)
             )
         ).vehicle_class,
-        "custom1"
+        'custom1'
     )
 
 
 def test_sumo_speed_rule():
-    """
+    '''
     Test SUMOSpeedRule class
-    """
+    '''
     l_sumo_rule = colmto.cse.rule.SUMOSpeedRule(speed_range=numpy.array((0., 60.)))
     assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMOSpeedRule)
 
@@ -371,15 +371,15 @@ def test_sumo_speed_rule():
                 )
             )
         ),
-        "<class 'colmto.cse.rule.SUMOSpeedRule'>: speed_range = [  0.  60.], behaviour = DENY, rule"
-        "_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
+        '<class \'colmto.cse.rule.SUMOSpeedRule\'>: speed_range = [  0.  60.], behaviour = DENY, ru'
+        'le_operator: RuleOperator.ANY, subrules: <class \'colmto.cse.rule.SUMOPositionRule\'>'
     )
 
 
 def test_sumo_position_rule():
-    """
+    '''
     Test SUMOPositionRule class
-    """
+    '''
     l_sumo_rule = colmto.cse.rule.SUMOPositionRule(position_bbox=((0., -1.), (100., 1.)))
     assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMOPositionRule)
 
@@ -428,7 +428,7 @@ def test_sumo_position_rule():
                 )
             )
         ),
-        "<class 'colmto.cse.rule.SUMOPositionRule'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)), b"
-        "ehaviour = custom1, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUM"
-        "OSpeedRule'>"
+        '<class \'colmto.cse.rule.SUMOPositionRule\'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)),'
+        ' behaviour = custom1, rule_operator: RuleOperator.ANY, subrules: <class \'colmto.cse.rule.'
+        'SUMOSpeedRule\'>'
     )

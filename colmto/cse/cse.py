@@ -109,14 +109,14 @@ class SumoCSE(BaseCSE):
             raise TypeError
 
         if rule_cfg is not None \
-                and rule_cfg.get('subrules', {}).get('rule', False):
+                and rule_cfg.get('vehicle_rules', {}).get('rule', False):
             # look for sub-rules
             rule.rule = colmto.cse.rule.BaseRule.ruleoperator_from_string(
-                rule_cfg.get('subrules', {}).get('rule'),
+                rule_cfg.get('vehicle_rules', {}).get('rule'),
                 colmto.cse.rule.RuleOperator.ALL
             )
-            for i_subrule in rule_cfg.get('subrules', {}).get('rules', []):
-                rule.add_subrule(
+            for i_subrule in rule_cfg.get('vehicle_rules', {}).get('rules', []):
+                rule.add_rule(
                     self._valid_rules.get(i_subrule.get('type'))(
                         behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
                             i_subrule.get('behaviour'),

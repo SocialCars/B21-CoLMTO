@@ -54,7 +54,7 @@ _DEFAULT_CONFIG_RUN = {
             'args': {
                 'position_bbox': ((0., -2.), (9520., 2.))
             },
-            'subrules': {
+            'vehicle_rules': {
                 'rule': 'any',
                 'rules': [
                     {

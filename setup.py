@@ -20,7 +20,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""setup.py"""
+'''setup.py'''
 import sys
 
 from setuptools import find_packages
@@ -29,10 +29,10 @@ from setuptools.command.test import test as TestCommand
 
 
 class PyTest(TestCommand):
-    """pytest class"""
+    '''pytest class'''
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ["tests"]
+        self.test_args = ['tests']
         self.test_suite = True  # pylint: disable=attribute-defined-outside-init
 
     def run_tests(self):
@@ -40,44 +40,44 @@ class PyTest(TestCommand):
         sys.exit(pytest.main(self.test_args))
 
 
-VERSION = "0.1.1"
+VERSION = '0.1.1'
 
 setup(
-    name="colmto",
+    name='colmto',
     version=VERSION,
-    description="Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)",
-    long_description=open("readme.md").read(),
+    description='Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)',
+    long_description=open('readme.md').read(),
     # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3 :: Only",
-        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)"
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3 :: Only',
+        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)'
     ],
-    keywords="",  # Separate with spaces
-    author="Malte Aschermann",
-    author_email="masc@tu-clausthal.de",
-    url="https://github.com/SocialCars/colmto",
-    license="LGPL",
-    packages=find_packages(exclude=["examples", "tests", "sumo"]),
+    keywords='',  # Separate with spaces
+    author='Malte Aschermann',
+    author_email='masc@tu-clausthal.de',
+    url='https://github.com/SocialCars/colmto',
+    license='LGPL',
+    packages=find_packages(exclude=['examples', 'tests', 'sumo']),
     include_package_data=True,
     zip_safe=False,
-    tests_require=["pytest"],
-    cmdclass={"test": PyTest},
+    tests_require=['pytest'],
+    cmdclass={'test': PyTest},
 
     install_requires=[
-        "doxypypy",
-        "defusedxml",
-        "h5py",
-        "lxml",
-        "matplotlib",
-        "nose",
-        "pytest",
-        "PyYAML",
-        "sh",
+        'doxypypy',
+        'defusedxml',
+        'h5py',
+        'lxml',
+        'matplotlib',
+        'nose',
+        'pytest',
+        'PyYAML',
+        'sh',
     ],
 
     entry_points={
-        "console_scripts": ["colmto=colmto.__main__:main"]
+        'console_scripts': ['colmto=colmto.__main__:main']
     }
 )

@@ -21,25 +21,25 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""
+'''
 colmto: Test module for common.colormaps.
-"""
+'''
 from nose.tools import assert_list_equal
 
 import colmto.common.visualisation
 
 
 def test_cmap_names():
-    """Test case for cmap_names function."""
+    '''Test case for cmap_names function.'''
     assert_list_equal(
         sorted(colmto.common.visualisation.cmap_names()),
-        sorted(["magma", "magma_r", "inferno", "inferno_r",
-                "plasma", "plasma_r", "viridis", "viridis_r"])
+        sorted(['magma', 'magma_r', 'inferno', 'inferno_r',
+                'plasma', 'plasma_r', 'viridis', 'viridis_r'])
     )
 
 
 def test_mapped_cmap():
-    """Test case for get_mapped_cmap function."""
+    '''Test case for get_mapped_cmap function.'''
 
     l_results = [
         [

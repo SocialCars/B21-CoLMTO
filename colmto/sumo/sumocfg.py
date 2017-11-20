@@ -28,6 +28,7 @@ import copy
 import enum
 from pathlib import Path
 import subprocess
+from types import MappingProxyType
 import typing
 from collections import OrderedDict
 
@@ -552,8 +553,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
             )
 
     @staticmethod
-    def _generate_settings_xml(
-            scenarioconfig: dict, runcfg: dict, settingsfile: Path, forcerebuildscenarios=False):
+    def _generate_settings_xml(scenarioconfig: dict, runcfg: MappingProxyType,
+                               settingsfile: Path, forcerebuildscenarios=False):
         '''
         Generate SUMO's settings configuration file.
 
