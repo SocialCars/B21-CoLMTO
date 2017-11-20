@@ -21,7 +21,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""Visualisation of simulation stuff."""
+'''Visualisation of simulation stuff.'''
 import matplotlib.cm
 import matplotlib.colors
 
@@ -577,17 +577,17 @@ _COLORMAP = dict(
 
 
 def cmap_names():
-    """Returns valid colormap names."""
+    '''Returns valid colormap names.'''
     return list(_COLORMAP.keys())
 
 
 def mapped_cmap(cmap_name, range_max):
-    """
+    '''
     Return colormap scaled to range_max.
 
     @param cmap_name: Colormap name
     @param range_max: scale colormap from 0 up to this value
     @retval colormap scaled to range_max
-    """
+    '''
     l_cnorm = matplotlib.colors.Normalize(vmin=0, vmax=range_max)
     return matplotlib.cm.ScalarMappable(norm=l_cnorm, cmap=_COLORMAP[cmap_name]).to_rgba

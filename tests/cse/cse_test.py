@@ -78,9 +78,9 @@ def test_sumo_cse():
         position_bbox=numpy.array(((0., 0), (64.0, 1)))
     )
     l_subrule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=numpy.array((0., 60.)))
-    l_rule_position.add_rule(l_subrule_speed)
+    l_rule_position.add_subrule(l_subrule_speed)
 
-    l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_speed).add_rule(l_rule_position)
+    l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_speed).add_subrule(l_rule_position)
 
     assert_is_instance(l_sumo_cse, colmto.cse.cse.SumoCSE)
     assert_is_instance(l_sumo_cse.rules, tuple)
@@ -88,7 +88,7 @@ def test_sumo_cse():
     assert_in(l_rule_position, l_sumo_cse.rules)
 
     with assert_raises(TypeError):
-        l_sumo_cse.add_rule("foo")
+        l_sumo_cse.add_subrule("foo")
 
     l_vehicles = [
         colmto.environment.vehicle.SUMOVehicle(
@@ -134,7 +134,7 @@ def test_sumo_cse():
                 "args": {
                     "position_bbox": ((1350., -2.), (2500., 2.))
                 },
-                "vehicle_rules": {
+                "subrules": {
                     "rule": "any",
                     "rules": [
                         {
@@ -153,6 +153,6 @@ def test_sumo_cse():
     assert_is_instance(l_sumo_cse.rules[0], colmto.cse.rule.SUMOSpeedRule)
     assert_is_instance(l_sumo_cse.rules[1], colmto.cse.rule.SUMOPositionRule)
     assert_is_instance(
-        l_sumo_cse.rules[1].vehicle_rules[0],
+        l_sumo_cse.rules[1].subrules[0],
         colmto.cse.rule.SUMOSpeedRule
     )

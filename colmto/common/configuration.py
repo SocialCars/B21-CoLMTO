@@ -21,7 +21,7 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-"""Configuration super class."""
+'''Configuration super class.'''
 
 import copy
 from pathlib import Path
@@ -33,42 +33,42 @@ import colmto.common.log
 
 
 _DEFAULT_CONFIG_RUN = {
-    "aadt": {
-        "enabled": False,
-        "value": 13000
+    'aadt': {
+        'enabled': False,
+        'value': 13000
     },
-    "cse-enabled": False,
-    "initialsortings": ["best", "random", "worst"],
-    "nbvehicles": {
-        "enabled": False,
-        "value": 30
+    'cse-enabled': False,
+    'initialsortings': ['best', 'random', 'worst'],
+    'nbvehicles': {
+        'enabled': False,
+        'value': 30
     },
-    "runs": 1000,
-    "scenarios": ["NI-B210"],
-    "simtimeinterval": [0, 1800],
-    "starttimedistribution": "poisson",
-    "rules": [
+    'runs': 1000,
+    'scenarios': ['NI-B210'],
+    'simtimeinterval': [0, 1800],
+    'starttimedistribution': 'poisson',
+    'rules': [
         {
-            "type": "SUMOPositionRule",
-            "behaviour": "deny",
-            "args": {
-                "position_bbox": ((0., -2.), (9520., 2.))
+            'type': 'SUMOPositionRule',
+            'behaviour': 'deny',
+            'args': {
+                'position_bbox': ((0., -2.), (9520., 2.))
             },
-            "vehicle_rules": {
-                "rule": "any",
-                "rules": [
+            'subrules': {
+                'rule': 'any',
+                'rules': [
                     {
-                        "type": "SUMOVTypeRule",
-                        "behaviour": "deny",
-                        "args": {
-                            "vehicle_type": "truck"
+                        'type': 'SUMOVTypeRule',
+                        'behaviour': 'deny',
+                        'args': {
+                            'vehicle_type': 'truck'
                         },
                     },
                     {
-                        "type": "SUMOVTypeRule",
-                        "behaviour": "deny",
-                        "args": {
-                            "vehicle_type": "passenger"
+                        'type': 'SUMOVTypeRule',
+                        'behaviour': 'deny',
+                        'args': {
+                            'vehicle_type': 'passenger'
                         },
                     },
 
@@ -76,234 +76,234 @@ _DEFAULT_CONFIG_RUN = {
             }
         }
     ],
-    "sumo": {
-        "enabled": True,
-        "gui-delay": 200,
-        "headless": True,
-        "port": 8873
+    'sumo': {
+        'enabled': True,
+        'gui-delay': 200,
+        'headless': True,
+        'port': 8873
     },
-    "vehiclespersecond": {
-        "enabled": False,
-        "value": 0.5
+    'vehiclespersecond': {
+        'enabled': False,
+        'value': 0.5
     },
-    "vtypedistribution": {
-        "passenger": {
-            "desiredSpeeds": [34.0],
-            "fraction": 0.8,
-            "speedDev": 0.0,
-            "sigma": 0.0
+    'vtypedistribution': {
+        'passenger': {
+            'desiredSpeeds': [34.0],
+            'fraction': 0.8,
+            'speedDev': 0.0,
+            'sigma': 0.0
         },
-        "tractor": {
-            "desiredSpeeds": [8.0],
-            "fraction": 0.05,
-            "speedDev": 0.0,
-            "sigma": 0.0
+        'tractor': {
+            'desiredSpeeds': [8.0],
+            'fraction': 0.05,
+            'speedDev': 0.0,
+            'sigma': 0.0
         },
-        "truck": {
-            "desiredSpeeds": [23.0],
-            "fraction": 0.15,
-            "speedDev": 0.0,
-            "sigma": 0.0
+        'truck': {
+            'desiredSpeeds': [23.0],
+            'fraction': 0.15,
+            'speedDev': 0.0,
+            'sigma': 0.0
         }
     },
-    "vtype_list": {}
+    'vtype_list': {}
 }
 
 _DEFAULT_CONFIG_SCENARIO = {
-    "NI-B210": {
-        "description": {
-            "from": "OUJever",
-            "road": "B210",
-            "state": "NI",
-            "to": "OUJever"
+    'NI-B210': {
+        'description': {
+            'from': 'OUJever',
+            'road': 'B210',
+            'state': 'NI',
+            'to': 'OUJever'
         },
-        "parameters": {
-            "aadt": 13000.0,
-            "detectorpositions": [0, 1360, 2720, 4080, 5440],
-            "length": 6800.0,
-            "speedlimit": 27.77777777777778,
-            "switches": 4,
-            "switchpositions": [0, 1360, 2720, 4080, 5440]
+        'parameters': {
+            'aadt': 13000.0,
+            'detectorpositions': [0, 1360, 2720, 4080, 5440],
+            'length': 6800.0,
+            'speedlimit': 27.77777777777778,
+            'switches': 4,
+            'switchpositions': [0, 1360, 2720, 4080, 5440]
         }
     },
-    "HE-B62": {
-        "description": {
-            "from": "Coelbe",
-            "road": "B62",
-            "state": "HE",
-            "to": "Kirchhain"
+    'HE-B62': {
+        'description': {
+            'from': 'Coelbe',
+            'road': 'B62',
+            'state': 'HE',
+            'to': 'Kirchhain'
         },
-        "parameters": {
-            "aadt": 13000.0,
-            "detectorpositions": [0, 1171, 2342, 3513, 4684, 5855, 7026, 8197],
-            "length": 8200.0,
-            "speedlimit": 27.77777777777778,
-            "switches": 6,
-            "switchpositions": [0, 1171, 2342, 3513, 4684, 5855, 7026, 8197]
+        'parameters': {
+            'aadt': 13000.0,
+            'detectorpositions': [0, 1171, 2342, 3513, 4684, 5855, 7026, 8197],
+            'length': 8200.0,
+            'speedlimit': 27.77777777777778,
+            'switches': 6,
+            'switchpositions': [0, 1171, 2342, 3513, 4684, 5855, 7026, 8197]
         }
     },
-    "NW-B1": {
-        "description": {
-            "from": "Paderborn",
-            "road": "B1",
-            "state": "NW",
-            "to": "Schlangen"
+    'NW-B1': {
+        'description': {
+            'from': 'Paderborn',
+            'road': 'B1',
+            'state': 'NW',
+            'to': 'Schlangen'
         },
-        "parameters": {
-            "aadt": 17000.0,
-            "detectorpositions": [0, 977, 1954, 2931, 3908, 4885, 5862, 6839, 7816, 8793],
-            "length": 8800.0,
-            "speedlimit": 27.77777777777778,
-            "switches": 8,
-            "switchpositions": [0, 977, 1954, 2931, 3908, 4885, 5862, 6839, 7816, 8793]
+        'parameters': {
+            'aadt': 17000.0,
+            'detectorpositions': [0, 977, 1954, 2931, 3908, 4885, 5862, 6839, 7816, 8793],
+            'length': 8800.0,
+            'speedlimit': 27.77777777777778,
+            'switches': 8,
+            'switchpositions': [0, 977, 1954, 2931, 3908, 4885, 5862, 6839, 7816, 8793]
         }
     },
-    "HE-B49": {
-        "description": {
-            "from": "Leun",
-            "road": "B49",
-            "state": "HE",
-            "to": "Niederbiel"
+    'HE-B49': {
+        'description': {
+            'from': 'Leun',
+            'road': 'B49',
+            'state': 'HE',
+            'to': 'Niederbiel'
         },
-        "parameters": {
-            "aadt": 19000.0,
-            "detectorpositions": [0, 900, 1800, 2700, 3600],
-            "length": 4500.0,
-            "speedlimit": 27.77777777777778,
-            "switches": 4,
-            "switchpositions": [0, 900, 1800, 2700, 3600]
+        'parameters': {
+            'aadt': 19000.0,
+            'detectorpositions': [0, 900, 1800, 2700, 3600],
+            'length': 4500.0,
+            'speedlimit': 27.77777777777778,
+            'switches': 4,
+            'switchpositions': [0, 900, 1800, 2700, 3600]
         }
     },
-    "BY-B20": {
-        "description": {
-            "from": "Cham",
-            "road": "B20",
-            "state": "BY",
-            "to": "Straubing"
+    'BY-B20': {
+        'description': {
+            'from': 'Cham',
+            'road': 'B20',
+            'state': 'BY',
+            'to': 'Straubing'
         },
-        "parameters": {
-            "aadt": 20000.0,
-            "detectorpositions": [0, 1375, 2750, 4125, 5500, 6875, 8250, 9625],
-            "length": 11000.0,
-            "speedlimit": 27.77777777777778,
-            "switches": 7,
-            "switchpositions": [0, 1375, 2750, 4125, 5500, 6875, 8250, 9625]
+        'parameters': {
+            'aadt': 20000.0,
+            'detectorpositions': [0, 1375, 2750, 4125, 5500, 6875, 8250, 9625],
+            'length': 11000.0,
+            'speedlimit': 27.77777777777778,
+            'switches': 7,
+            'switchpositions': [0, 1375, 2750, 4125, 5500, 6875, 8250, 9625]
         }
     },
-    "BY-B471": {
-        "description": {
-            "from": "OUDachau",
-            "road": "B471",
-            "state": "BY",
-            "to": "OUDachau"
+    'BY-B471': {
+        'description': {
+            'from': 'OUDachau',
+            'road': 'B471',
+            'state': 'BY',
+            'to': 'OUDachau'
         },
-        "parameters": {
-            "aadt": 16000.0,
-            "detectorpositions": [0, 1280, 2560, 3840, 5120],
-            "length": 6400.0,
-            "speedlimit": 27.77777777777778,
-            "switches": 4,
-            "switchpositions": [0, 1280, 2560, 3840, 5120]
+        'parameters': {
+            'aadt': 16000.0,
+            'detectorpositions': [0, 1280, 2560, 3840, 5120],
+            'length': 6400.0,
+            'speedlimit': 27.77777777777778,
+            'switches': 4,
+            'switchpositions': [0, 1280, 2560, 3840, 5120]
         }
     }
 }
 
 _DEFAULT_CONFIG_VTYPES = {
-    "delivery": {
-        "accel": 2.9,
-        "decel": 7.5,
-        "height": 2.86,
-        "length": 6.5,
-        "maxSpeed": 50.0,
-        "minGap": 2.5,
-        "speedDev": 0.1,
-        "speedFactor": 1,
-        "vClass": "custom2",
-        "vType": "delivery",
-        "width": 2.16,
-        "dsat_threshold": 0.2
+    'delivery': {
+        'accel': 2.9,
+        'decel': 7.5,
+        'height': 2.86,
+        'length': 6.5,
+        'maxSpeed': 50.0,
+        'minGap': 2.5,
+        'speedDev': 0.1,
+        'speedFactor': 1,
+        'vClass': 'custom2',
+        'vType': 'delivery',
+        'width': 2.16,
+        'dsat_threshold': 0.2
     },
-    "heavytransport": {
-        "accel": 1.3,
-        "decel": 4.0,
-        "height": 2.4,
-        "length": 7.1,
-        "maxSpeed": 11.11111111111111,
-        "minGap": 2.5,
-        "speedDev": 0.1,
-        "speedFactor": 1,
-        "vClass": "custom2",
-        "vType": "trailer",
-        "width": 2.4,
-        "dsat_threshold": 0.2
+    'heavytransport': {
+        'accel': 1.3,
+        'decel': 4.0,
+        'height': 2.4,
+        'length': 7.1,
+        'maxSpeed': 11.11111111111111,
+        'minGap': 2.5,
+        'speedDev': 0.1,
+        'speedFactor': 1,
+        'vClass': 'custom2',
+        'vType': 'trailer',
+        'width': 2.4,
+        'dsat_threshold': 0.2
     },
-    "passenger": {
-        "accel": 2.9,
-        "decel": 7.5,
-        "height": 1.5,
-        "length": 4.3,
-        "maxSpeed": 50.0,
-        "minGap": 2.5,
-        "speedDev": 0.1,
-        "speedFactor": 1,
-        "vClass": "custom2",
-        "vType": "passenger",
-        "width": 1.8,
-        "dsat_threshold": 0.2
+    'passenger': {
+        'accel': 2.9,
+        'decel': 7.5,
+        'height': 1.5,
+        'length': 4.3,
+        'maxSpeed': 50.0,
+        'minGap': 2.5,
+        'speedDev': 0.1,
+        'speedFactor': 1,
+        'vClass': 'custom2',
+        'vType': 'passenger',
+        'width': 1.8,
+        'dsat_threshold': 0.2
     },
-    "tractor": {
-        "accel": 1.3,
-        "decel": 4.0,
-        "height": 2.4,
-        "length": 3.0,
-        "maxSpeed": 8.333333333333334,
-        "minGap": 2.5,
-        "speedDev": 0.1,
-        "speedFactor": 1,
-        "vClass": "custom2",
-        "vType": "tractor",
-        "width": 2.4,
-        "dsat_threshold": 1.0
+    'tractor': {
+        'accel': 1.3,
+        'decel': 4.0,
+        'height': 2.4,
+        'length': 3.0,
+        'maxSpeed': 8.333333333333334,
+        'minGap': 2.5,
+        'speedDev': 0.1,
+        'speedFactor': 1,
+        'vClass': 'custom2',
+        'vType': 'tractor',
+        'width': 2.4,
+        'dsat_threshold': 1.0
     },
-    "truck": {
-        "accel": 1.3,
-        "decel": 4.0,
-        "height": 2.4,
-        "length": 7.1,
-        "maxSpeed": 36.11111111111111,
-        "minGap": 2.5,
-        "speedDev": 0.1,
-        "speedFactor": 1,
-        "vClass": "custom2",
-        "vType": "truck",
-        "width": 2.4,
-        "dsat_threshold": 0.1
+    'truck': {
+        'accel': 1.3,
+        'decel': 4.0,
+        'height': 2.4,
+        'length': 7.1,
+        'maxSpeed': 36.11111111111111,
+        'minGap': 2.5,
+        'speedDev': 0.1,
+        'speedFactor': 1,
+        'vClass': 'custom2',
+        'vType': 'truck',
+        'width': 2.4,
+        'dsat_threshold': 0.1
     },
-    "van": {
-        "accel": 2.9,
-        "decel": 7.5,
-        "height": 1.73,
-        "length": 4.7,
-        "maxSpeed": 50.0,
-        "minGap": 2.5,
-        "speedDev": 0.1,
-        "speedFactor": 1,
-        "vClass": "custom2",
-        "vType": "delivery",
-        "width": 1.9,
-        "dsat_threshold": 0.2
+    'van': {
+        'accel': 2.9,
+        'decel': 7.5,
+        'height': 1.73,
+        'length': 4.7,
+        'maxSpeed': 50.0,
+        'minGap': 2.5,
+        'speedDev': 0.1,
+        'speedFactor': 1,
+        'vClass': 'custom2',
+        'vType': 'delivery',
+        'width': 1.9,
+        'dsat_threshold': 0.2
     }
 }
 
 
 class Configuration(object):
-    """Configuration reads CoLMTO's general cfg files."""
+    '''Configuration reads CoLMTO's general cfg files.'''
 
     def __init__(self, args):
-        """
+        '''
         C'tor: Read scenario/run/vehicle_type configs and merge with command line arguments.
         Command line args override cfgs.
-        """
+        '''
 
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._reader = colmto.common.io.Reader(args)
@@ -311,17 +311,17 @@ class Configuration(object):
         self._args = args
 
         if self._args.runconfigfile is None:
-            raise BaseException("run configuration file flag is None")
+            raise BaseException('run configuration file flag is None')
 
         if self._args.scenarioconfigfile is None:
-            raise BaseException("scenario configuration file flag is None")
+            raise BaseException('scenario configuration file flag is None')
 
         if self._args.vtypesconfigfile is None:
-            raise BaseException("vehicle_type configuration file flag is None")
+            raise BaseException('vehicle_type configuration file flag is None')
 
         if not self._args.runconfigfile.is_file() or self._args.freshconfigs:
             self._log.info(
-                "generating default run configuration %s", self._args.runconfigfile
+                'generating default run configuration %s', self._args.runconfigfile
             )
             self._run_config = copy.copy(_DEFAULT_CONFIG_RUN)
             self._writer.write_yaml(self._run_config, self._args.runconfigfile)
@@ -330,7 +330,7 @@ class Configuration(object):
 
         if not self._args.scenarioconfigfile.is_file() or self._args.freshconfigs:
             self._log.info(
-                "generating default scenario configuration %s", self._args.scenarioconfigfile
+                'generating default scenario configuration %s', self._args.scenarioconfigfile
             )
             self._scenario_config = copy.copy(_DEFAULT_CONFIG_SCENARIO)
             self._writer.write_yaml(self._scenario_config, self._args.scenarioconfigfile)
@@ -339,7 +339,7 @@ class Configuration(object):
 
         if not self._args.vtypesconfigfile.is_file() or self._args.freshconfigs:
             self._log.info(
-                "generating default vehicle_type configuration %s", self._args.vtypesconfigfile
+                'generating default vehicle_type configuration %s', self._args.vtypesconfigfile
             )
             self._vtypes_config = copy.copy(_DEFAULT_CONFIG_VTYPES)
             self._writer.write_yaml(self._vtypes_config, self._args.vtypesconfigfile)
@@ -348,78 +348,78 @@ class Configuration(object):
 
         # store currently running version
         # inferred from current HEAD if located inside a git project.
-        # otherwise set version to "UNKNOWN"
+        # otherwise set version to 'UNKNOWN'
         try:
-            l_git_commit_id = sh.Command("git")(["rev-parse", "HEAD"])
-            self._run_config["colmto_version"] = str(l_git_commit_id).replace("\n", "")
+            l_git_commit_id = sh.Command('git')(['rev-parse', 'HEAD'])
+            self._run_config['colmto_version'] = str(l_git_commit_id).replace('\n', '')
         except sh.ErrorReturnCode:
-            self._run_config["colmto_version"] = "UNKNOWN"
+            self._run_config['colmto_version'] = 'UNKNOWN'
         except sh.CommandNotFound:
-            self._log.debug("Git command not found in PATH. Setting commit id to UNKNOWN.")
-            self._run_config["colmto_version"] = "UNKNOWN"
+            self._log.debug('Git command not found in PATH. Setting commit id to UNKNOWN.')
+            self._run_config['colmto_version'] = 'UNKNOWN'
 
         # make sure vtype_lise exists and is dict
-        if self._run_config.get("vtype_list") is None \
-                or not isinstance(self._run_config.get("vtype_list"), dict):
-            self._run_config["vtype_list"] = {}
+        if self._run_config.get('vtype_list') is None \
+                or not isinstance(self._run_config.get('vtype_list'), dict):
+            self._run_config['vtype_list'] = {}
 
         self._override_cfg_flags()
 
     def _override_cfg_flags(self):
-        """Override the cfs flags."""
+        '''Override the cfs flags.'''
 
         if self._args.headless:
-            self._run_config.get("sumo")["headless"] = True
+            self._run_config.get('sumo')['headless'] = True
         if self._args.gui:
-            self._run_config.get("sumo")["headless"] = False
+            self._run_config.get('sumo')['headless'] = False
         if self._args.cse_enabled:
-            self._run_config["cse-enabled"] = True
+            self._run_config['cse-enabled'] = True
         if self._args.runs is not None:
-            self._run_config["runs"] = self._args.runs
+            self._run_config['runs'] = self._args.runs
         if self._args.scenarios is not None:
-            if self._args.scenarios != ["all"]:
-                self._run_config["scenarios"] = self._args.scenarios
+            if self._args.scenarios != ['all']:
+                self._run_config['scenarios'] = self._args.scenarios
             else:
-                self._run_config["scenarios"] = list(self._scenario_config.keys())
+                self._run_config['scenarios'] = list(self._scenario_config.keys())
 
     @property
     def run_config(self) -> MappingProxyType:
-        """
+        '''
         @retval run config
-        """
+        '''
         return MappingProxyType(self._run_config)
 
     @property
     def scenario_config(self) -> MappingProxyType:
-        """
+        '''
         @retval scenario config
-        """
+        '''
         return MappingProxyType(self._scenario_config)
 
     @property
     def scenario_dir(self) -> Path:
-        """
+        '''
         @retval scenario directory.
-        """
+        '''
         return self._args.scenario_dir
 
     @property
     def vtypes_config(self) -> MappingProxyType:
-        """
+        '''
         @retval vehicle type config
-        """
+        '''
         return MappingProxyType(self._vtypes_config)
 
     @property
     def output_dir(self) -> Path:
-        """
+        '''
         @retval destination dir
-        """
+        '''
         return self._args.output_dir
 
     @property
     def run_prefix(self) -> str:
-        """
+        '''
         @retval run prefix
-        """
+        '''
         return self._args.run_prefix

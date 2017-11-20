@@ -102,21 +102,21 @@ def test_ruleoperatorfromstring():
     assert_equal(
         colmto.cse.rule.SUMOVehicleRule(
             behaviour=colmto.cse.rule.Behaviour.DENY,
-            rule_operator=colmto.cse.rule.RuleOperator.ANY
+            subrule_operator=colmto.cse.rule.RuleOperator.ANY
         ).ruleoperator_from_string("All", colmto.cse.rule.RuleOperator.ANY),
         colmto.cse.rule.RuleOperator.ALL
     )
     assert_equal(
         colmto.cse.rule.SUMOVehicleRule(
             behaviour=colmto.cse.rule.Behaviour.DENY,
-            rule_operator=colmto.cse.rule.RuleOperator.ANY
+            subrule_operator=colmto.cse.rule.RuleOperator.ANY
         ).ruleoperator_from_string("Any", colmto.cse.rule.RuleOperator.ALL),
         colmto.cse.rule.RuleOperator.ANY
     )
     assert_equal(
         colmto.cse.rule.SUMOVehicleRule(
             behaviour=colmto.cse.rule.Behaviour.DENY,
-            rule_operator=colmto.cse.rule.RuleOperator.ANY
+            subrule_operator=colmto.cse.rule.RuleOperator.ANY
         ).ruleoperator_from_string("Meh", colmto.cse.rule.RuleOperator.ALL),
         colmto.cse.rule.RuleOperator.ALL
     )
@@ -171,7 +171,7 @@ def test_sumo_vtype_rule():
             colmto.cse.rule.SUMOVTypeRule(
                 vehicle_type="passenger",
                 behaviour=colmto.cse.rule.Behaviour.DENY
-            ).add_rule(
+            ).add_subrule(
                 colmto.cse.rule.SUMOPositionRule(
                     position_bbox=((0., -1.), (100., 1.))
                 )
@@ -244,36 +244,36 @@ def test_sumo_extendable_rule():
     """Test SUMOExtendableRule class"""
     with assert_raises(ValueError):
         colmto.cse.rule.SUMOExtendableRule(
-            rules=[colmto.cse.rule.SUMONullRule()],
-            rule_operator="any"
+            subrules=[colmto.cse.rule.SUMONullRule()],
+            subrule_operator="any"
         )
 
     with assert_raises(ValueError):
         colmto.cse.rule.SUMOExtendableRule(
-            rules=[colmto.cse.rule.SUMOSpeedRule()],
-            rule_operator="foo"
+            subrules=[colmto.cse.rule.SUMOSpeedRule()],
+            subrule_operator="foo"
         )
 
     l_sumo_rule = colmto.cse.rule.SUMOExtendableRule(
-        rules=[colmto.cse.rule.SUMOSpeedRule()],
-        rule_operator=colmto.cse.rule.RuleOperator.ANY
+        subrules=[colmto.cse.rule.SUMOSpeedRule()],
+        subrule_operator=colmto.cse.rule.RuleOperator.ANY
     )
 
-    assert_equal(l_sumo_rule.rule_operator, colmto.cse.rule.RuleOperator.ANY)
-    l_sumo_rule.rule_operator = colmto.cse.rule.RuleOperator.ALL
-    assert_equal(l_sumo_rule.rule_operator, colmto.cse.rule.RuleOperator.ALL)
+    assert_equal(l_sumo_rule.subrule_operator, colmto.cse.rule.RuleOperator.ANY)
+    l_sumo_rule.subrule_operator = colmto.cse.rule.RuleOperator.ALL
+    assert_equal(l_sumo_rule.subrule_operator, colmto.cse.rule.RuleOperator.ALL)
 
     with assert_raises(ValueError):
-        l_sumo_rule.rule_operator = "foo"
+        l_sumo_rule.subrule_operator = "foo"
 
-    l_sumo_rule.add_rule(colmto.cse.rule.SUMOPositionRule())
+    l_sumo_rule.add_subrule(colmto.cse.rule.SUMOPositionRule())
 
     with assert_raises(TypeError):
-        l_sumo_rule.add_rule(colmto.cse.rule.SUMONullRule())
+        l_sumo_rule.add_subrule(colmto.cse.rule.SUMONullRule())
 
-    l_sumo_rule = colmto.cse.rule.SUMOExtendableRule(rules=[])
+    l_sumo_rule = colmto.cse.rule.SUMOExtendableRule(subrules=[])
     l_sumo_sub_rule = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 60.))
-    l_sumo_rule.add_rule(l_sumo_sub_rule)
+    l_sumo_rule.add_subrule(l_sumo_sub_rule)
 
     assert_true(
         l_sumo_rule.subrules_apply_to(
@@ -292,10 +292,10 @@ def test_sumo_extendable_rule():
     )
 
     l_sumo_rule = colmto.cse.rule.SUMOExtendableRule(
-        rules=[],
-        rule_operator=colmto.cse.rule.RuleOperator.ALL
+        subrules=[],
+        subrule_operator=colmto.cse.rule.RuleOperator.ALL
     )
-    l_sumo_rule.add_rule(l_sumo_sub_rule)
+    l_sumo_rule.add_subrule(l_sumo_sub_rule)
 
     assert_true(
         l_sumo_rule.subrules_apply_to(
@@ -365,7 +365,7 @@ def test_sumo_speed_rule():
             colmto.cse.rule.SUMOSpeedRule(
                 speed_range=(0., 60.),
                 behaviour=colmto.cse.rule.Behaviour.DENY
-            ).add_rule(
+            ).add_subrule(
                 colmto.cse.rule.SUMOPositionRule(
                     position_bbox=((0., -1.), (100., 1.))
                 )
@@ -422,13 +422,13 @@ def test_sumo_position_rule():
             colmto.cse.rule.SUMOPositionRule(
                 position_bbox=((0., -1.), (100., 1.)),
                 behaviour=colmto.cse.rule.Behaviour.DENY
-            ).add_rule(
+            ).add_subrule(
                 colmto.cse.rule.SUMOSpeedRule(
                     speed_range=(0., 60.)
                 )
             )
         ),
         "<class 'colmto.cse.rule.SUMOPositionRule'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)), b"
-        "ehaviour = custom1, rule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUM"
+        "ehaviour = custom1, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUM"
         "OSpeedRule'>"
     )
