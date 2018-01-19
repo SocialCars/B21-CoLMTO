@@ -119,7 +119,7 @@ class Writer(object):
         @param hdf5_file The file name
         @param hdf5_base_path Destination path in HDF5 structure, will be created if not existent.
         @param object_dict Object(s) to be stored in a named dictionary structure
-                          ([name] -> str|int|float|list|numpy)
+        ([name] -> str|int|float|list|numpy)
         @param **kwargs Optional arguments passed to create_dataset
         '''
         self._log.debug('Writing %s', hdf5_file)
