@@ -46,10 +46,11 @@ class Statistics(object):
     def aggregate_run_stats_to_hdf5(run_stats, detector_positions):
         '''
         Aggregates statistics of runs by applying the median.
-        @param run_stats: run stats in dictionary
-            { runID -> run stats provided by aggregate_vehicle_grid_stats }
-        @param detector_positions:
-        @retval dictionary with aggregated stats
+
+        :param run_stats: run stats in dictionary, i.e { runID -> run stats provided by aggregate_vehicle_grid_stats }
+        :param detector_positions: iterable of detector positions
+        :return: dictionary with aggregated stats
+
         '''
 
         l_aggregated = {
@@ -128,24 +129,25 @@ class Statistics(object):
 
     @staticmethod
     def aggregate_vehicle_grid_stats(vehicles):
-        r'''
+        '''
         Aggregates vehicle grid stats related to cells.
 
         Aggregate time losses in cells by using the median time loss if more than one (1) element
         got recorded, otherwise just replace the list with its containing element.
 
         For example
-        \code{.py}
-        { 'time_loss': [ [1.0, 2.0, 3.0, 5.0, 7.0], [8.0], [9.0] ] ... }
-        \endcode
-        will result in
-        \code{.py}
-        { 'time_loss': [ 3.0, 8.0, 9.0 ] ... }
-        \endcode
 
-        @param vehicles dictionary vID -> vObj from vehicle object
-        @retval vehicles with travel_stats median aggregated
+        ``{ 'time_loss': [ [1.0, 2.0, 3.0, 5.0, 7.0], [8.0], [9.0] ] ... }``
+
+        will result in
+
+        ``{ 'time_loss': [ 3.0, 8.0, 9.0 ] ... }``
+
+        :param vehicles: dictionary ``{ vID: vObj }`` with vObj as a vehicle object
+        :return: vehicles with travel_stats median aggregated
+
         '''
+
         for i_vehicle in vehicles.values():
 
             l_travel_stats = i_vehicle.travel_stats.get('grid')
@@ -197,12 +199,16 @@ class Statistics(object):
         Joins fairness of time loss and dissatisfaction into one row-matrix and
         corresponding annotations.
         Join vehicle step and grid stats into one row-matrices with corresponding annotations.
-        Returns \code{.py}{ 'fairness': { 'time_loss': value, 'dissatisfaction': value },
-        'vehicles': vehicles }\endcode
-        @param vehicles: dictionary of vehicle objects (vID -> Vehicle)
-        @param run_number: number of current run
-        @param detector_positions: list of detector positions
-        @retval dictionary containing vehicles and fairness dicts
+
+        Example (generic structure)
+
+        >>> stats_to_hdf5_structure(vehicles, run_number, detector_positions)
+        { 'fairness': { 'time_loss': value, 'dissatisfaction': value }, 'vehicles': vehicles }
+
+        :param vehicles: dictionary of vehicle objects (vID -> Vehicle)
+        :param run_number: number of current run
+        :param detector_positions: list of detector positions
+        :return: dictionary containing vehicles and fairness dicts
         '''
 
         l_hdf5structure = {
@@ -741,28 +747,33 @@ class Statistics(object):
 
         return l_hdf5structure
 
+    # pylint: disable=no-member,len-as-condition
     @staticmethod
     def h_spread(data: numpy.ndarray) -> numpy.float64:
-        '''
+        r'''
         Calculate H-Spread of Hinge for given data points.
-        \f{eqnarray*}{
+
+        Using numpy.percentile (speedup) with linear (=default) interpolation.
+
+        .. math::
+            :nowrap:
+
+            \begin{eqnarray}
             \text{Hinge} &=& H_2 - H_1 \text{with} \\
             H_1 &=& a_{n+2} = a_{(N+3)/4} \\
-            M &=& a_{2n+3} = a_{(N+1)/2} \\
             H_2 &=& a_{3n+4} = a_{(3N+1)/4}.
-        \f}
-        Using numpy.percentile (speedup) with linear (=default) interpolation.
-        @see Weisstein, Eric W. H-Spread. From MathWorld--A Wolfram Web Resource.
-        http://mathworld.wolfram.com/H-Spread.html
-        @see Weisstein, Eric W. Hinge. From MathWorld--A Wolfram Web Resource.
-        http://mathworld.wolfram.com/Hinge.html
-        @param data: Numpy ndarray of data elements (preferably) \f$4n+5\f$ for \f$n=0,1,...,N\f$,
-            i.e. minimum length is \f$5\f$
-        @retval Hinge of type numpy.float64
+            \end{eqnarray}
+
+        :todo: move to `model` module
+        :see: Weisstein, Eric W. H-Spread. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/H-Spread.html
+        :see: Weisstein, Eric W. Hinge. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/Hinge.html
+        :param data: Numpy ndarray of data elements (preferably) :math:`4n+5` for :math:`n=0,1,...,N`, i.e. minimum length is :math:`5`.
+        :return: Hinge of type numpy.float64
+
         '''
-        # pylint: disable=no-member,len-as-condition
+
         return numpy.subtract(*numpy.percentile(data, [75, 25])) if len(data) else numpy.float64(0)
-        # pylint: enable=no-member,len-as-condition
+
 
     @staticmethod
     def _closest_position_to_detector(vehicle_positions, detector_position):
@@ -770,13 +781,17 @@ class Statistics(object):
         Find the index of the closest vehicle position measurement
         to the given detector position (x-axis).
 
-        By using bisect.bisect_left we can get this in O(log n) time due to the sorted nature of
+        By using
+        `bisect.bisect_left <https://docs.python.org/3.6/library/bisect.html#bisect.bisect_left>`_
+        we can get this in :math:`O(\log n)` time due to the sorted nature of
         vehicle position measurements in x direction.
-        @see http://stackoverflow.com/questions/12141150/
-        from-list-of-integers-get-number-closest-to-a-given-value#12141511
-        @param vehicle_positions: sorted list of vehicle positions in x direction
-        @param detector_position: detector position
-        @retval index of vehicle_positions
+
+        :see: http://stackoverflow.com/questions/12141150/from-list-of-integers-get-number-closest-to-a-given-value#12141511
+        :todo: move to `environment` module
+        :param vehicle_positions: sorted list of vehicle positions in :math:`x` direction
+        :param detector_position: detector position
+        :return: index of vehicle_positions
+
         '''
 
         l_index = bisect.bisect_left(vehicle_positions, detector_position)

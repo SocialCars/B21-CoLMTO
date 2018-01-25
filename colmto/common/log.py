@@ -27,11 +27,20 @@ import logging.handlers
 from pathlib import Path
 import sys
 import warnings
+import functools
 
 
 def logger(name: str, loglevel=logging.NOTSET, quiet=False,
            logfile=Path('~/.colmto/colmto.log').expanduser()) -> logging.Logger:
-    '''Create a logger instance.'''
+    '''
+    Create a logger instance.
+
+    :param name: name of the logger, e.g. class/module name
+    :param loglevel: loglevel from logging module, e.g. `logging.DEBUG`. Default: `logging.NOTSET`
+    :param quiet: if true, suppress output to console
+    :param logfile: Path where to write logfile. Default: ``~/.colmto/colmto.log``
+    :return: Logger object
+    '''
 
     if not isinstance(loglevel, (int, str)):
         raise TypeError('Unknown log level type %s' % type(loglevel))
@@ -84,7 +93,7 @@ def deprecated(func):
     as deprecated. It will result in a warning being emitted
     when the function is used.
 
-    @see https://wiki.python.org/moin/PythonDecoratorLibrary#Generating_Deprecation_Warnings
+    :see: https://wiki.python.org/moin/PythonDecoratorLibrary#Generating_Deprecation_Warnings
     '''
 
     @functools.wraps(func)

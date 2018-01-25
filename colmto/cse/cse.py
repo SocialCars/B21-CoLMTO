@@ -37,8 +37,11 @@ class BaseCSE(object):
     def __init__(self, args=None):
         '''
         C'tor
-        @param args: argparse configuration
+
+        :param args: argparse configuration
+
         '''
+
         if args is not None:
             self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._log = colmto.common.log.logger(__name__)
@@ -49,16 +52,22 @@ class BaseCSE(object):
     def rules(self) -> tuple:
         '''
         Policies of CSE
-        @retval rules tuple
+
+        :return: rules tuple
+
         '''
+
         return tuple(self._rules)
 
     def apply(self, vehicles: typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]):
         '''
         Apply rules to vehicles
-        @param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
-        @retval self
+
+        :param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
+        :return: future self
+
         '''
+
         for i_vehicle in iter(vehicles.values()) if isinstance(vehicles, dict) else vehicles:
             self.apply_one(i_vehicle)
 
@@ -67,9 +76,12 @@ class BaseCSE(object):
     def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle):
         '''
         Apply rules to one vehicles
-        @param vehicle: Vehicle
-        @retval self
+
+        :param vehicle: Vehicle
+        :return: future self
+
         '''
+
         for i_rule in self._rules:
             if i_rule.applies_to(vehicle) \
                     and i_rule.behaviour == colmto.cse.rule.Behaviour.DENY:
@@ -100,9 +112,11 @@ class SumoCSE(BaseCSE):
     def add_rule(self, rule: colmto.cse.rule.SUMOVehicleRule, rule_cfg=None):
         '''
         Add rule to SumoCSE.
-        @param rule: rule object
-        @param rule_cfg: rule configuration
-        @retval self
+
+        :param rule: rule object
+        :param rule_cfg: rule configuration
+        :return: future self
+
         '''
 
         if not isinstance(rule, colmto.cse.rule.SUMOVehicleRule):
@@ -135,8 +149,10 @@ class SumoCSE(BaseCSE):
     def add_rules_from_cfg(self, rules_config: typing.Union[typing.List[dict], None]):
         '''
         Add rules to SumoCSE based on run config's 'rules' section.
-        @param rules_config: run config's 'rules' section
-        @retval self
+
+        :param rules_config: run config's 'rules' section
+        :return: future self
+
         '''
 
         if rules_config is None:

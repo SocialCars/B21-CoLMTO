@@ -87,10 +87,10 @@ class Distribution(enum.Enum):
         For every other value of distribution this function just returns the input value of
         prev_start_time.
 
-        @param lamb: lambda
-        @param prev_start_time: start time
-        @param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
-        @retval next start time
+        :param lamb: lambda
+        :param prev_start_time: start time
+        :param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
+        :return: next start time
         '''
         if self is Distribution.POISSON:
             return prev_start_time + self._prng.value.exponential(scale=lamb)
@@ -142,32 +142,28 @@ class SumoConfig(colmto.common.configuration.Configuration):
     @property
     def sumo_config_dir(self) -> Path:
         '''
-        Returns:
-             directory of SUMO config
+        :return: directory of SUMO config
         '''
         return self.output_dir / 'SUMO'
 
     @property
     def runsdir(self) -> Path:
         '''
-        Returns:
-             directory of runs
+        :return: directory of runs
         '''
         return self.output_dir / 'SUMO' / self.run_prefix / 'runs'
 
     @property
     def resultsdir(self) -> Path:
         '''
-        Returns:
-            directory for results
+        :return: directory for results
         '''
         return self.output_dir / 'SUMO' / self.run_prefix / 'results'
 
     @property
     def sumo_run_config(self):
         '''
-        Returns:
-             copy of sumo run config
+        :return: copy of sumo run config
         '''
         return copy.copy(
             self.run_config.get('sumo')
@@ -217,11 +213,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
             vtype_list):
         '''generate run configurations
 
-        @param scenario_run_config: run configuration of scenario
-        @param initial_sorting: initial sorting of vehicles (InitialSorting enum)
-        @param run_number: number of current run
-        @retval
-            run configuration dictionary
+        :param scenario_run_config: run configuration of scenario
+        :param initial_sorting: initial sorting of vehicles (InitialSorting enum)
+        :param run_number: number of current run
+        :return: run configuration dictionary
         '''
         self._log.debug(
             'Generating run %s for %s sorting', run_number, initial_sorting.name.lower()
@@ -300,9 +295,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's node configuration file.
 
-        @param scenarioconfig: Scenario configuration
-        @param nodefile: Destination to write node file
-        @param forcerebuildscenarios: rebuild scenarios,
+        :param scenarioconfig: Scenario configuration
+        :param nodefile: Destination to write node file
+        :param forcerebuildscenarios: rebuild scenarios,
                                         even if they already exist for current run
         '''
 
@@ -355,10 +350,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's edge configuration file.
 
-        @param scenario_name: Name of scenario (required to id detector positions)
-        @param scenario_config: Scenario configuration
-        @param edgefile: Destination to write edge file
-        @param forcerebuildscenarios: Rebuild scenarios,
+        :param scenario_name: Name of scenario (required to id detector positions)
+        :param scenario_config: Scenario configuration
+        :param edgefile: Destination to write edge file
+        :param forcerebuildscenarios: Rebuild scenarios,
                                         even if they already exist for current run
         '''
 
@@ -448,8 +443,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate switches if not pre-defined in scenario config.
 
-        @param edge: edge
-        @param scenario_config: scenario config dictionary
+        :param edge: edge
+        :param scenario_config: scenario config dictionary
         '''
         self._log.debug('generating switches')
 
@@ -504,10 +499,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's main configuration file.
 
-        @param config_files: Dictionary of config file locations,
+        :param config_files: Dictionary of config file locations,
                              i.e. netfile, routefile, settingsfile
-        @param simtimeinterval: Time interval of simulation
-        @param forcerebuildscenarios: Rebuild scenarios,
+        :param simtimeinterval: Time interval of simulation
+        :param forcerebuildscenarios: Rebuild scenarios,
                                         even if they already exist for current run
         '''
         if not isinstance(simtimeinterval, list):
@@ -558,10 +553,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's settings configuration file.
 
-        @param scenarioconfig: Scenario configuration
-        @param runcfg: Run configuration
-        @param settingsfile: Destination to write settings file
-        @param forcerebuildscenarios: Rebuild scenarios,
+        :param scenarioconfig: Scenario configuration
+        :param runcfg: Run configuration
+        :param settingsfile: Destination to write settings file
+        :param forcerebuildscenarios: Rebuild scenarios,
                                         even if they already exist for current run
         '''
         if Path(settingsfile).exists() and not forcerebuildscenarios:
@@ -596,11 +591,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Create a distribution of vehicles based on
 
-        @param vtype_list: list of vehicle types
-        @param aadt: annual average daily traffic (vehicles/day/lane)
-        @param initialsorting: initial sorting of vehicles (by max speed), i.e. InitialSorting enum
-        @param scenario_name: name of scenario
-        @retval OrderedDict of ID -> colmto.environment.vehicle.Vehicle
+        :param vtype_list: list of vehicle types
+        :param aadt: annual average daily traffic (vehicles/day/lane)
+        :param initialsorting: initial sorting of vehicles (by max speed), i.e. InitialSorting enum
+        :param scenario_name: name of scenario
+        :return: OrderedDict of ID -> colmto.environment.vehicle.Vehicle
         '''
 
         if not isinstance(initialsorting, InitialSorting):
@@ -676,11 +671,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's trip file.
 
-        @param scenario_runs:
-        @param initialsorting:
-        @param tripfile:
-        @param forcerebuildscenarios:
-        @retval vehicles
+        :param scenario_runs:
+        :param initialsorting:
+        :param tripfile:
+        :param forcerebuildscenarios:
+        :return: vehicles
         '''
 
         if Path(tripfile).exists() and not forcerebuildscenarios:
@@ -774,10 +769,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's net xml.
 
-        @param nodefile:
-        @param edgefile:
-        @param netfile:
-        @param forcerebuildscenarios:
+        :param nodefile:
+        :param edgefile:
+        :param netfile:
+        :param forcerebuildscenarios:
         '''
 
         if Path(netfile).exists() and not forcerebuildscenarios:
@@ -805,10 +800,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's route xml.
 
-        @param netfile:
-        @param tripfile:
-        @param routefile:
-        @param forcerebuildscenarios:
+        :param netfile:
+        :param tripfile:
+        :param routefile:
+        :param forcerebuildscenarios:
         '''
 
         if Path(routefile).exists() and not forcerebuildscenarios:

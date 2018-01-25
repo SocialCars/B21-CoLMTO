@@ -24,14 +24,17 @@
 '''Runtime to control SUMO.'''
 
 
-
+import os
 import subprocess
+import sys
 
 import colmto.common.log
 import colmto.cse.cse
 import colmto.cse.rule
 
 try:
+    sys.path.append(os.path.join('sumo', 'tools'))
+    sys.path.append(os.path.join(os.environ.get('SUMO_HOME', os.path.join('..', '..')), 'tools'))
     import traci
 except ImportError:  # pragma: no cover
     raise ImportError('please declare environment variable \'SUMO_HOME\' as the root')
@@ -48,11 +51,11 @@ class Runtime(object):
         self._sumo_binary = sumo_binary
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
 
-    def run_standalone(self, run_config):
+    def run_standalone(self, run_config: dict):
         '''
-        @brief Run provided scenario in one shot.
+        Run provided scenario in one shot.
 
-        @param run_config run configuration object
+        :param run_config: run configuration object
         '''
 
         self._log.info(
@@ -79,14 +82,14 @@ class Runtime(object):
             l_sumoprocess.decode('utf8').replace('\n', '')
         )
 
-    def run_traci(self, run_config, cse):
+    def run_traci(self, run_config: dict, cse: colmto.cse.cse.SumoCSE) -> list:
         '''
         Run provided scenario with TraCI by providing a ref to an optimisation entity.
 
-        @param run_config run configuration
-        @param cse central optimisation entity instance of colmto.cse.cse.SumoCSE
+        :param run_config: run configuration
+        :param cse: central optimisation entity instance of colmto.cse.cse.SumoCSE
 
-        @retval list of vehicles, containing travel stats
+        :return: list of vehicles, containing travel stats
         '''
 
         if not isinstance(cse, colmto.cse.cse.SumoCSE):

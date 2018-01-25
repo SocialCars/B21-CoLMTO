@@ -7,3 +7,4 @@ nose
 pytest
 PyYAML
 sh
+pygments-style-solarized

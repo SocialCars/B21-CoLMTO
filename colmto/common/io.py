@@ -114,14 +114,16 @@ class Writer(object):
             csv_writer.writerows(rowdict)
 
     def write_hdf5(self, object_dict: dict, hdf5_file: str, hdf5_base_path: str, **kwargs):
-        '''Write an object to a specific path into an open file, identified by fileid
-
-        @param hdf5_file The file name
-        @param hdf5_base_path Destination path in HDF5 structure, will be created if not existent.
-        @param object_dict Object(s) to be stored in a named dictionary structure
-        ([name] -> str|int|float|list|numpy)
-        @param **kwargs Optional arguments passed to create_dataset
         '''
+        Write an object to a specific path into an open file, identified by fileid
+
+        :param hdf5_file: The file name
+        :param hdf5_base_path: Destination path in HDF5 structure, will be created if not existent.
+        :param object_dict: Object(s) to be stored in a named dictionary structure
+            ([name] -> str|int|float|list|numpy)
+        :param \*\*kwargs: Optional arguments passed to create_dataset
+        '''
+
         self._log.debug('Writing %s', hdf5_file)
 
         # verify whether arguments are sane
@@ -179,15 +181,15 @@ class Writer(object):
         '''
         Flatten dictionary and apply a '/'-separated key (path) structure for HDF5 writing.
         EXECPT there is a key named 'value' in a sub-dictionary, indicating a leaf in the tree
-        @param dictionary: dictionary
-        @retval: dictionary with flattened structure
+        :param dictionary: dictionary
+        :return: dictionary with flattened structure
         '''
         def items():
             '''
             Expand dictionary.
 
             yields (key, value) pairs of sub-dictionaries
-            @retval: (key, value) pairs
+            :return: (key, value) pairs
             '''
             for i_k, i_v in dictionary.items():
                 if isinstance(i_v, dict) and 'value' not in i_v:

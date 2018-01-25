@@ -24,6 +24,7 @@
 # pylint: disable=too-few-public-methods
 '''Rule related classes'''
 
+from abc import ABCMeta
 from collections import namedtuple
 
 from typing import Any
@@ -32,8 +33,10 @@ from typing import Iterable
 
 import enum
 
-from colmto.environment import SUMOVehicle
-
+# Avoid cyclic import of SUMOVehicle (also imported in colmto.cse.cse) but satisfy hinting in IDE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from colmto.environment.vehicle import SUMOVehicle
 
 class Position(namedtuple('Position', ('x', 'y'))):
     '''named tuple to represent positions on the road'''
@@ -75,15 +78,18 @@ class Behaviour(enum.Enum):
         return self.value
 
     @staticmethod
-    def behaviour_from_string(behaviour: str, or_else: Behaviour) -> Behaviour:
+    def behaviour_from_string(behaviour: str, or_else: 'Behaviour') -> 'Behaviour':
         '''
         Transforms string argument of behaviour, i.e. 'allow', 'deny' case insensitive to
         Behaviour enum value. Otherwise return passed or_else argument.
-        @param behaviour string 'allow', 'deny'
-        @param or_else otherwise returned argument
-        @type or_else Behaviour
-        @retval Behaviour.ALLOW, Behaviour.DENY, or_else
+
+        :param behaviour: string 'allow', 'deny'
+        :param or_else: otherwise returned argument
+        :type or_else: Behaviour
+        :return: Behaviour.ALLOW, Behaviour.DENY, or_else
+
         '''
+
         try:
             return Behaviour[behaviour.upper()]
         except KeyError:
@@ -106,15 +112,18 @@ class RuleOperator(enum.Enum):
         return self.value(args)  # pylint: disable=too-many-function-args
 
     @staticmethod
-    def ruleoperator_from_string(rule_operator: str, or_else: RuleOperator) -> RuleOperator:
+    def ruleoperator_from_string(rule_operator: str, or_else: 'Behaviour') -> 'Behaviour':
         '''
         Transforms string argument of rule operator, i.e. 'any', 'all' case insensitive to
         RuleOperator enum value. Otherwise return passed or_else argument.
-        @param rule_operator str ('any'|'all')
-        @param or_else otherwise returned argument
-        @type or_else RuleOperator
-        @retval RuleOperator.ANY, RuleOperator.ALL, or_else
+
+        :param rule_operator: str ('any'|'all')
+        :param or_else: otherwise returned argument
+        :type or_else: RuleOperator
+        :return: RuleOperator.ANY, RuleOperator.ALL, or_else
+
         '''
+
         try:
             return RuleOperator[rule_operator.upper()]
         except KeyError:
@@ -127,16 +136,16 @@ class BaseRule(metaclass=ABCMeta):
     def __init__(self, behaviour=Behaviour.DENY):
         '''
         C'tor
-        @param behaviour Default, i.e. baseline rule.
-                       Enum of colmto.cse.rule.Behaviour.DENY/ALLOW
+
+        :param behaviour: Default, i.e. baseline rule.
+            Enum of colmto.cse.rule.Behaviour.DENY/ALLOW
         '''
         self._behaviour = behaviour
 
     @property
     def behaviour(self) -> Behaviour:
         '''
-        Returns behaviour
-        @retval behaviour
+        :return: behaviour
         '''
         return self._behaviour
 
@@ -158,24 +167,28 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         return Behaviour.DENY.vclass
 
     # pylint: disable=unused-argument,no-self-use
-    def applies_to(self, vehicle: SUMOVehicle) -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
-        @param vehicle Vehicle
-        @retval boolean
+
+        :param vehicle: Vehicle
+        :return: boolean
+
         '''
+
         return False
 
 
-class SUMOExtendableSUMORule(SUMORule, metaclass=ABCMeta):
+class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
     '''Add ability to rules to be extended, i.e. to add sub-rules to them'''
 
     def __init__(self, behaviour=Behaviour.DENY, subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
         C'tor.
 
-        @param subrules List of sub-rules
-        @param subrule_operator Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
+        :param subrules: List of sub-rules
+        :param subrule_operator: Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
+
         '''
 
         # verify rule types
@@ -199,30 +212,21 @@ class SUMOExtendableSUMORule(SUMORule, metaclass=ABCMeta):
     @property
     def subrules(self) -> tuple:
         '''
-        Return vehicle related sub-rules.
-
-        Returns:
-            subrules
+        :return: vehicle related subrules
         '''
         return tuple(self._subrules)
 
     @property
     def subrules_as_str(self) -> str:
         '''
-        Return string representation of vehicle related sub-rules.
-
-        Returns:
-            subrules as string
+        :return: string representation of vehicle related sub-rules
         '''
         return ', '.join(str(type(i_rule)) for i_rule in self._subrules)
 
     @property
     def subrule_operator(self) -> RuleOperator:
         '''
-        Returns sub-rule operator.
-
-        Returns:
-            sub-rule operator
+        :return: sub-rule operator
         '''
         return self._subrule_operator
 
@@ -231,8 +235,10 @@ class SUMOExtendableSUMORule(SUMORule, metaclass=ABCMeta):
         '''
         Sets rule operator for applying sub-rules (ANY|ALL).
 
-        @param rule_operator Rule for applying sub-rules (ANY|ALL)
+        :param rule_operator: Rule for applying sub-rules (ANY|ALL)
+
         '''
+
         if rule_operator not in RuleOperator:
             raise ValueError
         self._subrule_operator = rule_operator
@@ -243,9 +249,9 @@ class SUMOExtendableSUMORule(SUMORule, metaclass=ABCMeta):
 
         Rule must derive from colmto.cse.rule.SUMORule.
 
-        @param subrule A rule
+        :param subrule: A rule
 
-        @retval self
+        :return: future self
         '''
 
         if not isinstance(subrule, SUMORule):
@@ -255,13 +261,15 @@ class SUMOExtendableSUMORule(SUMORule, metaclass=ABCMeta):
 
         return self
 
-    def subrules_apply_to(self, vehicle: SUMOVehicle) -> bool:
+    def subrules_apply_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Check whether sub-rules apply to this vehicle.
 
-        @param vehicle SUMOVehicle object
-        @retval boolean
+        :param vehicle: SUMOVehicle object
+        :return: boolean
+
         '''
+
         return self._subrule_operator.evaluate([i_rule.applies_to(vehicle) for i_rule in self._subrules])
 
 
@@ -271,21 +279,24 @@ class SUMOUniversalRule(SUMORule):
     '''
 
     # pylint: disable=unused-argument
-    def applies_to(self, vehicle: SUMOVehicle) -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
-        @param vehicle Vehicle
-        @retval boolean
+
+        :param vehicle: Vehicle
+        :return: boolean
+
         '''
+
         return True
 
-    def apply(self,
-              vehicles: typing.Iterable[SUMOVehicle]
-             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
         '''
-        apply rule to vehicles
-        @param vehicles iterable object containing BaseVehicles, or inherited objects
-        @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+        Apply rule to vehicles.
+
+        :param vehicles: iterable object containing BaseVehicles, or inherited objects
+        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+
         '''
 
         return (
@@ -301,23 +312,27 @@ class SUMONullRule(SUMORule):
     '''
 
     # pylint: disable=unused-argument
-    def applies_to(self, vehicle: SUMOVehicle) -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
-        @param vehicle Vehicle
-        @retval boolean
+
+        :param vehicle: Vehicle
+        :return: boolean
+
         '''
+
         return False
 
     # pylint: disable=no-self-use
-    def apply(self,
-              vehicles: typing.Iterable[SUMOVehicle]
-             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
         '''
-        apply rule to vehicles
-        @param vehicles iterable object containing BaseVehicles, or inherited objects
-        @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+        Apply rule to vehicles.
+
+        :param vehicles: iterable object containing BaseVehicles, or inherited objects
+        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+
         '''
+
         return (
             i_vehicle.change_vehicle_class(
                 self.to_disallowed_class()
@@ -325,7 +340,7 @@ class SUMONullRule(SUMORule):
         )
 
 
-class SUMOVehicleRule(SUMORule, SUMOExtendableRule):
+class SUMOVehicleRule(SUMOExtendableRule):
     '''Base class for vehicle attribute specific rules.'''
 
     def __init__(self, behaviour=Behaviour.DENY, subrule_operator=RuleOperator.ANY):
@@ -333,7 +348,6 @@ class SUMOVehicleRule(SUMORule, SUMOExtendableRule):
         self._vehicle_rules = []
         self._rule_operator = subrule_operator
         super().__init__(behaviour)
-
 
 
 class SUMOVTypeRule(SUMOVehicleRule):
@@ -351,24 +365,27 @@ class SUMOVTypeRule(SUMOVehicleRule):
                f'subrule_operator: {self._rule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
-    def applies_to(self, vehicle: SUMOVehicle) -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this (and sub)rules apply to given vehicle.
-        @param vehicle Vehicle
-        @retval boolean
+
+        :param vehicle: Vehicle
+        :return: boolean
+
         '''
+
         if (self._vehicle_type == vehicle.vehicle_type) and \
                 (self.subrules_apply_to(vehicle) if self._vehicle_rules else True):
             return True
         return False
 
-    def apply(self,
-              vehicles: typing.Iterable[SUMOVehicle]
-             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
         '''
-        apply rule to vehicles
-        @param vehicles iterable object containing BaseVehicles, or inherited objects
-        @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+        Apply rule to vehicles.
+
+        :param vehicles: iterable object containing BaseVehicles, or inherited objects
+        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+
         '''
 
         return (
@@ -394,20 +411,25 @@ class SUMOSpeedRule(SUMOVehicleRule):
                f'subrule_operator: {self._rule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
-    def applies_to(self, vehicle: SUMOVehicle) -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
-        Test whether this (and sub)rules apply to given vehicle
-        @param vehicle Vehicle
-        @retval boolean
+        Test whether this (and sub)rules apply to given vehicle.
+
+        :param vehicle: Vehicle
+        :return: boolean
+
         '''
+
         return self._speed_range.contains(vehicle.speed_max) and \
                 self.subrules_apply_to(vehicle) if self._vehicle_rules else True
 
-    def apply(self, vehicles: typing.Iterable[SUMOVehicle]) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
         '''
-        apply rule to vehicles
-        @param vehicles iterable object containing BaseVehicles, or inherited objects
-        @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+        Apply rule to vehicles.
+
+        :param vehicles: iterable object containing BaseVehicles, or inherited objects
+        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+
         '''
 
         return (
@@ -440,27 +462,29 @@ class SUMOPositionRule(SUMOVehicleRule):
     @property
     def position_bbox(self) -> BoundingBox:
         '''
-        Returns position bounding box.
-        @retval position bounding box
+        :return: position bounding box
         '''
         return BoundingBox(*self._position_bbox)
 
-    def applies_to(self, vehicle: SUMOVehicle) -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this (and sub)rules apply to given vehicle
-        @param vehicle Vehicle
-        @retval boolean
+
+        :param vehicle: Vehicle
+        :return: boolean
+
         '''
+
         return self._position_bbox.contains(vehicle.position) \
                and self.subrules_apply_to(vehicle) if self._vehicle_rules else True
 
-    def apply(self,
-              vehicles: typing.Iterable[SUMOVehicle]
-             ) -> typing.Generator[SUMOVehicle, typing.Any, None]:
+    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
         '''
-        apply rule to vehicles
-        @param vehicles iterable object containing BaseVehicles, or inherited objects
-        @retval List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+        Apply rule to vehicles.
+
+        :param vehicles: iterable object containing BaseVehicles, or inherited objects
+        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+
         '''
 
         return (

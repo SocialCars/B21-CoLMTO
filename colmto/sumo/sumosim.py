@@ -29,7 +29,7 @@ import sys
 import numpy
 
 try:
-    sys.path.append(os.path.join('sumo', 'sumo', 'tools'))
+    sys.path.append(os.path.join('sumo', 'tools'))
     sys.path.append(os.path.join(os.environ.get('SUMO_HOME', os.path.join('..', '..')), 'tools'))
     import sumolib
 except ImportError:  # pragma: no cover
@@ -76,7 +76,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
         '''
         Run given scenario.
 
-        @param scenario_name: Scenario name to look up in cfgs.
+        :param scenario_name: Scenario name to look up in cfgs.
         '''
 
         if self._sumocfg.scenario_config.get(scenario_name) is None:

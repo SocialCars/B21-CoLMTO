@@ -54,14 +54,14 @@ class BaseVehicle(object):
     @property
     def properties(self) -> MappingProxyType:
         '''
-        @retval vehicle properties as MappingProxyType dictionary bundle
+        :return: vehicle properties as MappingProxyType dictionary bundle
         '''
         return MappingProxyType(self._properties)
 
     @property
     def speed(self) -> float:
         '''
-        @retval current speed at time step
+        :return: current speed at time step
         '''
         return self._properties.get('speed')
 
@@ -69,14 +69,14 @@ class BaseVehicle(object):
     def speed(self, speed: float):
         '''
         Set vehicle speed
-        @param speed current position
+        :param speed: current position
         '''
         self._properties['speed'] = float(speed)
 
     @property
     def position(self) -> Position:
         '''
-        @retval current position
+        :return: current position
         '''
         return self._properties.get('position')
 
@@ -84,7 +84,7 @@ class BaseVehicle(object):
     def position(self, position: Position):
         '''
         Set vehicle position
-        @param position current position
+        :param position: current position
         '''
         self._properties['position'] = Position(*position)
 
@@ -102,11 +102,11 @@ class SUMOVehicle(BaseVehicle):
         '''
         C'tor.
 
-        @param vehicle_type
-        @param vtype_sumo_cfg
-        @param speed_deviation
-        @param sigma
-        @param speed_max
+        :param vehicle_type:
+        :param vtype_sumo_cfg:
+        :param speed_deviation:
+        :param sigma:
+        :param speed_max:
         '''
 
         super().__init__()
@@ -153,7 +153,7 @@ class SUMOVehicle(BaseVehicle):
     @property
     def grid_position(self) -> Position:
         '''
-        @retval current grid position
+        :return: current grid position
         '''
         return Position(*self._properties.get('grid_position'))
 
@@ -161,88 +161,78 @@ class SUMOVehicle(BaseVehicle):
     def grid_position(self, position: Position):
         '''
         Updates current position
-        @param position current grid position
+        :param position: current grid position
         '''
         self._properties['grid_position'] = Position(*position)
 
     @property
     def vehicle_type(self) -> str:
         '''
-        @retval vehicle type
+        :return: vehicle type
         '''
         return str(self._properties.get('vType'))
 
     @property
     def start_time(self) -> float:
         '''
-        Returns start time
-
-        @retval start time
+        :return: start time
         '''
         return float(self._properties.get('start_time'))
 
     @start_time.setter
     def start_time(self, start_time: float):
         '''
-        Sets start time.
-
-        @param start_time start time
+        :param start_time: start time
         '''
         self._properties['start_time'] = float(start_time)
 
     @property
     def color(self) -> Colour:
         '''
-        Returns:
-            color
+        :return: color
         '''
         return Colour(*self._properties.get('color'))
 
     @color.setter
-    def color(self, color: Position):
+    def color(self, color: Colour):
         '''
         Update color
-        @param color Color (rgba tuple, e.g. (255, 255, 0, 255))
+        :param color: Color (rgba tuple, e.g. (255, 255, 0, 255))
         '''
         self._properties['color'] = Colour(*color)
 
     @property
     def vehicle_class(self) -> str:
         '''
-        @retval SUMO vehicle class
+        :return: SUMO vehicle class
         '''
         return str(self._properties.get('vClass'))
 
     @property
     def speed_max(self) -> float:
         '''
-        @retval self._properties.get('maxSpeed')
+        :return: self._properties.get('maxSpeed')
         '''
         return float(self._properties.get('maxSpeed'))
 
     @property
     def travel_time(self) -> float:
         '''
-        Returns current travel time
-
-        @retval travel time
+        :return: current travel time
         '''
         return float(self._travel_stats.get('travel_time'))
 
     @property
     def travel_stats(self) -> MappingProxyType:
         '''
-        @brief Returns MappingProxyType travel stats dictionary
-
-        @retval self._travel_stats
+        :return: MappingProxyType travel stats dictionary
         '''
         return MappingProxyType(self._travel_stats)
 
     @property
     def dsat_threshold(self) -> float:
         '''
-        returns dissatisfaction threshold
-        @retval self.properties.get('dsat_threshold')
+        :return: dissatisfaction threshold, i.e. `self.properties.get('dsat_threshold')`
         '''
         return float(self._properties.get('dsat_threshold'))
 
@@ -256,9 +246,13 @@ class SUMOVehicle(BaseVehicle):
             time_loss: float,
             optimal_travel_time: float,
             time_loss_threshold=0.2) -> float:
-        r'''Calculate driver's dissatisfaction.
+        r'''
         Calculate driver's dissatisfaction.
-        \f{eqnarray*}{
+
+        .. math::
+            :nowrap:
+
+            \begin{eqnarray}
             TT &:=& \text{travel time}, \\
             TT^{*} &:=& \text{optimal travel time}, \\
             TL &:=& \text{time loss}, \\
@@ -266,12 +260,15 @@ class SUMOVehicle(BaseVehicle):
             \text{dissatisfaction} &:=& dsat(TL, TT^{*}, TLT) \\
             &=&\frac{1}{1+e^{(-TL + TLT \cdot TT^{*}) \cdot 0{.}5}}.\\
             &&\text{note: using a smoothening factor of 0.5 to make the transition not that sharp}
-        \f}
-        @param time_loss time loss
-        @param time_loss_threshold cut-off point of acceptable time loss
+            \end{eqnarray}
+
+        :todo: Move to ``model`` module
+        :param time_loss: time loss
+        :param time_loss_threshold: cut-off point of acceptable time loss
             relative to optimal travel time in [0,1]
-        @param optimal_travel_time optimal travel time
-        @retval dissatisfaction ([0,1] normalised)
+        :param optimal_travel_time: optimal travel time
+        :return: dissatisfaction ([0,1] normalised)
+
         '''
 
         # pylint: disable=no-member
@@ -283,11 +280,12 @@ class SUMOVehicle(BaseVehicle):
 
     def record_travel_stats(self, time_step: float) -> BaseVehicle:
         r'''Record travel statistics to vehicle.
-        Write travel stats, i.e. travel time, time loss, position,
-        and dissatisfaction of vehicle for a given time step into self._travel_stats
+        Instruct vehicle to write travel stats, i.e. travel time, time loss, position,
+        and dissatisfaction for a given time step into `self._travel_stats`
 
-        @param time_step current time step
-        @retval self
+        :param time_step: current time step
+        :return: future self
+
         '''
 
         # update current travel time
@@ -392,9 +390,12 @@ class SUMOVehicle(BaseVehicle):
     def change_vehicle_class(self, class_name: str) -> BaseVehicle:
         '''
         Change vehicle class
-        @param class_name vehicle class
-        @retval self
+
+        :param class_name: vehicle class
+        :return: future self
+
         '''
+
         self._properties['vClass'] = str(class_name)
         return self
 
@@ -404,12 +405,14 @@ class SUMOVehicle(BaseVehicle):
 
         For the grid cell the vehicle is in, take the global position in x-direction divided by grid
         cell size and int-rounded. For the y-coordinate take the lane index.
-        NOTE: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
 
-        @param position: tuple TraCI provided position
-        @param lane_index: int TraCI provided lane index
-        @param speed: float TraCI provided speed
-        @retval self Vehicle reference
+        :NOTE: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
+
+        :param position: tuple TraCI provided position
+        :param lane_index: int TraCI provided lane index
+        :param speed: float TraCI provided speed
+        :return: self Vehicle reference
+
         '''
 
         self._properties['position'] = Position(*position)

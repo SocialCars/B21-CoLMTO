@@ -32,7 +32,7 @@ import h5py
 def main(argv):
     '''
     main
-    @param argv: cmdline args
+    :param argv: cmdline args
     '''
     if len(sys.argv) != 3:
         print('Usage: merge_scenario_hdf5.py hdf5-input-file hdf5-output-file')

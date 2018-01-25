@@ -385,41 +385,41 @@ class Configuration(object):
     @property
     def run_config(self) -> MappingProxyType:
         '''
-        @retval run config
+        :return: run config
         '''
         return MappingProxyType(self._run_config)
 
     @property
     def scenario_config(self) -> MappingProxyType:
         '''
-        @retval scenario config
+        :return: scenario config
         '''
         return MappingProxyType(self._scenario_config)
 
     @property
     def scenario_dir(self) -> Path:
         '''
-        @retval scenario directory.
+        :return: scenario directory.
         '''
         return self._args.scenario_dir
 
     @property
     def vtypes_config(self) -> MappingProxyType:
         '''
-        @retval vehicle type config
+        :return: vehicle type config
         '''
         return MappingProxyType(self._vtypes_config)
 
     @property
     def output_dir(self) -> Path:
         '''
-        @retval destination dir
+        :return: destination dir
         '''
         return self._args.output_dir
 
     @property
     def run_prefix(self) -> str:
         '''
-        @retval run prefix
+        :return: run prefix
         '''
         return self._args.run_prefix

@@ -22,11 +22,13 @@
 # @endcond
 '''setup.py'''
 import sys
-
+import os
 from setuptools import find_packages
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
+from sphinx.setup_command import BuildDoc
 
+os.environ['SUMO_HOME'] = os.path.abspath('../sumo')
 
 class PyTest(TestCommand):
     '''pytest class'''
@@ -40,10 +42,11 @@ class PyTest(TestCommand):
         sys.exit(pytest.main(self.test_args))
 
 
-VERSION = '0.1.1'
+VERSION = '0.1.2'
+NAME = 'colmto'
 
 setup(
-    name='colmto',
+    name=NAME,
     version=VERSION,
     description='Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)',
     long_description=open('readme.md').read(),
@@ -63,8 +66,17 @@ setup(
     include_package_data=True,
     zip_safe=False,
     tests_require=['pytest'],
-    cmdclass={'test': PyTest},
-
+    cmdclass={
+        'test': PyTest,
+        'build_sphinx': BuildDoc
+    },
+    command_options={
+        'build_sphinx': {
+            'project': ('setup.py', NAME),
+            'version': ('setup.py', VERSION),
+            'release': ('setup.py', VERSION),
+        }
+    },
     install_requires=[
         'doxypypy',
         'defusedxml',
@@ -75,6 +87,7 @@ setup(
         'pytest',
         'PyYAML',
         'sh',
+        'pygments-style-solarized',
     ],
 
     entry_points={
