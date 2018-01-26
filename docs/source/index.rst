@@ -29,7 +29,7 @@ Where to start
 
 1. :ref:`Platform Description <platform>`
 2. :ref:`Installation <install>`
-3. :ref:`Use <run_colmto>`
+3. :ref:`Usage <run_colmto>`
 4. :ref:`CoLMTO Code Documentation <modules>`
 
 Indices and tables
