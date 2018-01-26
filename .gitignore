@@ -13,3 +13,8 @@
 !build-sumo-osx.sh
 !.pre-commit-config.yaml
 !*.coveragerc
+docs/build/**/*
+!docs/Makefile
+!docs/source/**/*.png
+!docs/source/**/*.py
+!docs/source/**/*.rst
