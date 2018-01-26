@@ -5,4 +5,5 @@ export LDFLAGS="-L/opt/X11/lib"
 cd sumo &&
 make -f Makefile.cvs &&
 ./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local &&
-make -j8
+make -j8 &&
+cd ../..
