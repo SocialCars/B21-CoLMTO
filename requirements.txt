@@ -7,4 +7,5 @@ nose
 pytest
 PyYAML
 sh
+sphinx
 pygments-style-solarized
