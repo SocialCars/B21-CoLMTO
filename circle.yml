@@ -40,9 +40,9 @@ jobs:
             - run:
                   name: Install Colmto Package
                   command: python3 setup.py install --user
-            - run:
-                  name: Run Tests
-                  command: python3 setup.py test
+#            - run:
+#                  name: Run Tests
+#                  command: python3 setup.py test
             - run:
                   name: Run Simulation for Scenario NI-B210 (1/2)
                   command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
@@ -52,12 +52,12 @@ jobs:
             - run:
                   name: Run Nosetests for Codecov
                   command: nosetests -w tests --with-coverage
-            - run:
-                  name: Upload Codecov Results (1/2)
-                  command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
-            - run:
-                  name: Upload Codecov Results (2/2)
-                  command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
+#            - run:
+#                  name: Upload Codecov Results (1/2)
+#                  command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
+#            - run:
+#                  name: Upload Codecov Results (2/2)
+#                  command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
             - run:
                   name: Move to /tmp
                   command: mv -f colmto tests site readme.md license.md architecture.png executionmodel.png /tmp
@@ -119,8 +119,11 @@ jobs:
                   name: Update report.md (4/4)
                   command: cat pylint.md >> report.md
             - run:
-                  name: Create Documentation (doxygen)
-                  command: doxygen site/configuration.doxyfile
+                  name: Create documentation (Sphinx)
+                  command: python3 setup.py build_sphinx
+            - run:
+                  name: Move documentation into place
+                  command: mkdir -p docs && mv build/sphinx/html docs/sources
             - run:
                   name: Cleanup
                   command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
