@@ -40,6 +40,12 @@ jobs:
             - run:
                   name: Install Colmto Package
                   command: python3 setup.py install --user
+            - run:
+                  name: Create documentation (Sphinx)
+                  command: python3 setup.py build_sphinx
+            - run:
+                  name: Move documentation into place
+                  command: mv build/sphinx/html docs/sources
 #            - run:
 #                  name: Run Tests
 #                  command: python3 setup.py test
@@ -118,12 +124,6 @@ jobs:
             - run:
                   name: Update report.md (4/4)
                   command: cat pylint.md >> report.md
-            - run:
-                  name: Create documentation (Sphinx)
-                  command: python3 setup.py build_sphinx
-            - run:
-                  name: Move documentation into place
-                  command: mv build/sphinx/html docs/sources
             - run:
                   name: Cleanup
                   command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
