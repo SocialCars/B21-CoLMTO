@@ -44,11 +44,11 @@ jobs:
                   name: Create documentation (Sphinx)
                   command: python3 setup.py build_sphinx
             - run:
-                  name: Move documentation into place
-                  command: mv build/sphinx/html docs/sources
-            - run:
                   name: Remove sphinx source
-                  command: rm -r docs/source
+                  command: rm -r docs/source && rm docs/Makefile
+            - run:
+                  name: Move documentation into place
+                  command: mv build/sphinx/html docs/sources && ls -l docs/sources/
 #            - run:
 #                  name: Run Tests
 #                  command: python3 setup.py test
