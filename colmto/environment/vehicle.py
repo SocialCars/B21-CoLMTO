@@ -41,16 +41,17 @@ class Position(namedtuple('Position', ('x', 'y'))):
 
     def gridify(self, width: float, lane_index: int) -> 'Position':
         '''
-        Round position to grid depending on ``width`` of grid cells and return new Position object.
+        Round position *in-place* to grid depending on ``width`` of grid cells and return new Position object.
         Lane index replaces the y coordinate.
 
         :param width: grid cell width
         :param: lane_index: Replace y coordinate with lane_index
-        :return: Position with gridified positional attributes
+        :return: future Position object with *in-place* gridified positional attributes
 
         '''
-
-        return Position(x=int(round(self.x/width)-1), y=int(lane_index))
+        self.x=int(round(self.x/width)-1)
+        self.y=int(lane_index)
+        return self
 
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
