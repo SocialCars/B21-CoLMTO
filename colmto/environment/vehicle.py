@@ -41,17 +41,16 @@ class Position(namedtuple('Position', ('x', 'y'))):
 
     def gridify(self, width: float, lane_index: int) -> 'Position':
         '''
-        Round position *in-place* to grid depending on ``width`` of grid cells and return new Position object.
+        Round position to grid depending on ``width`` of grid cells and return new Position object.
         Lane index replaces the y coordinate.
 
         :param width: grid cell width
         :param: lane_index: Replace y coordinate with lane_index
-        :return: future Position object with *in-place* gridified positional attributes
+        :return: future Position object with gridified positional attributes
 
         '''
-        self.x=int(round(self.x/width)-1)
-        self.y=int(lane_index)
-        return self
+
+        return Position(x=int(round(self.x/width)-1), y=int(lane_index))
 
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
@@ -435,7 +434,7 @@ class SUMOVehicle(BaseVehicle):
         :param position: tuple TraCI provided position
         :param lane_index: int TraCI provided lane index
         :param speed: float TraCI provided speed
-        :return: self Vehicle reference
+        :return: future self Vehicle reference
 
         '''
 
