@@ -31,12 +31,35 @@ import colmto.cse.rule
 
 
 class Position(namedtuple('Position', ('x', 'y'))):
-    '''named tuple to represent the vehicle position'''
+    '''
+    named tuple to represent the vehicle position
+    :todo: move to ``common.math``
+
+    '''
+
     __slots__ = ()
+
+    def gridify(self, width: float, lane_index: int) -> 'Position':
+        '''
+        Round position to grid depending on ``width`` of grid cells and return new Position object.
+        Lane index replaces the y coordinate.
+
+        :param width: grid cell width
+        :param: lane_index: Replace y coordinate with lane_index
+        :return: Position with gridified positional attributes
+
+        '''
+
+        return Position(x=int(round(self.x/width)-1), y=int(lane_index))
 
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
-    '''named tuple to represent rgba values'''
+    '''
+    named tuple to represent rgba values
+    :todo: move to ``common.math``
+
+    '''
+
     __slots__ = ()
 
 
@@ -262,7 +285,7 @@ class SUMOVehicle(BaseVehicle):
             &&\text{note: using a smoothening factor of 0.5 to make the transition not that sharp}
             \end{eqnarray}
 
-        :todo: Move to ``model`` module
+        :todo: Move to ``common.model`` module
         :param time_loss: time loss
         :param time_loss_threshold: cut-off point of acceptable time loss
             relative to optimal travel time in [0,1]
@@ -416,7 +439,7 @@ class SUMOVehicle(BaseVehicle):
         '''
 
         self._properties['position'] = Position(*position)
-        self._properties['grid_position'] = Position(x=int(round(position.x/4.)-1), y=int(lane_index))
+        self._properties['grid_position'] = Position(*position).gridify(width=4., lane_index=lane_index)
         self._properties['speed'] = float(speed)
 
         return self

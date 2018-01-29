@@ -39,12 +39,24 @@ if TYPE_CHECKING:
     from colmto.environment.vehicle import SUMOVehicle
 
 class Position(namedtuple('Position', ('x', 'y'))):
-    '''named tuple to represent positions on the road'''
+    '''
+    named tuple to represent positions on the road
+
+    :todo: move to ``common.math``
+
+    '''
+
     __slots__ = ()
 
 
 class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
-    '''named tuple to represent a bounding box'''
+    '''
+    named tuple to represent a bounding box
+
+    :todo: move to common.math
+
+    '''
+
     __slots__ = ()
 
     def __new__(cls, p1, p2):
@@ -58,7 +70,13 @@ class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
 
 
 class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
-    '''named tuple to represent allowed speed range'''
+    '''
+    named tuple to represent allowed speed range
+
+    :todo: move to ``common.math``
+
+    '''
+
     __slots__ = ()
 
     def contains(self, speed: float):
@@ -112,7 +130,7 @@ class RuleOperator(enum.Enum):
         return self.value(args)  # pylint: disable=too-many-function-args
 
     @staticmethod
-    def ruleoperator_from_string(rule_operator: str, or_else: 'Behaviour') -> 'Behaviour':
+    def ruleoperator_from_string(rule_operator: str, or_else: 'RuleOperator') -> 'RuleOperator':
         '''
         Transforms string argument of rule operator, i.e. 'any', 'all' case insensitive to
         RuleOperator enum value. Otherwise return passed or_else argument.
@@ -202,8 +220,6 @@ class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
 
         if subrule_operator not in RuleOperator:
             raise ValueError
-
-        subrule_operator.foo()
 
         self._subrule_operator = subrule_operator
 

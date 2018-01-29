@@ -764,7 +764,8 @@ class Statistics(object):
             H_2 &=& a_{3n+4} = a_{(3N+1)/4}.
             \end{eqnarray}
 
-        :todo: move to `model` module
+        :todo: move to ``common.model`` module
+
         :see: Weisstein, Eric W. H-Spread. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/H-Spread.html
         :see: Weisstein, Eric W. Hinge. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/Hinge.html
         :param data: Numpy ndarray of data elements (preferably) :math:`4n+5` for :math:`n=0,1,...,N`, i.e. minimum length is :math:`5`.
@@ -787,7 +788,9 @@ class Statistics(object):
         vehicle position measurements in x direction.
 
         :see: http://stackoverflow.com/questions/12141150/from-list-of-integers-get-number-closest-to-a-given-value#12141511
-        :todo: move to `environment` module
+
+        :todo: move to ``environment.vehicle``
+
         :param vehicle_positions: sorted list of vehicle positions in :math:`x` direction
         :param detector_position: detector position
         :return: index of vehicle_positions

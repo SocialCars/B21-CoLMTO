@@ -125,14 +125,14 @@ class SumoCSE(BaseCSE):
         if rule_cfg is not None \
                 and rule_cfg.get('vehicle_rules', {}).get('rule', False):
             # look for sub-rules
-            rule.rule = colmto.cse.rule.BaseRule.ruleoperator_from_string(
+            rule.rule = colmto.cse.rule.RuleOperator.ruleoperator_from_string(
                 rule_cfg.get('vehicle_rules', {}).get('rule'),
                 colmto.cse.rule.RuleOperator.ALL
             )
             for i_subrule in rule_cfg.get('vehicle_rules', {}).get('rules', []):
-                rule.add_rule(
+                rule.add_subrule(
                     self._valid_rules.get(i_subrule.get('type'))(
-                        behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
+                        behaviour=colmto.cse.rule.Behaviour.behaviour_from_string(
                             i_subrule.get('behaviour'),
                             colmto.cse.rule.Behaviour.DENY
                         ),
@@ -161,7 +161,7 @@ class SumoCSE(BaseCSE):
         for i_rule in rules_config:
             self.add_rule(
                 self._valid_rules.get(i_rule.get('type'))(
-                    behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
+                    behaviour=colmto.cse.rule.Behaviour.behaviour_from_string(
                         i_rule.get('behaviour'),
                         colmto.cse.rule.Behaviour.DENY
                     ),
