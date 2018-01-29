@@ -46,6 +46,9 @@ jobs:
             - run:
                   name: Move documentation into place
                   command: mv build/sphinx/html docs/sources
+            - run:
+                  name: Remove sphinx source
+                  command: rm -r docs/source
 #            - run:
 #                  name: Run Tests
 #                  command: python3 setup.py test

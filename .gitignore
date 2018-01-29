@@ -18,3 +18,4 @@ docs/build/**/*
 !docs/source/**/*.png
 !docs/source/**/*.py
 !docs/source/**/*.rst
+!docs/sources/html/**/*.*
