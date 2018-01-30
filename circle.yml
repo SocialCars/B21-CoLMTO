@@ -4,7 +4,7 @@ jobs:
     build:
         working_directory: ~/colmto
         docker:
-            - image: socialcars/colmto-docker:latest
+            - image: socialcars/docker:colmto
         environment:
             TZ: "/usr/share/zoneinfo/Europe/Berlin"
             GIT_AUTHOR_NAME: CircleCI
