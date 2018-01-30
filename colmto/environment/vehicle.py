@@ -45,7 +45,7 @@ class Position(namedtuple('Position', ('x', 'y'))):
         Lane index replaces the y coordinate.
 
         :param width: grid cell width
-        :param: lane_index: Replace y coordinate with lane_index
+        :param lane_index: Replace y coordinate with lane_index
         :return: future Position object with gridified positional attributes
 
         '''
