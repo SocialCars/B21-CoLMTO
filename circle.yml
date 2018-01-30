@@ -78,7 +78,7 @@ jobs:
                   command: git checkout gh-pages || git checkout -b gh-pages
             - run:
                   name: Backup circle.yml and create new .gitignore in /tmp
-                  command: mv -f circle.yml /tmp && rm .gitignore && echo -e "*.*\n!.gitignore\n!.gitmodules\n!circle.yml\n!codecov.yml\n!setup.cfg\n!colmto/resources/*.yaml\n!site/*\n!*.txt\n!*.py\n!*.md\n!*.png\n!build-sumo-osx.sh\n!.pre-commit-config.yaml\n!*.coveragerc\ndocs/build/**/*\n!docs/Makefile\n!docs/sources/**/*\n!.nojekyll" >> /tmp/.gitignore
+                  command: mv -f circle.yml /tmp && rm .gitignore && echo -e "*.*\n!.gitignore\n!.gitmodules\n!circle.yml\n!codecov.yml\n!setup.cfg\n!colmto/resources/*.yaml\n!site/*\n!*.txt\n!*.py\n!*.md\n!*.png\n!build-sumo-osx.sh\n!.pre-commit-config.yaml\n!*.coveragerc\ndocs/build/**/*\n!docs/Makefile\n!docs/**/*\n!.nojekyll" >> /tmp/.gitignore
             - run:
                   name: Checkout Master
                   command: git checkout master
