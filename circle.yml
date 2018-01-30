@@ -48,7 +48,7 @@ jobs:
                   command: rm -r docs/source && rm docs/Makefile
             - run:
                   name: Move documentation into place
-                  command: mv build/sphinx/html docs/sources && ls -l docs/sources/
+                  command: mv build/sphinx/html docs/sources
 #            - run:
 #                  name: Run Tests
 #                  command: python3 setup.py test
@@ -68,14 +68,14 @@ jobs:
 #                  name: Upload Codecov Results (2/2)
 #                  command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
             - run:
-                  name: Move to /tmp
+                  name: Backup documentation files to /tmp
                   command: mv -f colmto tests site docs readme.md license.md architecture.png executionmodel.png /tmp
             - run:
                   name: Checkout gh-pages
                   command: git checkout gh-pages || git checkout -b gh-pages
             - run:
-                  name: Move to /tmp
-                  command: mv -f circle.yml .gitignore /tmp
+                  name: Backup circle.yml and create new .gitignore in /tmp
+                  command: mv -f circle.yml /tmp && rm .gitignore && echo -e "*.*\n!.gitignore\n!.gitmodules\n!circle.yml\n!codecov.yml\n!setup.cfg\n!colmto/resources/*.yaml\n!site/*\n!*.txt\n!*.py\n!*.md\n!*.png\n!build-sumo-osx.sh\n!.pre-commit-config.yaml\n!*.coveragerc\ndocs/build/**/*\n!docs/Makefile\n!docs/source/**/*.png\n!docs/source/**/*.py\n!docs/source/**/*.rst\n!.nojekyll" >> /tmp/.gitignore
             - run:
                   name: Checkout Master
                   command: git checkout master
@@ -93,9 +93,9 @@ jobs:
                   command: rm -Rf *
             - run:
                   name: Remove pre-commit-config
-                  command: rm .pre-commit-config.yaml
+                  command: rm -f .pre-commit-config.yaml
             - run:
-                  name: Move Docs from /tmp
+                  name: Restore documentation files from /tmp
                   command: mv -f /tmp/.gitignore /tmp/circle.yml /tmp/colmto /tmp/tests /tmp/site /tmp/docs /tmp/readme.md /tmp/license.md /tmp/architecture.png /tmp/executionmodel.png .
             - run:
                   name: Update pylint.md (1/4)
@@ -130,6 +130,9 @@ jobs:
             - run:
                   name: Cleanup
                   command: rm -Rf colmto tests site readme_doc.md pylint.html pylint.md pylint_doc.md radon.md
+            - run:
+                  name: gh-pages is not a jekyll page
+                  command: touch .nojekyll
             - run:
                   name: Git Add All
                   command: git add --all .
