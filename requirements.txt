@@ -9,3 +9,4 @@ PyYAML
 sh
 sphinx
 pygments-style-solarized
+git+https://github.com/rtfd/sphinx_rtd_theme.git
