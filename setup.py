@@ -44,11 +44,12 @@ class PyTest(TestCommand):
 
 VERSION = '0.1.2'
 NAME = 'colmto'
+DESCRIPTION = 'Cooperative Lane Management and Traffic flow Optimisation'
 
 setup(
     name=NAME,
     version=VERSION,
-    description='Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)',
+    description=DESCRIPTION,
     long_description=open('readme.md').read(),
     # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -72,7 +73,7 @@ setup(
     },
     command_options={
         'build_sphinx': {
-            'project': ('setup.py', NAME),
+            'project': ('setup.py', DESCRIPTION),
             'version': ('setup.py', VERSION),
             'release': ('setup.py', VERSION),
         }
