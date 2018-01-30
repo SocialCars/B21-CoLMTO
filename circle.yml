@@ -45,7 +45,7 @@ jobs:
                   command: python3 setup.py build_sphinx
             - run:
                   name: Create PDF documentation
-                  command: cd docs && make latexpdf && cp build/latex/CooperativeLaneManagementandTrafficflowOptimisation.pdf CoLMTO-doc.pdf && cd ..
+                  command: cd docs && make latexpdf && cp build/latex/CoLMTO-doc.pdf . && cd ..
             - run:
                   name: Remove sphinx source and build files
                   command: rm -r docs/source && rm -r docs/build && rm docs/Makefile

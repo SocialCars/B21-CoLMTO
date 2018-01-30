@@ -1,7 +1,7 @@
 .. _platform:
 
-CoLMTO Platform Description
-===========================
+Platform Description
+====================
 
 .. _execution_model:
 

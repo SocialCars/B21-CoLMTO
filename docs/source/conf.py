@@ -100,7 +100,7 @@ html_theme_options = {
     'logo_only': False,
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
-    'style_external_links': True,
+    'style_external_links': False,
     # Toc options
     'collapse_navigation': False,
     'sticky_navigation': True,
@@ -119,7 +119,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'CooperativeLaneManagementandTrafficflowOptimisationdoc'
+htmlhelp_basename = 'CoLMTOdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -146,7 +146,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'CooperativeLaneManagementandTrafficflowOptimisation.tex', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
+    (master_doc, 'CoLMTO-doc.tex', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
      u'Malte Aschermann', 'manual'),
 ]
 
@@ -156,7 +156,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'cooperativelanemanagementandtrafficflowoptimisation', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
+    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
      [author], 1)
 ]
 
@@ -167,8 +167,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'CooperativeLaneManagementandTrafficflowOptimisation', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
-     author, 'CooperativeLaneManagementandTrafficflowOptimisation', 'One line description of project.',
+    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
+     author, 'CoLMTO', 'One line description of project.',
      'Miscellaneous'),
 ]
 

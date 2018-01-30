@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 #SPHINXBUILD   = sphinx-build
 SPHINXBUILD   = python3 -c "import sys,sphinx,os;sys.path.insert(0, os.path.abspath('source'));import conf;os.environ['SUMO_HOME'] = os.path.abspath('../sumo');sys.exit(sphinx.main(sys.argv))"
-SPHINXPROJ    = CooperativeLaneManagementandTrafficflowOptimisation
+SPHINXPROJ    = CoLMTO
 SOURCEDIR     = source
 BUILDDIR      = build
 SUMO_HOME     = ./sumo

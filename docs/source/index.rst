@@ -25,34 +25,37 @@ Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
         :alt: PDF documentation
         :target: http://socialcars.github.io/colmto/docs/CoLMTO-doc.pdf
 
-Where to start
---------------
+.. only:: html
 
-1. :ref:`Platform Description <platform>`
-2. :ref:`Installation <install>`
-3. :ref:`Usage <run_colmto>`
-4. :ref:`CoLMTO Code Documentation <modules>`
+    Where to start
+    --------------
 
-Indices and tables
-==================
+    1. :ref:`Platform Description <platform>`
+    2. :ref:`Installation <install>`
+    3. :ref:`Usage <run_colmto>`
+    4. :ref:`Code Documentation <modules>`
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-Sitemap
-=======
+    Table of Contents
+    -----------------
 
 .. toctree::
-  :maxdepth: 2
+    :maxdepth: 2
+    :numbered:
 
-  platform
-  install
-  modules/index
-  modules/common
-  modules/cse
-  modules/environment
-  modules/sumo
+    platform
+    install
+    usage
+    modules
+    additional
+
+.. only:: html
+
+    Indices and tables
+    ------------------
+
+    * :ref:`genindex`
+    * :ref:`modindex`
+    * :ref:`search`
 
 Copyright & License
 ===================
