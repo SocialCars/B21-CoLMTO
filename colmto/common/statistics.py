@@ -27,6 +27,7 @@ import bisect
 
 import colmto.common.io
 import colmto.common.log
+import colmto.common.model
 
 import numpy
 
@@ -231,7 +232,7 @@ class Statistics(object):
                 ] = {
                     'value': numpy.array(
                         [
-                            Statistics.h_spread(
+                            colmto.common.model.h_spread(
                                 numpy.array(
                                     [
                                         # pylint: disable=no-member
@@ -269,7 +270,7 @@ class Statistics(object):
                 ] = {
                     'value': numpy.array(
                         [
-                            Statistics.h_spread(
+                            colmto.common.model.h_spread(
                                 numpy.array(
                                     [
                                         i_vehicle.travel_stats.get('grid')
@@ -303,7 +304,7 @@ class Statistics(object):
                 ] = {
                     'value': numpy.array(
                         [
-                            Statistics.h_spread(
+                            colmto.common.model.h_spread(
                                 numpy.array(
                                     [
                                         i_vehicle.travel_stats.get('grid')
@@ -449,7 +450,7 @@ class Statistics(object):
                     ).get(i_vtype)['{}_delta'.format(i_stat)] = {
                         'value': numpy.array(
                             [
-                                Statistics.h_spread(
+                                colmto.common.model.h_spread(
                                     numpy.array(
                                         [
                                             # pylint: disable=no-member
@@ -500,7 +501,7 @@ class Statistics(object):
                     ).get(i_vtype)['{}_start'.format(i_stat)] = {
                         'value': numpy.array(
                             [
-                                Statistics.h_spread(
+                                colmto.common.model.h_spread(
                                     numpy.array(
                                         [
                                             i_vehicle.travel_stats.get('grid')
@@ -538,7 +539,7 @@ class Statistics(object):
                     ).get(i_vtype)['{}_end'.format(i_stat)] = {
                         'value': numpy.array(
                             [
-                                Statistics.h_spread(
+                                colmto.common.model.h_spread(
                                     numpy.array(
                                         [
                                             i_vehicle.travel_stats.get('grid')
