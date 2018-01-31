@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -23,44 +23,12 @@
 # @endcond
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
-from collections import namedtuple
 from types import MappingProxyType
-import numpy
 
 import colmto.cse.rule
-
-
-class Position(namedtuple('Position', ('x', 'y'))):
-    '''
-    named tuple to represent the vehicle position
-    :todo: move to ``common.math``
-
-    '''
-
-    __slots__ = ()
-
-    def gridify(self, width: float, lane_index: int) -> 'Position':
-        '''
-        Round position to grid depending on ``width`` of grid cells and return new Position object.
-        Lane index replaces the y coordinate.
-
-        :param width: grid cell width
-        :param lane_index: Replace y coordinate with lane_index
-        :return: future Position object with gridified positional attributes
-
-        '''
-
-        return Position(x=int(round(self.x/width)-1), y=int(lane_index))
-
-
-class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
-    '''
-    named tuple to represent rgba values
-    :todo: move to ``common.math``
-
-    '''
-
-    __slots__ = ()
+import colmto.common.model
+from colmto.common.property import Position
+from colmto.common.property import Colour
 
 
 class BaseVehicle(object):
@@ -264,43 +232,6 @@ class SUMOVehicle(BaseVehicle):
         ''' sets dissatisfaction threshold '''
         self._properties['dsat_threshold'] = float(threshold)
 
-    @staticmethod
-    def dissatisfaction(
-            time_loss: float,
-            optimal_travel_time: float,
-            time_loss_threshold=0.2) -> float:
-        r'''
-        Calculate driver's dissatisfaction.
-
-        .. math::
-            :nowrap:
-
-            \begin{eqnarray}
-            TT &:=& \text{travel time}, \\
-            TT^{*} &:=& \text{optimal travel time}, \\
-            TL &:=& \text{time loss}, \\
-            TLT &:=& \text{time loss threshold}, \\
-            \text{dissatisfaction} &:=& dsat(TL, TT^{*}, TLT) \\
-            &=&\frac{1}{1+e^{(-TL + TLT \cdot TT^{*}) \cdot 0{.}5}}.\\
-            &&\text{note: using a smoothening factor of 0.5 to make the transition not that sharp}
-            \end{eqnarray}
-
-        :todo: Move to ``common.model`` module
-        :param time_loss: time loss
-        :param time_loss_threshold: cut-off point of acceptable time loss
-            relative to optimal travel time in [0,1]
-        :param optimal_travel_time: optimal travel time
-        :return: dissatisfaction ([0,1] normalised)
-
-        '''
-
-        # pylint: disable=no-member
-        return numpy.divide(
-            1.,
-            1 + numpy.exp((-time_loss + time_loss_threshold * optimal_travel_time)) * .5
-        )
-        # pylint: enable=no-member
-
     def record_travel_stats(self, time_step: float) -> BaseVehicle:
         r'''Record travel statistics to vehicle.
         Instruct vehicle to write travel stats, i.e. travel time, time loss, position,
@@ -341,7 +272,7 @@ class SUMOVehicle(BaseVehicle):
             )
 
             self._travel_stats.get('grid').get('dissatisfaction')[-1].append(
-                self.dissatisfaction(
+                colmto.common.model.dissatisfaction(
                     time_step - self.start_time - self.position[0] / self.speed_max,
                     self.position[0] / self.speed_max,
                     self._properties.get('dsat_threshold')
@@ -363,7 +294,7 @@ class SUMOVehicle(BaseVehicle):
             )
             self._travel_stats.get('grid').get('dissatisfaction').append(
                 [
-                    self.dissatisfaction(
+                    colmto.common.model.dissatisfaction(
                         time_step - self.start_time - self.position[0] / self.speed_max,
                         self.position[0] / self.speed_max,
                         self._properties.get('dsat_threshold')
@@ -383,7 +314,7 @@ class SUMOVehicle(BaseVehicle):
         self._travel_stats.get('step').get('speed').append(self.speed)
 
         self._travel_stats.get('step').get('dissatisfaction').append(
-            self.dissatisfaction(
+            colmto.common.model.dissatisfaction(
                 time_step - self.start_time - self.position[0] / self.speed_max,
                 self.position[0] / self.speed_max,
                 self._properties.get('dsat_threshold')

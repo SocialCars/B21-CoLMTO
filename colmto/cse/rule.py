@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -25,7 +25,6 @@
 '''Rule related classes'''
 
 from abc import ABCMeta
-from collections import namedtuple
 
 from typing import Any
 from typing import Generator
@@ -38,50 +37,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from colmto.environment.vehicle import SUMOVehicle
 
-class Position(namedtuple('Position', ('x', 'y'))):
-    '''
-    named tuple to represent positions on the road
-
-    :todo: move to ``common.math``
-
-    '''
-
-    __slots__ = ()
-
-
-class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
-    '''
-    named tuple to represent a bounding box
-
-    :todo: move to common.math
-
-    '''
-
-    __slots__ = ()
-
-    def __new__(cls, p1, p2):
-        '''override to ensure Position named tuples'''
-        # noinspection PyArgumentList
-        return super(cls, BoundingBox).__new__(cls, p1=Position(*p1), p2=Position(*p2))
-
-    def contains(self, position: Position) -> bool:
-        '''checks whether position is inside bounding box'''
-        return self.p1.x <= position.x <= self.p2.x and self.p1.y <= position.y <= self.p2.y
-
-
-class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
-    '''
-    named tuple to represent allowed speed range
-
-    :todo: move to ``common.math``
-
-    '''
-
-    __slots__ = ()
-
-    def contains(self, speed: float):
-        '''checks whether speed lies between min and max (including)'''
-        return self.min <= speed <= self.max
+from colmto.common.property import Position
+from colmto.common.property import BoundingBox
+from colmto.common.property import SpeedRange
 
 
 @enum.unique

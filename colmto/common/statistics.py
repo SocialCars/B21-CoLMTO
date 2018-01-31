@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -747,34 +747,6 @@ class Statistics(object):
 
         return l_hdf5structure
 
-    # pylint: disable=no-member,len-as-condition
-    @staticmethod
-    def h_spread(data: numpy.ndarray) -> numpy.float64:
-        r'''
-        Calculate H-Spread of Hinge for given data points.
-
-        Using numpy.percentile (speedup) with linear (=default) interpolation.
-
-        .. math::
-            :nowrap:
-
-            \begin{eqnarray}
-            \text{Hinge} &=& H_2 - H_1 \text{with} \\
-            H_1 &=& a_{n+2} = a_{(N+3)/4} \\
-            H_2 &=& a_{3n+4} = a_{(3N+1)/4}.
-            \end{eqnarray}
-
-        :todo: move to ``common.model`` module
-
-        :see: Weisstein, Eric W. H-Spread. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/H-Spread.html
-        :see: Weisstein, Eric W. Hinge. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/Hinge.html
-        :param data: Numpy ndarray of data elements (preferably) :math:`4n+5` for :math:`n=0,1,...,N`, i.e. minimum length is :math:`5`.
-        :return: Hinge of type numpy.float64
-
-        '''
-
-        return numpy.subtract(*numpy.percentile(data, [75, 25])) if len(data) else numpy.float64(0)
-
 
     @staticmethod
     def _closest_position_to_detector(vehicle_positions, detector_position):
@@ -788,8 +760,6 @@ class Statistics(object):
         vehicle position measurements in x direction.
 
         :see: http://stackoverflow.com/questions/12141150/from-list-of-integers-get-number-closest-to-a-given-value#12141511
-
-        :todo: move to ``environment.vehicle``
 
         :param vehicle_positions: sorted list of vehicle positions in :math:`x` direction
         :param detector_position: detector position

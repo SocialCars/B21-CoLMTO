@@ -36,6 +36,20 @@ Module `colmto.common.log`
 
 .. automodule:: colmto.common.log
 
+.. _modules_common_model:
+
+Module `colmto.common.model`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: colmto.common.model
+
+.. _modules_common_property:
+
+Module `colmto.common.property`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: colmto.common.property
+
 .. _modules_common_statistics:
 
 Module `colmto.common.statistics`
