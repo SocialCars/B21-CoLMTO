@@ -41,7 +41,6 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
 ### Prerequisites
 
 * [Python 3.6](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
-  * [doxypy](https://pypi.python.org/pypi/doxypy)
   * [defusedxml](https://pypi.python.org/pypi/defusedxml)
   * [h5py](https://pypi.python.org/pypi/h5py)
   * [lxml](https://pypi.python.org/pypi/lxml)
@@ -49,6 +48,8 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
   * [nose](https://pypi.python.org/pypi/nose)
   * [PyYAML](https://pypi.python.org/pypi/PyYAML)
   * [sh](https://pypi.python.org/pypi/sh)
+  * [sphinx_rtd_theme](https://github.com/rtfd/sphinx_rtd_theme.git) (documentation)
+  * [pygments-style-solarized](https://pypi.python.org/pypi/pygments-style-solarized) (documentation)
 * libhdf5
 * libxml
 * libyaml

@@ -1,5 +1,4 @@
 defusedxml
-doxypypy
 h5py
 lxml
 matplotlib

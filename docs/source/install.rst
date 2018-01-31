@@ -11,14 +11,14 @@ Prerequisites
 * `Python 3.6 <https://python.org>`_, with the following packages (will be installed during the install process, see :ref:`build_and_install_colmto`).:
 
   * `defusedxml <https://pypi.python.org/pypi/defusedxml>`_
-  * `doxypy <https://pypi.python.org/pypi/doxypy>`_
   * `h5py <https://pypi.python.org/pypi/h5py>`_
   * `lxml <https://pypi.python.org/pypi/lxml>`_
   * `matplotlib <https://pypi.python.org/pypi/matplotlib>`_
   * `nose <https://pypi.python.org/pypi/nose>`_
   * `PyYAML <https://pypi.python.org/pypi/PyYAML>`_
   * `sh <https://pypi.python.org/pypi/sh>`_
-  * `pygments-style-solarized <https://github.com/shkumagai/pygments-style-solarized>`_ (for building the documentation)
+  * `sphinx_rtd_theme <https://github.com/rtfd/sphinx_rtd_theme.git>`_ (for building this documentation)
+  * `pygments-style-solarized <https://pypi.python.org/pypi/pygments-style-solarized>`_ (for building this documentation)
 
 * libhdf5
 * libxml
