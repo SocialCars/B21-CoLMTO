@@ -94,9 +94,6 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 
 html_theme_options = {
-    'typekit_id': '',
-    'canonical_url': '',
-    'analytics_id': '',
     'logo_only': False,
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
