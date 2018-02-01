@@ -41,17 +41,14 @@ jobs:
                   name: Install Colmto Package
                   command: python3 setup.py install --user
             - run:
-                  name: Create documentation (Sphinx)
-                  command: python3 setup.py build_sphinx
+                  name: Create documentation (html)
+                  command: cd docs && make html && mv build/html sources && cd ..
             - run:
-                  name: Create PDF documentation
+                  name: Create documentation (pdf)
                   command: cd docs && make latexpdf && cp build/latex/CoLMTO-doc.pdf . && cd ..
             - run:
                   name: Remove sphinx source and build files
                   command: rm -r docs/source && rm -r docs/build && rm docs/Makefile
-            - run:
-                  name: Move documentation into place
-                  command: mv build/sphinx/html docs/sources
 #            - run:
 #                  name: Run Tests
 #                  command: python3 setup.py test
