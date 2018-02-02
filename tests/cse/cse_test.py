@@ -72,18 +72,18 @@ def test_sumo_cse():
         colmto.cse.cse.SumoCSE
     )
 
-    l_rule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 80.))
+    l_rule_speed = colmto.cse.rule.SUMOSpeedRule(
+        speed_range=(0., 80.)
+    )
     l_rule_position = colmto.cse.rule.SUMOPositionRule(
         position_bbox=((0., 0), (64.0, 1))
     )
-    l_subrule_speed = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 60.))
-    l_rule_position.add_rule(l_subrule_speed)
 
-    l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_speed).add_subrule(l_rule_position)
+    l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_speed).add_rule(l_rule_position)
 
     assert_is_instance(l_sumo_cse, colmto.cse.cse.SumoCSE)
     assert_is_instance(l_sumo_cse.rules, tuple)
-    assert_in(l_rule_position, l_sumo_cse.rules)
+    assert_in(l_rule_speed, l_sumo_cse.rules)
     assert_in(l_rule_position, l_sumo_cse.rules)
 
     with assert_raises(TypeError):
@@ -100,17 +100,16 @@ def test_sumo_cse():
     l_sumo_cse.apply(l_vehicles)
 
     for i, i_result in enumerate(l_vehicles):
-        if (0 <= l_vehicles[i].position.x <= 64.0 and 0 <= l_vehicles[i].position.y <= 1
-                and 0. <= l_vehicles[i].speed_max <= 60.0) \
-                or 0. <= l_vehicles[i].speed_max <= 80.0:
+        if (0 <= l_vehicles[i].position.x <= 64.0 and 0 <= l_vehicles[i].position.y <= 1) \
+                and 0. <= l_vehicles[i].speed_max <= 80.0:
             assert_equal(
                 i_result.vehicle_class,
-                colmto.cse.rule.SUMORule.to_disallowed_class()
+                colmto.cse.rule.SUMORule.to_allowed_class()
             )
         else:
             assert_equal(
                 i_result.vehicle_class,
-                colmto.cse.rule.SUMORule.to_allowed_class()
+                colmto.cse.rule.SUMORule.to_disallowed_class()
             )
 
     assert_equal(

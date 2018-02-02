@@ -114,35 +114,6 @@ def test_closestpositiontodetector():
     # pylint: enable=protected-access
 
 
-def test_h_spread():
-    '''
-    Test H-Spread function.
-
-    Example data taken from http://mathworld.wolfram.com/Hinge.html
-    '''
-
-    assert_equal(
-        colmto.common.statistics.Statistics.h_spread(
-            numpy.array(
-                (
-                    150, 250, 688, 795, 795, 795, 895, 895, 895,
-                    1099, 1166, 1333, 1499, 1693, 1699, 1775, 1895
-                )
-            )
-        ),
-        704
-    )
-
-    assert_equal(
-        colmto.common.statistics.Statistics.h_spread(
-            numpy.array(
-                range(10 ** 6)
-            )
-        ),
-        499999.5
-    )
-
-
 def test_aggregate_hdf5():
     '''
     Test aggregate_vehicle_grid_stats -> stats_to_hdf5_structure -> aggregate_run_stats_to_hdf5

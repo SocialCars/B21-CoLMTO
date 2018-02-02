@@ -124,27 +124,6 @@ def test_sumovehicle():
     )
 
 
-def test_dissatisfaction():
-    '''Test dissatisfaction method'''
-    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle()
-    l_data = (
-        9.079162e-05, 2.467587e-04, 6.704754e-04, 1.820444e-03, 4.933049e-03, 1.329671e-02,
-        3.533684e-02, 9.055700e-02, 2.130140e-01, 4.238831e-01, 6.666667e-01, 8.446376e-01,
-        9.366211e-01, 9.757111e-01, 9.909253e-01, 9.966423e-01, 9.987622e-01, 9.995443e-01,
-        9.998323e-01, 9.999383e-01, 9.999773e-01, 9.999916e-01, 9.999969e-01, 9.999989e-01,
-        9.999996e-01, 9.999998e-01, 9.999999e-01, 1.000000e+00, 1.000000e+00, 1.000000e+00
-    )
-    for i_time_loss in range(30):
-        assert_almost_equal(
-            l_sumovehicle.dissatisfaction(
-                time_loss=i_time_loss+10,
-                optimal_travel_time=100,
-                time_loss_threshold=0.2
-            ),
-            l_data[i_time_loss]
-        )
-
-
 def test_update():
     '''Test update'''
     l_sumovehicle = colmto.environment.vehicle.SUMOVehicle()

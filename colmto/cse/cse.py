@@ -99,7 +99,12 @@ class BaseCSE(object):
 
 
 class SumoCSE(BaseCSE):
-    '''First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.'''
+    '''
+    First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.
+
+    :todo: simplify sub-rule handling. only one level of subrules allowed.
+
+    '''
 
     _valid_rules = {
         'SUMOUniversalRule': colmto.cse.rule.SUMOUniversalRule,

@@ -105,7 +105,6 @@ class RuleOperator(enum.Enum):
         except KeyError:
             return or_else
 
-
 class BaseRule(metaclass=ABCMeta):
     '''Base Rule'''
 
@@ -156,7 +155,13 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
 
 
 class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
-    '''Add ability to rules to be extended, i.e. to add sub-rules to them'''
+    '''
+    Add ability to rules to be extended, i.e. to add sub-rules to them.
+
+    :todo: remove inheritance of SUMORule
+    :todo: change class structure to make any rule extendable by inheriting ExtendableRule
+    :todo: idea: if we want to add subrules to a position rule, i.e. SUMOPositionRule, we simply create a class SUMOExtendablePositionRule(SUMOPositionRule, ExtendableRule)
+    '''
 
     def __init__(self, behaviour=Behaviour.DENY, subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
