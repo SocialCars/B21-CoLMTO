@@ -178,4 +178,4 @@ autodoc_default_flags = [
 
 autodoc_member_order = 'groupwise'
 
-inheritance_graph_attrs = dict(rankdir="TB")
+inheritance_graph_attrs = dict(rankdir='TB')
