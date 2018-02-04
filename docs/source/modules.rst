@@ -10,128 +10,144 @@ Modules
 
 .. _modules_common:
 
-Module `colmto.common`
-----------------------
+`colmto.common`
+---------------
 
 .. automodule:: colmto.common
 
 .. _modules_common_configuration:
 
-Module `colmto.common.configuration`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.common.configuration`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.configuration
 
 .. _modules_common_io:
 
-Module `colmto.common.io`
-^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.common.io`
+^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.io
 
 .. _modules_common_log:
 
-Module `colmto.common.log`
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.common.log`
+^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.log
 
 .. _modules_common_model:
 
-Module `colmto.common.model`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.common.model`
+^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.model
 
 .. _modules_common_property:
 
-Module `colmto.common.property`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.common.property`
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.property
 
 .. _modules_common_statistics:
 
-Module `colmto.common.statistics`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.common.statistics`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.statistics
 
 .. _modules_common_visualisation:
 
-Module `colmto.common.visualisation`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.common.visualisation`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.visualisation
 
 
 .. _modules_cse:
 
-Module `colmto.cse`
--------------------
+`colmto.cse`
+------------
 
 .. automodule:: colmto.cse
 
 .. _modules_cse_cse:
 
-Module `colmto.cse.cse`
-^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.cse.cse`
+^^^^^^^^^^^^^^^^
 
 .. inheritance-diagram:: colmto.cse.cse
+    :parts: 2
+    :private-bases:
+    :caption: Inheritance graph of classes in package ``colmto.cse.cse``.
+
 
 .. automodule:: colmto.cse.cse
 
 .. _modules_cse_rule:
 
-Module `colmto.cse.rule`
-^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.cse.rule`
+^^^^^^^^^^^^^^^^^
 
 .. inheritance-diagram:: colmto.cse.rule
+    :parts: 2
+    :private-bases:
+    :caption: Inheritance graph of classes in package ``colmto.cse.rule``.
+
 
 .. automodule:: colmto.cse.rule
 
 .. _modules_environment:
 
-Module `colmto.environment`
----------------------------
+`colmto.environment`
+--------------------
 
 .. automodule:: colmto.environment
 
 .. _modules_environment_vehicle:
 
-Module `colmto.environment.vehicle`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.environment.vehicle`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. inheritance-diagram:: colmto.environment.vehicle
+    :parts: 2
+    :private-bases:
+    :caption: Inheritance graph of classes in package ``colmto.environment.vehicle``.
+
 
 .. automodule:: colmto.environment.vehicle
 
 .. _modules_sumo:
 
-Module `colmto.sumo`
---------------------
+`colmto.sumo`
+-------------
 
 .. automodule:: colmto.sumo
 
 .. _modules_sumo_runtime:
 
-Module `colmto.sumo.runtime`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.sumo.runtime`
+^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.sumo.runtime
 
 .. _modules_sumo_sumocfg:
 
-Module `colmto.sumo.sumocfg`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.sumo.sumocfg`
+^^^^^^^^^^^^^^^^^^^^^
 
 .. inheritance-diagram:: colmto.sumo.sumocfg
+    :parts: 2
+    :private-bases:
+    :caption: Inheritance graph of classes in package ``colmto.sumo.sumocfg``.
+
 
 .. automodule:: colmto.sumo.sumocfg
 
 .. _modules_sumo_sumosim:
 
-Module `colmto.sumo.sumosim`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`colmto.sumo.sumosim`
+^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.sumo.sumosim
