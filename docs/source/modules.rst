@@ -3,10 +3,7 @@
 Modules
 =======
 
-1. :ref:`colmto.common <modules_common>`
-2. :ref:`colmto.cse <modules_cse>`
-3. :ref:`colmto.environment <modules_environment>`
-4. :ref:`colmto.sumo <modules_sumo>`
+.. contents::
 
 .. _modules_common:
 
@@ -20,6 +17,11 @@ Modules
 `colmto.common.configuration`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. inheritance-diagram:: colmto.common.configuration colmto.sumo.sumocfg.SumoConfig
+    :parts: 2
+    :private-bases:
+    :caption: Inheritance graph of classes in package ``colmto.common.configuration``.
+    
 .. automodule:: colmto.common.configuration
 
 .. _modules_common_io:
@@ -63,7 +65,6 @@ Modules
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.visualisation
-
 
 .. _modules_cse:
 
@@ -141,7 +142,6 @@ Modules
     :parts: 2
     :private-bases:
     :caption: Inheritance graph of classes in package ``colmto.sumo.sumocfg``.
-
 
 .. automodule:: colmto.sumo.sumocfg
 
