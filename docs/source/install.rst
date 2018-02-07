@@ -48,10 +48,11 @@ FreeBSD
 .. code-block:: bash
 
     sudo portmaster devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
+
     cd colmto/sumo/sumo
     make -f Makefile.cvs
-    ./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local
-    make -jN
+    ./configure CXX=clang++ --with-xerces-libraries=/usr/local/lib --with-proj-libraries=/usr/local/lib --with-proj-includes=/usr/local/include --with-fox-config=/usr/local/bin/fox-config --enable-pic
+    make -j $(getconf NPROCESSORS_CONF)
 
 MacOS
 ^^^^^
@@ -59,12 +60,13 @@ MacOS
 .. code-block:: bash
 
     brew install Caskroom/cask/xquartz autoconf automake gdal proj xerces-c fox
+    
     export CPPFLAGS="$CPPFLAGS -I/opt/X11/include/"
     export LDFLAGS="-L/opt/X11/lib"
     cd colmto/sumo/sumo
     make -f Makefile.cvs
-    ./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local
-    make -jN
+    ./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local --enable-pic
+    make -j $(getconf NPROCESSORS_CONF)
 
 Ubuntu
 ^^^^^^
@@ -72,10 +74,11 @@ Ubuntu
 .. code-block:: bash
 
     sudo apt-get install autoconf libproj-dev proj-bin proj-data libtool libgdal-dev libxerces-c-dev libfox-1.6-0 libfox-1.6-dev
+
     cd colmto/sumo/sumo
     make -f Makefile.cvs
-    ./configure
-    make -jN
+    ./configure --enable-pic
+    make -j $(getconf NPROCESSORS_CONF)
 
 Install Required System Packages
 --------------------------------
