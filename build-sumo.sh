@@ -3,7 +3,6 @@
 OS=$(uname)
 cd sumo && \
 make -f Makefile.cvs && \
-make clean && \
 if [[ $OS = "Darwin" ]]; then
 	export CPPFLAGS="$CPPFLAGS -I/opt/X11/include/" && \
 	export LDFLAGS="-L/opt/X11/lib" && \
@@ -13,5 +12,6 @@ elif [[ $OS = "FreeBSD" ]]; then
 elif [[ $OS = "Linux" ]]; then
 	./configure
 fi && \
+make clean && \
 make -j && \
 cd ../..
