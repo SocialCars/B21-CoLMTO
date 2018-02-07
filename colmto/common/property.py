@@ -24,6 +24,7 @@
 '''Classes and functions to realise property structures, e.g. Position, Colour, ...'''
 
 from collections import namedtuple
+import matplotlib.pyplot as plt
 
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
@@ -33,6 +34,10 @@ class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
     '''
 
     __slots__ = ()
+
+    @staticmethod
+    def map(name: str, max_value: int, value: int):
+        return Colour(*plt.get_cmap(name=name, lut=max_value)(value))
 
 
 class Position(namedtuple('Position', ('x', 'y'))):
