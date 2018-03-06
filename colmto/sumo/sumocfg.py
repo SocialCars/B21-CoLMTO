@@ -704,10 +704,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
             l_vattr = {k: str(v) for k, v in i_vehicle.properties.items()}
             l_vattr.update({
                 'id': str(i_vid),
-                'color': f'{i_vehicle.color[0]/255.},'
-                         f'{i_vehicle.color[1]/255.},'
-                         f'{i_vehicle.color[2]/255.},'
-                         f'{i_vehicle.color[3]/255.}'
+                'color': f'{i_vehicle.color.red/255.},'
+                         f'{i_vehicle.color.green/255.},'
+                         f'{i_vehicle.color.blue/255.},'
+                         f'{i_vehicle.color.alpha/255.}'
             })
 
             # override parameters speedDev, desiredSpeed, and length if defined in run config
