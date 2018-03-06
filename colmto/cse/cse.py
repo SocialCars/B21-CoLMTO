@@ -46,7 +46,7 @@ class BaseCSE(object):
             self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._log = colmto.common.log.logger(__name__)
         self._vehicles = set()
-        self._rules = []
+        self._rules = set()
 
     @property
     def rules(self) -> tuple:
@@ -114,7 +114,7 @@ class SumoCSE(BaseCSE):
         'SUMOVTypeRule': colmto.cse.rule.SUMOVTypeRule
     }
 
-    def add_rule(self, rule: colmto.cse.rule.SUMOVehicleRule, rule_cfg=None):
+    def add_rule(self, rule: typing.Union[dict,colmto.cse.rule.SUMOVehicleRule], rule_cfg=None):
         '''
         Add rule to SumoCSE.
 
@@ -124,34 +124,36 @@ class SumoCSE(BaseCSE):
 
         '''
 
-        if not isinstance(rule, colmto.cse.rule.SUMOVehicleRule):
+        if isinstance(rule, colmto.cse.rule.SUMOVehicleRule):
+            self._rules.add(rule)
+        elif isinstance(rule, dict):
+            self._rules.add(
+                self._valid_rules[rule.get('type')].from_configuration(rule)
+            )
+        else:
             raise TypeError
 
-        if rule_cfg is not None \
-                and rule_cfg.get('vehicle_rules', {}).get('rule', False):
-            # look for sub-rules
-            rule.rule = colmto.cse.rule.RuleOperator.ruleoperator_from_string(
-                rule_cfg.get('vehicle_rules', {}).get('rule'),
-                colmto.cse.rule.RuleOperator.ALL
-            )
-            for i_subrule in rule_cfg.get('vehicle_rules', {}).get('rules', []):
-                rule.add_subrule(
-                    self._valid_rules.get(i_subrule.get('type'))(
-                        behaviour=colmto.cse.rule.Behaviour.behaviour_from_string(
-                            i_subrule.get('behaviour'),
-                            colmto.cse.rule.Behaviour.DENY
-                        ),
-                        **i_subrule.get('args')
-                    )
-                )
-
-        self._rules.append(
-            rule
-        )
+        # if rule_cfg is not None \
+        #         and rule_cfg.get('vehicle_rules', {}).get('rule',   False):
+        #     # look for sub-rules
+        #     rule.rule = colmto.cse.rule.RuleOperator.ruleoperator_from_string(
+        #         rule_cfg.get('vehicle_rules', {}).get('rule'),
+        #         colmto.cse.rule.RuleOperator.ALL
+        #     )
+        #     for i_subrule in rule_cfg.get('vehicle_rules', {}).get('rules', []):
+        #         rule.add_subrule(
+        #             self._valid_rules.get(i_subrule.get('type'))(
+        #                 behaviour=colmto.cse.rule.Behaviour.behaviour_from_string(
+        #                     i_subrule.get('behaviour'),
+        #                     colmto.cse.rule.Behaviour.DENY
+        #                 ),
+        #                 **i_subrule.get('args')
+        #             )
+        #         )
 
         return self
 
-    def add_rules_from_cfg(self, rules_config: typing.Union[typing.List[dict], None]):
+    def add_rules(self, rules: typing.List[dict]):
         '''
         Add rules to SumoCSE based on run config's 'rules' section.
 
@@ -160,10 +162,10 @@ class SumoCSE(BaseCSE):
 
         '''
 
-        if rules_config is None:
+        if rules is None:
             return self
 
-        for i_rule in rules_config:
+        for i_rule in rules:
             self.add_rule(
                 self._valid_rules.get(i_rule.get('type'))(
                     behaviour=colmto.cse.rule.Behaviour.behaviour_from_string(

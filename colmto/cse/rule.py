@@ -32,11 +32,6 @@ from typing import Iterable
 
 import enum
 
-# Avoid cyclic import of SUMOVehicle (also imported in colmto.cse.cse) but satisfy hinting in IDE
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from colmto.environment.vehicle import SUMOVehicle
-
 from colmto.common.property import Position
 from colmto.common.property import BoundingBox
 from colmto.common.property import SpeedRange
@@ -117,6 +112,12 @@ class BaseRule(metaclass=ABCMeta):
         '''
         self._behaviour = behaviour
 
+    @classmethod
+    def from_configuration(cls, rule_cfg: dict):
+        self.log('create rule for', cls.__name__, 'of', rule_cfg)
+        r = cls()
+
+
     @property
     def behaviour(self) -> Behaviour:
         '''
@@ -158,9 +159,6 @@ class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
     '''
     Add ability to rules to be extended, i.e. to add sub-rules to them.
 
-    :todo: remove inheritance of SUMORule
-    :todo: change class structure to make any rule extendable by inheriting ExtendableRule
-    :todo: idea: if we want to add subrules to a position rule, i.e. SUMOPositionRule, we simply create a class SUMOExtendablePositionRule(SUMOPositionRule, ExtendableRule)
     '''
 
     def __init__(self, behaviour=Behaviour.DENY, subrules=tuple(), subrule_operator=RuleOperator.ANY):
