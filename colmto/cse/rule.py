@@ -233,9 +233,9 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
         # verify rule types
         for i_subrule in subrules:
             if not isinstance(i_subrule, BaseRule):
-                raise TypeError(
-                    '%s is not of colmto.cse.rule.BaseRule', i_subrule
-                )
+                raise TypeError(f'{i_subrule} is not of colmto.cse.rule.BaseRule.')
+            if isinstance(i_subrule, ExtendableRule):
+                raise TypeError(f'{i_subrule} can\'t be an ExtendableRule.')
 
         if subrule_operator not in RuleOperator:
             raise ValueError
@@ -290,12 +290,19 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
         :return: future self
         '''
 
+        if subrule is self:
+            raise ValueError('Cyclic rules: Can\'t add itself as a sub-rule.')
+
         if not isinstance(subrule, BaseRule):
-            raise TypeError('%s is not of colmto.cse.rule.BaseRule', subrule)
+            raise TypeError(f'{type(subrule)} is not of colmto.cse.rule.BaseRule.')
+
+        if isinstance(subrule, ExtendableRule):
+            raise TypeError(f'{type(subrule)} can\'t be an ExtendableRule.')
 
         self._subrules.add(subrule)
 
         return self
+
 
 class ExtendableSUMORule(ExtendableRule, metaclass=ABCMeta):
     '''
