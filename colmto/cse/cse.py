@@ -59,7 +59,7 @@ class BaseCSE(object):
 
         return tuple(self._rules)
 
-    def apply(self, vehicles: typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]):
+    def apply(self, vehicles: typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]) -> 'BaseCSE':
         '''
         Apply rules to vehicles
 
@@ -73,9 +73,9 @@ class BaseCSE(object):
 
         return self
 
-    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle):
+    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle) -> 'BaseCSE':
         '''
-        Apply rules to one vehicles
+        Apply rules to one vehicle
 
         :param vehicle: Vehicle
         :return: future self
@@ -101,80 +101,34 @@ class BaseCSE(object):
 class SumoCSE(BaseCSE):
     '''
     First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.
-
-    :todo: simplify sub-rule handling. only one level of subrules allowed.
-
     '''
 
-    _valid_rules = {
-        'SUMOUniversalRule': colmto.cse.rule.SUMOUniversalRule,
-        'SUMONullRule': colmto.cse.rule.SUMONullRule,
-        'SUMOSpeedRule': colmto.cse.rule.SUMOSpeedRule,
-        'SUMOPositionRule': colmto.cse.rule.SUMOPositionRule,
-        'SUMOVTypeRule': colmto.cse.rule.SUMOVTypeRule
-    }
-
-    def add_rule(self, rule: typing.Union[dict,colmto.cse.rule.SUMOVehicleRule], rule_cfg=None):
+    def add_rule(self, rule: colmto.cse.rule.SUMOVehicleRule) -> 'SumoCSE':
         '''
         Add rule to SumoCSE.
 
         :param rule: rule object
-        :param rule_cfg: rule configuration
         :return: future self
 
         '''
 
         if isinstance(rule, colmto.cse.rule.SUMOVehicleRule):
             self._rules.add(rule)
-        elif isinstance(rule, dict):
-            self._rules.add(
-                self._valid_rules[rule.get('type')].from_configuration(rule)
-            )
         else:
             raise TypeError
 
-        # if rule_cfg is not None \
-        #         and rule_cfg.get('vehicle_rules', {}).get('rule',   False):
-        #     # look for sub-rules
-        #     rule.rule = colmto.cse.rule.RuleOperator.ruleoperator_from_string(
-        #         rule_cfg.get('vehicle_rules', {}).get('rule'),
-        #         colmto.cse.rule.RuleOperator.ALL
-        #     )
-        #     for i_subrule in rule_cfg.get('vehicle_rules', {}).get('rules', []):
-        #         rule.add_subrule(
-        #             self._valid_rules.get(i_subrule.get('type'))(
-        #                 behaviour=colmto.cse.rule.Behaviour.behaviour_from_string(
-        #                     i_subrule.get('behaviour'),
-        #                     colmto.cse.rule.Behaviour.DENY
-        #                 ),
-        #                 **i_subrule.get('args')
-        #             )
-        #         )
-
         return self
 
-    def add_rules(self, rules: typing.List[dict]):
+    def add_rules(self, rules: typing.Iterable[colmto.cse.rule.SUMOVehicleRule]) -> 'SumoCSE':
         '''
-        Add rules to SumoCSE based on run config's 'rules' section.
+        Add iterable of rules to SumoCSE.
 
-        :param rules_config: run config's 'rules' section
+        :param rules: iterable of rule objects
         :return: future self
 
         '''
 
-        if rules is None:
-            return self
-
         for i_rule in rules:
-            self.add_rule(
-                self._valid_rules.get(i_rule.get('type'))(
-                    behaviour=colmto.cse.rule.Behaviour.behaviour_from_string(
-                        i_rule.get('behaviour'),
-                        colmto.cse.rule.Behaviour.DENY
-                    ),
-                    **i_rule.get('args')
-                ),
-                i_rule
-            )
+            self.add_rule(i_rule)
 
         return self

@@ -103,7 +103,73 @@ class RuleOperator(enum.Enum):
 class BaseRule(metaclass=ABCMeta):
     '''Base Rule'''
 
-    def __init__(self, behaviour=Behaviour.DENY):
+    # register known rules here for figuring out whether a configured rule-type is actually valid.
+    _valid_rules = {}
+
+    def __init_subclass__(cls, *, rule_name=None, **kwargs):
+        if rule_name:
+            cls._valid_rules[rule_name] = cls
+        super().__init_subclass__(**kwargs)
+
+    @classmethod
+    def rule_cls(cls, rule_name: str) -> 'cls':
+        '''
+        Return a class object for instantiating a valid rule.
+
+        :param rule_name: valid rule name
+        :return: cls
+        '''
+
+        return cls._valid_rules[rule_name]
+
+    @classmethod
+    def from_configuration(cls, rule_config: dict) -> 'BaseRule':
+        '''
+        Create a rule from a dictionary configuration
+
+        Example:
+
+        >>> from colmto.cse import rule
+        >>> position_rule_config = {
+        >>>     'type': 'ExtendableSUMOPositionRule',
+        >>>     'behaviour': 'deny',
+        >>>     'args': {
+        >>>         'position_bbox': [[0,0], [100,100]]
+        >>>     }
+        >>> }
+        >>> vtype_rule_config = {
+        >>>     'type': 'SUMOVTypeRule',
+        >>>     'behaviour': 'deny',
+        >>>     'args': {
+        >>>         'vehicle_type': 'truck'
+        >>>     }
+        >>> }
+        >>> position_rule = rule.ExtendableSUMOPositionRule.from_configuration(position_rule_config) # type: rule.ExtendableSUMOPositionRule
+        >>> vtype_rule = rule.SUMOVTypeRule.from_configuration(vtype_rule_config) # type: rule.SUMOVTypeRule
+        >>> print(position_rule._valid_rules.keys())
+        dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule', 'ExtendableSUMOVTypeRule', 'SUMOSpeedRule', 'ExtendableSUMOSpeedRule', 'SUMOPositionRule', 'ExtendableSUMOPositionRule'])
+        >>> print(position_rule.add_subrule(vtype_rule))
+        <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: position_bbox = BoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)), behaviour = custom1, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
+
+        :param rule_config: rule configuration
+        :return: rule
+        '''
+
+        if not isinstance(rule_config, dict):
+            raise TypeError("rule_cfg is not a dictionary.")
+
+        if not rule_config.get('args'):
+            raise ValueError("rule_cfg must contain a key \'args\'")
+
+        if rule_config.get('type') != cls.__name__:
+            raise ValueError('Configured type must match class. Class method called from '
+                             f'\"{cls.__name__}\" but config has type set to \"{rule_config.get("type")}\".')
+        return cls(
+            behaviour=Behaviour.behaviour_from_string(rule_config.get('behaviour'), Behaviour.DENY),
+            **rule_config.get('args')
+        )
+
+    def __init__(self, behaviour=Behaviour.DENY, **kwargs):
         '''
         C'tor
 
@@ -111,12 +177,6 @@ class BaseRule(metaclass=ABCMeta):
             Enum of colmto.cse.rule.Behaviour.DENY/ALLOW
         '''
         self._behaviour = behaviour
-
-    @classmethod
-    def from_configuration(cls, rule_cfg: dict):
-        self.log('create rule for', cls.__name__, 'of', rule_cfg)
-        r = cls()
-
 
     @property
     def behaviour(self) -> Behaviour:
@@ -155,7 +215,7 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         return False
 
 
-class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
+class ExtendableRule(BaseRule, metaclass=ABCMeta):
     '''
     Add ability to rules to be extended, i.e. to add sub-rules to them.
 
@@ -172,16 +232,15 @@ class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
 
         # verify rule types
         for i_subrule in subrules:
-            if not isinstance(i_subrule, SUMORule):
+            if not isinstance(i_subrule, BaseRule):
                 raise TypeError(
-                    '%s is not of colmto.cse.rule.SUMORule', i_subrule
+                    '%s is not of colmto.cse.rule.BaseRule', i_subrule
                 )
-
-        self._subrules = list(subrules)
 
         if subrule_operator not in RuleOperator:
             raise ValueError
 
+        self._subrules = set(subrules)
         self._subrule_operator = subrule_operator
 
         super().__init__(behaviour)
@@ -198,7 +257,7 @@ class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
         '''
         :return: string representation of vehicle related sub-rules
         '''
-        return ', '.join(str(type(i_rule)) for i_rule in self._subrules)
+        return ', '.join(str(type(i_rule)) for i_rule in sorted(self._subrules))
 
     @property
     def subrule_operator(self) -> RuleOperator:
@@ -220,23 +279,28 @@ class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
             raise ValueError
         self._subrule_operator = rule_operator
 
-    def add_subrule(self, subrule: SUMORule):
+    def add_subrule(self, subrule: BaseRule) -> 'BaseRule':
         '''
-        Adds a rule, specifically for SUMO attributes.
+        Adds a sub-rule.
 
-        Rule must derive from colmto.cse.rule.SUMORule.
+        Rule must derive from colmto.cse.rule.BaseRule.
 
         :param subrule: A rule
 
         :return: future self
         '''
 
-        if not isinstance(subrule, SUMORule):
-            raise TypeError('%s is not of colmto.cse.rule.SUMORule', subrule)
+        if not isinstance(subrule, BaseRule):
+            raise TypeError('%s is not of colmto.cse.rule.BaseRule', subrule)
 
-        self._subrules.append(subrule)
+        self._subrules.add(subrule)
 
         return self
+
+class ExtendableSUMORule(ExtendableRule, metaclass=ABCMeta):
+    '''
+    Extends Extendable rule to check whether sub-rules apply to a given SUMOVehicle
+    '''
 
     def subrules_apply_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -247,10 +311,12 @@ class SUMOExtendableRule(SUMORule, metaclass=ABCMeta):
 
         '''
 
-        return self._subrule_operator.evaluate([i_rule.applies_to(vehicle) for i_rule in self._subrules])
+        return self._subrule_operator.evaluate(
+            (i_rule.applies_to(vehicle) for i_rule in self._subrules)
+        )
 
 
-class SUMOUniversalRule(SUMORule):
+class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
     '''
     Universal rule, i.e. always applies to any vehicle
     '''
@@ -283,7 +349,7 @@ class SUMOUniversalRule(SUMORule):
         )
 
 
-class SUMONullRule(SUMORule):
+class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
     '''
     Null rule, i.e. no restrictions: Applies to no vehicle
     '''
@@ -317,7 +383,7 @@ class SUMONullRule(SUMORule):
         )
 
 
-class SUMOVehicleRule(SUMOExtendableRule):
+class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
     '''Base class for vehicle attribute specific rules.'''
 
     def __init__(self, behaviour=Behaviour.DENY, subrule_operator=RuleOperator.ANY):
@@ -327,7 +393,7 @@ class SUMOVehicleRule(SUMOExtendableRule):
         super().__init__(behaviour)
 
 
-class SUMOVTypeRule(SUMOVehicleRule):
+class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
     '''Vehicle type based rule: Applies to vehicles with a given SUMO vehicle type'''
 
     def __init__(self, vehicle_type=None, behaviour=Behaviour.DENY):
@@ -338,7 +404,7 @@ class SUMOVTypeRule(SUMOVehicleRule):
     def __str__(self):
         return f'{self.__class__}: ' \
                f'vehicle_type = {self._vehicle_type}, ' \
-               f'behaviour = {self._behaviour.vclass}, ' \
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
                f'subrule_operator: {self._rule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
@@ -373,8 +439,16 @@ class SUMOVTypeRule(SUMOVehicleRule):
         )
 
 
-class SUMOSpeedRule(SUMOVehicleRule):
-    '''Speed based rule: Applies to vehicles within a given speed range'''
+class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='ExtendableSUMOVTypeRule'):
+    '''
+    Extendable vehicle-type based rule: Applies to vehicles with a given SUMO vehicle type.
+    Can be extendend by sub-rules.
+    '''
+    pass
+
+
+class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
+    '''Speed-based rule: Applies to vehicles within a given speed range'''
 
     def __init__(self, speed_range=SpeedRange(0, 120), behaviour=Behaviour.DENY):
         '''C'tor.'''
@@ -417,10 +491,18 @@ class SUMOSpeedRule(SUMOVehicleRule):
         )
 
 
-class SUMOPositionRule(SUMOVehicleRule):
+class ExtendableSUMOSpeedRule(SUMOSpeedRule, ExtendableSUMORule, rule_name='ExtendableSUMOSpeedRule'):
+    '''
+    Extendable speed-based rule: Applies to vehicles within a given speed range.
+    Can be extendend by sub-rules.
+    '''
+    pass
+
+
+class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
     '''
     Position based rule: Applies to vehicles which are located inside a given bounding box, i.e.
-    [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)]
+    [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
     '''
 
     def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
@@ -470,3 +552,12 @@ class SUMOPositionRule(SUMOVehicleRule):
             ) if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         )
+
+
+class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name='ExtendableSUMOPositionRule'):
+    '''
+    Extendable position-based rule: Applies to vehicles which are located inside a given bounding box, i.e.
+    [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
+    Can be extendend by sub-rules.
+    '''
+    pass
