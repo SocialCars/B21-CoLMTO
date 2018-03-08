@@ -113,7 +113,7 @@ class BaseRule(metaclass=ABCMeta):
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def rule_cls(cls, rule_name: str) -> 'cls':
+    def rule_cls(cls, rule_name: str) -> 'BaseRule':
         '''
         Return a class object for instantiating a valid rule.
 
@@ -165,12 +165,10 @@ class BaseRule(metaclass=ABCMeta):
         if rule_config.get('args') is None:
             raise KeyError("rule_cfg must contain a key \'args\'")
 
-        # if not rule_config.get('args'):
-        #     raise ValueError("rule_cfg must contain a key \'args\'")
-
         if rule_config.get('type') != cls.__name__:
             raise ValueError('Configured type must match class. Class method called from '
                              f'\"{cls.__name__}\" but config has type set to \"{rule_config.get("type")}\".')
+
         return cls(
             behaviour=Behaviour.behaviour_from_string(rule_config.get('behaviour'), Behaviour.DENY),
             **rule_config.get('args')
@@ -416,9 +414,8 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
 class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
     '''Base class for vehicle attribute specific rules.'''
 
-    def __init__(self, behaviour=Behaviour.DENY, subrule_operator=RuleOperator.ANY):
+    def __init__(self, behaviour=Behaviour.DENY):
         '''C'tor.'''
-        self._rule_operator = subrule_operator
         super().__init__(behaviour)
 
 
@@ -433,8 +430,7 @@ class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
     def __str__(self):
         return f'{self.__class__}: ' \
                f'vehicle_type = {self._vehicle_type}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}'
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass})' \
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -458,7 +454,7 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
         return f'{self.__class__}: ' \
                f'vehicle_type = {self._vehicle_type}, ' \
                f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}, ' \
+               f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
@@ -484,8 +480,7 @@ class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
     def __str__(self):
         return f'{self.__class__}: ' \
                f'speed_range = {self._speed_range}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}'
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass})'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -509,7 +504,7 @@ class ExtendableSUMOSpeedRule(SUMOSpeedRule, ExtendableSUMORule, rule_name='Exte
         return f'{self.__class__}: ' \
                f'speed_range = {self._speed_range}, ' \
                f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}, ' \
+               f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
@@ -538,8 +533,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
     def __str__(self):
         return f'{self.__class__}: ' \
                f'position_bbox = {self._position_bbox}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}'
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass})'
 
     @property
     def position_bbox(self) -> BoundingBox:
@@ -571,7 +565,7 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
         return f'{self.__class__}: ' \
                f'position_bbox = {self._position_bbox}, ' \
                f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}, ' \
+               f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
@@ -599,8 +593,7 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
     def __str__(self):
         return f'{self.__class__}: ' \
                f'threshold = {self._threshold}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}'
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass})'
 
     @property
     def threshold(self) -> float:
@@ -631,7 +624,7 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
         return f'{self.__class__}: ' \
                f'threshold = {self._threshold}, ' \
                f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
-               f'subrule_operator: {self._rule_operator}, ' \
+               f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
