@@ -25,6 +25,7 @@
 '''Rule related classes'''
 
 from abc import ABCMeta
+from abc import abstractclassmethod
 
 from typing import Any
 from typing import Generator
@@ -158,8 +159,14 @@ class BaseRule(metaclass=ABCMeta):
         if not isinstance(rule_config, dict):
             raise TypeError("rule_cfg is not a dictionary.")
 
-        if not rule_config.get('args'):
-            raise ValueError("rule_cfg must contain a key \'args\'")
+        if rule_config.get('behaviour') is None:
+            raise KeyError("rule_cfg must contain a key \'behaviour\'")
+
+        if rule_config.get('args') is None:
+            raise KeyError("rule_cfg must contain a key \'args\'")
+
+        # if not rule_config.get('args'):
+        #     raise ValueError("rule_cfg must contain a key \'args\'")
 
         if rule_config.get('type') != cls.__name__:
             raise ValueError('Configured type must match class. Class method called from '
@@ -203,6 +210,7 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         return Behaviour.DENY.vclass
 
     # pylint: disable=unused-argument,no-self-use
+    @abstractclassmethod
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
@@ -211,8 +219,23 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         :return: boolean
 
         '''
+        pass
 
-        return False
+    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
+        '''
+        Apply rule to vehicles.
+
+        :param vehicles: iterable object containing BaseVehicles, or inherited objects
+        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
+
+        '''
+
+        return (
+            i_vehicle.change_vehicle_class(
+                self._behaviour.vclass
+            ) if self.applies_to(i_vehicle) else i_vehicle
+            for i_vehicle in vehicles
+        )
 
 
 class ExtendableRule(BaseRule, metaclass=ABCMeta):
@@ -309,7 +332,7 @@ class ExtendableSUMORule(ExtendableRule, metaclass=ABCMeta):
     Extends Extendable rule to check whether sub-rules apply to a given SUMOVehicle
     '''
 
-    def subrules_apply_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to_subrules(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Check whether sub-rules apply to this vehicle.
 
@@ -395,7 +418,6 @@ class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
 
     def __init__(self, behaviour=Behaviour.DENY, subrule_operator=RuleOperator.ANY):
         '''C'tor.'''
-        self._vehicle_rules = []
         self._rule_operator = subrule_operator
         super().__init__(behaviour)
 
@@ -406,7 +428,31 @@ class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
     def __init__(self, vehicle_type=None, behaviour=Behaviour.DENY):
         '''C'tor.'''
         super().__init__(behaviour)
-        self._vehicle_type = vehicle_type
+        self._vehicle_type = vehicle_type  # type: str
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'vehicle_type = {self._vehicle_type}, ' \
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
+               f'subrule_operator: {self._rule_operator}'
+
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+        '''
+        Test whether this rule applies to given vehicle.
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+
+        return self._vehicle_type == vehicle.vehicle_type
+
+
+class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='ExtendableSUMOVTypeRule'):
+    '''
+    Extendable vehicle-type based rule: Applies to vehicles with a given SUMO vehicle type.
+    Can be extendend by sub-rules.
+    '''
 
     def __str__(self):
         return f'{self.__class__}: ' \
@@ -417,41 +463,14 @@ class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
-        Test whether this (and sub)rules apply to given vehicle.
+        Test whether this rule applies to given vehicle.
 
         :param vehicle: Vehicle
         :return: boolean
 
         '''
 
-        if (self._vehicle_type == vehicle.vehicle_type) and \
-                (self.subrules_apply_to(vehicle) if self._vehicle_rules else True):
-            return True
-        return False
-
-    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
-        '''
-        Apply rule to vehicles.
-
-        :param vehicles: iterable object containing BaseVehicles, or inherited objects
-        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
-
-        '''
-
-        return (
-            i_vehicle.change_vehicle_class(
-                self._behaviour.vclass
-            ) if self.applies_to(i_vehicle) else i_vehicle
-            for i_vehicle in vehicles
-        )
-
-
-class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='ExtendableSUMOVTypeRule'):
-    '''
-    Extendable vehicle-type based rule: Applies to vehicles with a given SUMO vehicle type.
-    Can be extendend by sub-rules.
-    '''
-    pass
+        return super().applies_to(vehicle) and (self.subrules_apply_to(vehicle) if self._subrules else True)
 
 
 class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
@@ -465,7 +484,31 @@ class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
     def __str__(self):
         return f'{self.__class__}: ' \
                f'speed_range = {self._speed_range}, ' \
-               f'behaviour = {self._behaviour.name}, ' \
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
+               f'subrule_operator: {self._rule_operator}'
+
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+        '''
+        Test whether this rule applies to given vehicle.
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+
+        return self._speed_range.contains(vehicle.speed_max)
+
+
+class ExtendableSUMOSpeedRule(SUMOSpeedRule, ExtendableSUMORule, rule_name='ExtendableSUMOSpeedRule'):
+    '''
+    Extendable speed-based rule: Applies to vehicles within a given speed range.
+    Can be extendend by sub-rules.
+    '''
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'speed_range = {self._speed_range}, ' \
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
                f'subrule_operator: {self._rule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
@@ -477,33 +520,7 @@ class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
         :return: boolean
 
         '''
-
-        return self._speed_range.contains(vehicle.speed_max) and \
-               self.subrules_apply_to(vehicle) if self._vehicle_rules else True
-
-    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
-        '''
-        Apply rule to vehicles.
-
-        :param vehicles: iterable object containing BaseVehicles, or inherited objects
-        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
-
-        '''
-
-        return (
-            i_vehicle.change_vehicle_class(
-                self._behaviour.vclass
-            ) if self.applies_to(i_vehicle) else i_vehicle
-            for i_vehicle in vehicles
-        )
-
-
-class ExtendableSUMOSpeedRule(SUMOSpeedRule, ExtendableSUMORule, rule_name='ExtendableSUMOSpeedRule'):
-    '''
-    Extendable speed-based rule: Applies to vehicles within a given speed range.
-    Can be extendend by sub-rules.
-    '''
-    pass
+        return super().applies_to(vehicle) and (self.applies_to_subrules(vehicle) if self._subrules else True)
 
 
 class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
@@ -521,9 +538,8 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
     def __str__(self):
         return f'{self.__class__}: ' \
                f'position_bbox = {self._position_bbox}, ' \
-               f'behaviour = {self._behaviour.vclass}, ' \
-               f'subrule_operator: {self._rule_operator}, ' \
-               f'subrules: {self.subrules_as_str}'
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
+               f'subrule_operator: {self._rule_operator}'
 
     @property
     def position_bbox(self) -> BoundingBox:
@@ -543,22 +559,6 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
 
         return self._position_bbox.contains(vehicle.position)
 
-    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
-        '''
-        Apply rule to vehicles.
-
-        :param vehicles: iterable object containing BaseVehicles, or inherited objects
-        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
-
-        '''
-
-        return (
-            i_vehicle.change_vehicle_class(
-                self._behaviour.vclass
-            ) if self.applies_to(i_vehicle) else i_vehicle
-            for i_vehicle in vehicles
-        )
-
 
 class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name='ExtendableSUMOPositionRule'):
     '''
@@ -566,6 +566,48 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
     Can be extendend by sub-rules.
     '''
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'position_bbox = {self._position_bbox}, ' \
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
+               f'subrule_operator: {self._rule_operator}, ' \
+               f'subrules: {self.subrules_as_str}'
+
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+        '''
+        Test whether this (and sub)rules apply to given vehicle.
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+        return super().applies_to(vehicle) and (self.applies_to_subrules(vehicle) if self._subrules else True)
+
+
+class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRule'):
+    '''
+    Dissatisfaction based rule:
+    Applies to vehicles which have reached a given dissatisfaction threshold (default: >=0.5).
+    '''
+
+    def __init__(self, threshold=0.5, behaviour=Behaviour.DENY):
+        '''C'tor.'''
+        super().__init__(behaviour)
+        self._threshold = threshold
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'threshold = {self._threshold}, ' \
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
+               f'subrule_operator: {self._rule_operator}'
+
+    @property
+    def threshold(self) -> float:
+        '''
+        :return: dissatisfaction threshold
+        '''
+        return self._threshold
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -575,4 +617,30 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
         :return: boolean
 
         '''
-        return self._position_bbox.contains(vehicle.position) and (self.subrules_apply_to(vehicle) if self._vehicle_rules else True)
+
+        return vehicle.dsat_threshold >= self._threshold
+
+
+class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, rule_name='ExtendableSUMODissatisfactionRule'):
+    '''
+    Extendable dissatisfaction-based rule:
+    Applies to vehicles which have reached a given dissatisfaction threshold (default: >=0.5).
+    '''
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'threshold = {self._threshold}, ' \
+               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
+               f'subrule_operator: {self._rule_operator}, ' \
+               f'subrules: {self.subrules_as_str}'
+
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+        '''
+        Test whether this (and sub)rules apply to given vehicle
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+
+        return super().applies_to(vehicle) and (self.applies_to_subrules(vehicle) if self._subrules else True)
