@@ -621,7 +621,7 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
         return vehicle.dsat_threshold >= self._threshold
 
 
-class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, rule_name='ExtendableSUMODissatisfactionRule'):
+class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMORule, rule_name='ExtendableSUMODissatisfactionRule'):
     '''
     Extendable dissatisfaction-based rule:
     Applies to vehicles which have reached a given dissatisfaction threshold (default: >=0.5).
