@@ -29,6 +29,7 @@ import typing
 import colmto.common.log
 import colmto.cse.rule
 import colmto.environment.vehicle
+from colmto.cse.rule import BaseRule
 
 
 class BaseCSE(object):
@@ -64,7 +65,7 @@ class BaseCSE(object):
         Apply rules to vehicles
 
         :param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
-        :return: future self
+        :return: `BaseCSE` as future reference
 
         '''
 
@@ -78,13 +79,12 @@ class BaseCSE(object):
         Apply rules to one vehicle
 
         :param vehicle: Vehicle
-        :return: future self
+        :return: `BaseCSE` as future reference
 
         '''
 
         for i_rule in self._rules:
-            if i_rule.applies_to(vehicle) \
-                    and i_rule.behaviour == colmto.cse.rule.Behaviour.DENY:
+            if i_rule.applies_to(vehicle) and i_rule.behaviour == colmto.cse.rule.Behaviour.DENY:
                 vehicle.change_vehicle_class(
                     colmto.cse.rule.SUMORule.to_disallowed_class()
                 )
@@ -103,28 +103,57 @@ class SumoCSE(BaseCSE):
     First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.
     '''
 
-    def add_rule(self, rule: colmto.cse.rule.SUMOVehicleRule) -> 'SumoCSE':
+    def add_rules_from_cfg(self, rules_cfg: dict) -> 'SumoCSE':
+        '''
+        Create `Rules` from dict-based config and add them to SumoCSE.
+
+        :param rules_cfg: dict-based config (see example)
+        :return: `SumoCSE` as future reference
+
+        Example:
+
+        >>> rules_cfg = [
+        >>>     {
+        >>>         'type': 'SUMOPositionRule',
+        >>>         'behaviour': 'deny',
+        >>>         'args': {
+        >>>             'position_bbox': ((0., -2.), (9520., 2.))
+        >>>         },
+        >>>     },
+        >>> ]
+        >>> colmto.cse.cse.SumoCSE(args).add_rules_from_cfg(rules_cfg)
+
+        '''
+
+        self.add_rules(
+            BaseRule.rule_cls(i_rule.get('type')).from_configuration(i_rule)
+            for i_rule in rules_cfg
+        )
+
+        return self
+
+    def add_rule(self, rule: colmto.cse.rule.BaseRule) -> 'SumoCSE':
         '''
         Add rule to SumoCSE.
 
-        :param rule: rule object
-        :return: future self
+        :param rule: `SUMOVehicleRule` object
+        :return: `SumoCSE` as future reference
 
         '''
 
-        if isinstance(rule, colmto.cse.rule.SUMOVehicleRule):
+        if isinstance(rule, colmto.cse.rule.BaseRule):
             self._rules.add(rule)
         else:
             raise TypeError
 
         return self
 
-    def add_rules(self, rules: typing.Iterable[colmto.cse.rule.SUMOVehicleRule]) -> 'SumoCSE':
+    def add_rules(self, rules: typing.Iterable[colmto.cse.rule.BaseRule]) -> 'SumoCSE':
         '''
         Add iterable of rules to SumoCSE.
 
-        :param rules: iterable of rule objects
-        :return: future self
+        :param rules: iterable of `SUMOVehicleRule` objects
+        :return: `SumoCSE` as future reference
 
         '''
 
