@@ -479,7 +479,7 @@ class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
         '''
 
         return self._speed_range.contains(vehicle.speed_max) and \
-                self.subrules_apply_to(vehicle) if self._vehicle_rules else True
+               self.subrules_apply_to(vehicle) if self._vehicle_rules else True
 
     def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
         '''
@@ -541,8 +541,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
 
         '''
 
-        return self._position_bbox.contains(vehicle.position) \
-               and self.subrules_apply_to(vehicle) if self._vehicle_rules else True
+        return self._position_bbox.contains(vehicle.position)
 
     def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
         '''
@@ -567,4 +566,13 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
     Can be extendend by sub-rules.
     '''
-    pass
+
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+        '''
+        Test whether this (and sub)rules apply to given vehicle
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+        return self._position_bbox.contains(vehicle.position) and (self.subrules_apply_to(vehicle) if self._vehicle_rules else True)
