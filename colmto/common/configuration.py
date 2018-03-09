@@ -50,7 +50,6 @@ _DEFAULT_CONFIG_RUN = {
     'rules': [
         {
             'type': 'SUMOPositionRule',
-            'behaviour': 'deny',
             'args': {
                 'position_bbox': ((0., -2.), (9520., 2.))
             },
@@ -59,14 +58,12 @@ _DEFAULT_CONFIG_RUN = {
                 'rules': [
                     {
                         'type': 'SUMOVTypeRule',
-                        'behaviour': 'deny',
                         'args': {
                             'vehicle_type': 'truck'
                         },
                     },
                     {
                         'type': 'SUMOVTypeRule',
-                        'behaviour': 'deny',
                         'args': {
                             'vehicle_type': 'passenger'
                         },
