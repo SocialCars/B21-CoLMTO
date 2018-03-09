@@ -250,12 +250,12 @@ def test_sumo_extendable_rule():
 
     with assert_raises(ValueError):
         colmto.cse.rule.SUMOExtendableRule(
-            rules=[colmto.cse.rule.SUMOSpeedRule()],
+            rules=[colmto.cse.rule.SUMOMinimalSpeedRule()],
             rule_operator='foo'
         )
 
     l_sumo_rule = colmto.cse.rule.SUMOExtendableRule(
-        subrules=[colmto.cse.rule.SUMOSpeedRule()],
+        subrules=[colmto.cse.rule.SUMOMinimalSpeedRule()],
         subrule_operator=colmto.cse.rule.RuleOperator.ANY
     )
 
@@ -272,7 +272,7 @@ def test_sumo_extendable_rule():
         l_sumo_rule.add_subrule(colmto.cse.rule.SUMONullRule())
 
     l_sumo_rule = colmto.cse.rule.SUMOExtendableRule(subrules=[])
-    l_sumo_sub_rule = colmto.cse.rule.SUMOSpeedRule(speed_range=(0., 60.))
+    l_sumo_sub_rule = colmto.cse.rule.SUMOMinimalSpeedRule(speed_range=(0., 60.))
     l_sumo_rule.add_subrule(l_sumo_sub_rule)
 
     assert_true(
@@ -335,10 +335,10 @@ def test_sumo_universal_rule():
 
 def test_sumo_speed_rule():
     '''
-    Test SUMOSpeedRule class
+    Test SUMOMinimalSpeedRule class
     '''
-    l_sumo_rule = colmto.cse.rule.SUMOSpeedRule(speed_range=numpy.array((0., 60.)))
-    assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMOSpeedRule)
+    l_sumo_rule = colmto.cse.rule.SUMOMinimalSpeedRule(speed_range=numpy.array((0., 60.)))
+    assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMOMinimalSpeedRule)
 
     l_vehicles = [
         colmto.environment.vehicle.SUMOVehicle(
@@ -362,7 +362,7 @@ def test_sumo_speed_rule():
 
     assert_equal(
         str(
-            colmto.cse.rule.SUMOSpeedRule(
+            colmto.cse.rule.SUMOMinimalSpeedRule(
                 speed_range=(0., 60.),
                 behaviour=colmto.cse.rule.Behaviour.DENY
             ).add_subrule(
@@ -371,7 +371,7 @@ def test_sumo_speed_rule():
                 )
             )
         ),
-        '<class \'colmto.cse.rule.SUMOSpeedRule\'>: speed_range = [  0.  60.], behaviour = DENY, ru'
+        '<class \'colmto.cse.rule.SUMOMinimalSpeedRule\'>: speed_range = [  0.  60.], behaviour = DENY, ru'
         'le_operator: RuleOperator.ANY, subrules: <class \'colmto.cse.rule.SUMOPositionRule\'>'
     )
 
@@ -423,12 +423,12 @@ def test_sumo_position_rule():
                 position_bbox=((0., -1.), (100., 1.)),
                 behaviour=colmto.cse.rule.Behaviour.DENY
             ).add_subrule(
-                colmto.cse.rule.SUMOSpeedRule(
+                colmto.cse.rule.SUMOMinimalSpeedRule(
                     speed_range=(0., 60.)
                 )
             )
         ),
         '<class \'colmto.cse.rule.SUMOPositionRule\'>: position_bbox = ((0.0, -1.0), (100.0, 1.0)),'
         ' behaviour = custom1, rule_operator: RuleOperator.ANY, subrules: <class \'colmto.cse.rule.'
-        'SUMOSpeedRule\'>'
+        'SUMOMinimalSpeedRule\'>'
     )
