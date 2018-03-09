@@ -131,14 +131,12 @@ class BaseRule(metaclass=ABCMeta):
         >>> from colmto.cse import rule
         >>> position_rule_config = {
         >>>     'type': 'ExtendableSUMOPositionRule',
-        >>>     'behaviour': 'deny',
         >>>     'args': {
         >>>         'position_bbox': [[0,0], [100,100]]
         >>>     }
         >>> }
         >>> vtype_rule_config = {
         >>>     'type': 'SUMOVTypeRule',
-        >>>     'behaviour': 'deny',
         >>>     'args': {
         >>>         'vehicle_type': 'truck'
         >>>     }
@@ -148,7 +146,7 @@ class BaseRule(metaclass=ABCMeta):
         >>> print(position_rule._valid_rules.keys())
         dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule', 'ExtendableSUMOVTypeRule', 'SUMOMinimalSpeedRule', 'ExtendableSUMOMinimalSpeedRule', 'SUMOPositionRule', 'ExtendableSUMOPositionRule'])
         >>> print(position_rule.add_subrule(vtype_rule))
-        <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: position_bbox = BoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)), behaviour = custom1, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
+        <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: position_bbox = BoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
 
         :param rule_config: rule configuration
         :return: rule
@@ -157,9 +155,6 @@ class BaseRule(metaclass=ABCMeta):
         if not isinstance(rule_config, dict):
             raise TypeError("rule_cfg is not a dictionary.")
 
-        if rule_config.get('behaviour') is None:
-            raise KeyError("rule_cfg must contain a key \'behaviour\'")
-
         if rule_config.get('args') is None:
             raise KeyError("rule_cfg must contain a key \'args\'")
 
@@ -167,26 +162,13 @@ class BaseRule(metaclass=ABCMeta):
             raise ValueError('Configured type must match class. Class method called from '
                              f'\"{cls.__name__}\" but config has type set to \"{rule_config.get("type")}\".')
 
-        return cls(
-            behaviour=Behaviour.behaviour_from_string(rule_config.get('behaviour'), Behaviour.DENY),
-            **rule_config.get('args')
-        )
+        return cls(**rule_config.get('args'))
 
-    def __init__(self, behaviour=Behaviour.DENY, **kwargs):
+    def __init__(self, **kwargs):
         '''
         C'tor
-
-        :param behaviour: Default, i.e. baseline rule.
-            Enum of colmto.cse.rule.Behaviour.DENY/ALLOW
+        :param kwargs: configuration args
         '''
-        self._behaviour = behaviour
-
-    @property
-    def behaviour(self) -> Behaviour:
-        '''
-        :return: behaviour
-        '''
-        return self._behaviour
 
 
 class SUMORule(BaseRule, metaclass=ABCMeta):
@@ -227,9 +209,8 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         '''
 
         return (
-            i_vehicle.change_vehicle_class(
-                self._behaviour.vclass
-            ) if self.applies_to(i_vehicle) else i_vehicle
+            i_vehicle.change_vehicle_class(self.to_disallowed_class())
+            if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         )
 
@@ -240,7 +221,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
 
     '''
 
-    def __init__(self, behaviour=Behaviour.DENY, subrules=tuple(), subrule_operator=RuleOperator.ANY):
+    def __init__(self, subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
         C'tor.
 
@@ -262,7 +243,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
         self._subrules = set(subrules)
         self._subrule_operator = subrule_operator
 
-        super().__init__(behaviour)
+        super().__init__()
 
     @property
     def subrules(self) -> tuple:
@@ -411,24 +392,19 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
 
 class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
     '''Base class for vehicle attribute specific rules.'''
-
-    def __init__(self, behaviour=Behaviour.DENY):
-        '''C'tor.'''
-        super().__init__(behaviour)
-
+    pass
 
 class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
     '''Vehicle type based rule: Applies to vehicles with a given SUMO vehicle type'''
 
-    def __init__(self, vehicle_type=None, behaviour=Behaviour.DENY):
+    def __init__(self, vehicle_type=None):
         '''C'tor.'''
-        super().__init__(behaviour)
+        super().__init__()
         self._vehicle_type = vehicle_type  # type: str
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'vehicle_type = {self._vehicle_type}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass})' \
+               f'vehicle_type = {self._vehicle_type}'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -451,7 +427,6 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
     def __str__(self):
         return f'{self.__class__}: ' \
                f'vehicle_type = {self._vehicle_type}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
@@ -470,15 +445,14 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
 class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
     '''MinimalSpeed rule: Applies to vehicles unable to reach a minimal velocity.'''
 
-    def __init__(self, minimal_speed: float, behaviour=Behaviour.DENY):
+    def __init__(self, minimal_speed: float):
         '''C'tor.'''
-        super().__init__(behaviour)
+        super().__init__()
         self._minimal_speed = minimal_speed
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'minimal_speed = {self._minimal_speed}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass})'
+               f'minimal_speed = {self._minimal_speed}'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -501,7 +475,6 @@ class ExtendableSUMOMinimalSpeedRule(SUMOMinimalSpeedRule, ExtendableSUMORule, r
     def __str__(self):
         return f'{self.__class__}: ' \
                f'minimal_speed = {self._minimal_speed}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
@@ -522,23 +495,19 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
     '''
 
-    def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
-                 outside=False,
-                 behaviour=Behaviour.DENY):
+    def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)), outside=False):
         '''
         C'tor.
         :param position_bbox: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
         :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
-        :param behaviour: Behaviour.ALLOW|Behaviour.DENY, allow or deny access if rule applies (default: Behaviour.DENY)
         '''
-        super().__init__(behaviour)
+        super().__init__()
         self._position_bbox = BoundingBox(*position_bbox)
         self._outside = outside
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'position_bbox = {self._position_bbox}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass})'
+               f'position_bbox = {self._position_bbox}'
 
     @property
     def position_bbox(self) -> BoundingBox:
@@ -568,7 +537,6 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
     def __str__(self):
         return f'{self.__class__}: ' \
                f'position_bbox = {self._position_bbox}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
@@ -589,15 +557,14 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
     Applies to vehicles which have reached a given dissatisfaction threshold (default: >=0.5).
     '''
 
-    def __init__(self, threshold=0.5, behaviour=Behaviour.DENY):
+    def __init__(self, threshold=0.5):
         '''C'tor.'''
-        super().__init__(behaviour)
+        super().__init__()
         self._threshold = threshold
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'threshold = {self._threshold}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass})'
+               f'threshold = {self._threshold}'
 
     @property
     def threshold(self) -> float:
@@ -627,7 +594,6 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
     def __str__(self):
         return f'{self.__class__}: ' \
                f'threshold = {self._threshold}, ' \
-               f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 

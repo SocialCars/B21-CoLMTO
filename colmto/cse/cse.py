@@ -84,16 +84,12 @@ class BaseCSE(object):
         '''
 
         for i_rule in self._rules:
-            if i_rule.applies_to(vehicle) and i_rule.behaviour == colmto.cse.rule.Behaviour.DENY:
-                vehicle.change_vehicle_class(
-                    colmto.cse.rule.SUMORule.to_disallowed_class()
-                )
+            if i_rule.applies_to(vehicle):
+                vehicle.change_vehicle_class(colmto.cse.rule.SUMORule.to_disallowed_class())
                 return self
 
         # default case: no applicable rule found
-        vehicle.change_vehicle_class(
-            colmto.cse.rule.SUMORule.to_allowed_class()
-        )
+        vehicle.change_vehicle_class(colmto.cse.rule.SUMORule.to_allowed_class())
 
         return self
 
