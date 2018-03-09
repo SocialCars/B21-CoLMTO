@@ -35,8 +35,6 @@ import enum
 
 from colmto.common.property import Position
 from colmto.common.property import BoundingBox
-from colmto.common.property import SpeedRange
-
 
 @enum.unique
 class Behaviour(enum.Enum):
@@ -148,7 +146,7 @@ class BaseRule(metaclass=ABCMeta):
         >>> position_rule = rule.ExtendableSUMOPositionRule.from_configuration(position_rule_config) # type: rule.ExtendableSUMOPositionRule
         >>> vtype_rule = rule.SUMOVTypeRule.from_configuration(vtype_rule_config) # type: rule.SUMOVTypeRule
         >>> print(position_rule._valid_rules.keys())
-        dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule', 'ExtendableSUMOVTypeRule', 'SUMOSpeedRule', 'ExtendableSUMOSpeedRule', 'SUMOPositionRule', 'ExtendableSUMOPositionRule'])
+        dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule', 'ExtendableSUMOVTypeRule', 'SUMOMinimalSpeedRule', 'ExtendableSUMOMinimalSpeedRule', 'SUMOPositionRule', 'ExtendableSUMOPositionRule'])
         >>> print(position_rule.add_subrule(vtype_rule))
         <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: position_bbox = BoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)), behaviour = custom1, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
 
@@ -469,17 +467,17 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
         return super().applies_to(vehicle) and (self.subrules_apply_to(vehicle) if self._subrules else True)
 
 
-class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
-    '''Speed-based rule: Applies to vehicles within a given speed range'''
+class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
+    '''MinimalSpeed rule: Applies to vehicles unable to reach a minimal velocity.'''
 
-    def __init__(self, speed_range=SpeedRange(0, 120), behaviour=Behaviour.DENY):
+    def __init__(self, minimal_speed: float, behaviour=Behaviour.DENY):
         '''C'tor.'''
         super().__init__(behaviour)
-        self._speed_range = SpeedRange(*speed_range)
+        self._minimal_speed = minimal_speed
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'speed_range = {self._speed_range}, ' \
+               f'minimal_speed = {self._minimal_speed}, ' \
                f'behaviour = {self._behaviour} ({self._behaviour.vclass})'
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
@@ -491,18 +489,18 @@ class SUMOSpeedRule(SUMOVehicleRule, rule_name='SUMOSpeedRule'):
 
         '''
 
-        return self._speed_range.contains(vehicle.speed_max)
+        return vehicle.speed_max < self._minimal_speed
 
 
-class ExtendableSUMOSpeedRule(SUMOSpeedRule, ExtendableSUMORule, rule_name='ExtendableSUMOSpeedRule'):
+class ExtendableSUMOMinimalSpeedRule(SUMOMinimalSpeedRule, ExtendableSUMORule, rule_name='ExtendableSUMOMinimalSpeedRule'):
     '''
-    Extendable speed-based rule: Applies to vehicles within a given speed range.
+    Extendable speed-based rule: Applies to vehicles unable to reach a minimal velocity.
     Can be extendend by sub-rules.
     '''
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'speed_range = {self._speed_range}, ' \
+               f'minimal_speed = {self._minimal_speed}, ' \
                f'behaviour = {self._behaviour} ({self._behaviour.vclass}), ' \
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
@@ -520,15 +518,22 @@ class ExtendableSUMOSpeedRule(SUMOSpeedRule, ExtendableSUMORule, rule_name='Exte
 
 class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
     '''
-    Position based rule: Applies to vehicles which are located inside a given bounding box, i.e.
+    Position based rule: Applies to vehicles which are located inside/outside a given bounding box, i.e.
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
     '''
 
     def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
+                 outside=False,
                  behaviour=Behaviour.DENY):
-        '''C'tor.'''
+        '''
+        C'tor.
+        :param position_bbox: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
+        :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
+        :param behaviour: Behaviour.ALLOW|Behaviour.DENY, allow or deny access if rule applies (default: Behaviour.DENY)
+        '''
         super().__init__(behaviour)
         self._position_bbox = BoundingBox(*position_bbox)
+        self._outside = outside
 
     def __str__(self):
         return f'{self.__class__}: ' \
@@ -550,8 +555,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
         :return: boolean
 
         '''
-
-        return self._position_bbox.contains(vehicle.position)
+        return self._outside ^ self._position_bbox.contains(vehicle.position)
 
 
 class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name='ExtendableSUMOPositionRule'):

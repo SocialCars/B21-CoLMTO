@@ -60,7 +60,7 @@ class BaseCSE(object):
 
         return tuple(self._rules)
 
-    def apply(self, vehicles: typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]) -> 'BaseCSE':
+    def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]]) -> 'BaseCSE':
         '''
         Apply rules to vehicles
 
@@ -69,7 +69,7 @@ class BaseCSE(object):
 
         '''
 
-        for i_vehicle in iter(vehicles.values()) if isinstance(vehicles, dict) else vehicles:
+        for i_vehicle in (iter(vehicles.values()) if isinstance(vehicles, dict) else vehicles):
             self.apply_one(i_vehicle)
 
         return self
