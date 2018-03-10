@@ -20,4 +20,5 @@ docs/build/**/*
 !docs/source/**/*.py
 !docs/source/**/*.rst
 !docs/source/_static/style.css
+!docs/source/_static/fonts/*.woff
 !docs/source/_templates/layout.html

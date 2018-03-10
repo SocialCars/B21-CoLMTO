@@ -1,3 +1,68 @@
+@font-face {
+    font-family: "Mononoki";
+    src: url("fonts/mononoki-Regular.woff") format('woff');
+}
+
+@font-face {
+    font-family: "Mononoki";
+    src: url("fonts/mononoki-Bold.woff") format('woff');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Fira";
+    src: url("fonts/FiraSans-Light.woff") format('woff');
+}
+
+@font-face {
+    font-family: "Fira";
+    src: url("fonts/FiraSans-Regular.woff") format('woff');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Fira";
+    src: url("fonts/FiraSans-LightItalic.woff") format('woff');
+    font-weight: italic;
+}
+
+@font-face {
+    font-family: "Fira";
+    src: url("fonts/FiraSans-Italic.woff") format('woff');
+    font-weight: bold italic;
+}
+
+@font-face {
+    font-family: "Charter";
+    src: url("fonts/charter_regular-webfont.woff") format('woff');
+}
+
+@font-face {
+    font-family: "Charter";
+    src: url("fonts/charter_bold-webfont.woff") format('woff');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Charter";
+    src: url("fonts/charter_italic-webfont.woff") format('woff');
+    font-weight: italic;
+}
+
+@font-face {
+    font-family: "Charter";
+    src: url("fonts/charter_bold_italic-webfont.woff") format('woff');
+    font-weight: bold italic;
+}
+
+body {
+    font-family: "Fira","Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+}
+
+h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
+	font-family: "Charter","Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif
+}
+
 .wy-nav-content {
     max-width: none;
 }
@@ -7,8 +72,8 @@
 }
 
 .rst-content code.literal {
-	color: #268bd2;
-	font-family: "Source Code Pro",Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace;
+	color: #839496;
+	font-family: "Source Code Pro",Mononoki,Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace;
 }
 
 .rst-content tt, .rst-content code {
@@ -17,9 +82,13 @@
 	background: none;
 }
 
+.rst-content div[class^='highlight'] pre {
+	font-family: "Source Code Pro",Mononoki,Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace;
+}
+
 code {
 	font-size: 100%;
-	font-family: "Source Code Pro",Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace;
+	font-family: "Source Code Pro",Mononoki,Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace;
 	color: #268bd2;
 	border: none;
 	background: none;
