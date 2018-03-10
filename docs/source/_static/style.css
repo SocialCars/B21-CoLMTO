@@ -67,6 +67,24 @@ h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
     max-width: none;
 }
 
+@media screen and (max-width: 768px) {
+    .wy-body-for-nav {
+        max-width: 768px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .wy-body-for-nav {
+        max-width: 480px;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .wy-body-for-nav {
+        max-width: 1100px;
+    }
+}
+
 .rst-content dl:not(.docutils) dt {
 	width: 100%;
 }
