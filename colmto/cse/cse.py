@@ -99,7 +99,7 @@ class SumoCSE(BaseCSE):
     First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.
     '''
 
-    def add_rules_from_cfg(self, rules_cfg: typing.Iterable) -> 'SumoCSE':
+    def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
         '''
         Create `Rules` from dict-based config and add them to SumoCSE.
 

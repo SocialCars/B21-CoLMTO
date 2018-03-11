@@ -114,34 +114,40 @@ def test_sumo_cse():
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rules_from_cfg(
         [
             {
-                'type': 'SUMOMinimalSpeedRule',
-                'args': {
-                    'minimal_speed': (0., 30/3.6)
-                }
-            },
-            {
                 'type': 'ExtendableSUMOPositionRule',
                 'args': {
                     'position_bbox': ((1350., -2.), (2500., 2.))
                 },
-                'vehicle_rules': {
-                    'rule': 'any',
-                    'rules': [
-                        {
-                            'type': 'SUMOMinimalSpeedRule',
-                            'args': {
-                                'minimal_speed': 85/3.6
-                            },
-                        }
-                    ]
-                }
+                'subrule_operator': 'ANY',
+                'subrules': [
+                    {
+                        'type': 'SUMOMinimalSpeedRule',
+                        'args': {
+                            'minimal_speed': 85/3.6
+                        },
+                    }
+                ]
             }
         ]
     )
 
-    assert_is_instance(l_sumo_cse.rules[0], colmto.cse.rule.SUMOMinimalSpeedRule)
-    assert_is_instance(l_sumo_cse.rules[1], colmto.cse.rule.ExtendableSUMOPositionRule)
-    # assert_is_instance(
-    #     l_sumo_cse.rules[1].subrules[0],
-    #     colmto.cse.rule.SUMOMinimalSpeedRule
-    # )
+    assert_is_instance(l_sumo_cse.rules[0], colmto.cse.rule.ExtendableSUMOPositionRule)
+
+    assert_is_instance(l_sumo_cse.rules[0].subrules[0], colmto.cse.rule.SUMOMinimalSpeedRule)
+
+    l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(
+        {
+            'type': 'SUMOMinimalSpeedRule',
+            'args': {
+                'minimal_speed': 30/3.6
+            }
+        }
+    )
+
+    l_sumo_cse.add_rule(
+        l_rule_speed
+    )
+
+    assert_in(l_rule_speed, l_sumo_cse.rules)
+
+

@@ -23,7 +23,7 @@
 # @endcond
 # pylint: disable=too-few-public-methods
 '''Rule related classes'''
-
+import typing
 from abc import ABCMeta
 from abc import abstractclassmethod
 
@@ -164,11 +164,14 @@ class BaseRule(metaclass=ABCMeta):
 
         return cls(**rule_config.get('args'))
 
+
+    @abstractclassmethod
     def __init__(self, **kwargs):
         '''
         C'tor
         :param kwargs: configuration args
         '''
+        pass
 
 
 class SUMORule(BaseRule, metaclass=ABCMeta):
@@ -231,17 +234,19 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
         '''
 
         # verify rule types
+        self._subrules = set()
+
         for i_subrule in subrules:
-            if not isinstance(i_subrule, BaseRule):
-                raise TypeError(f'{i_subrule} is not of colmto.cse.rule.BaseRule.')
+            if not isinstance(i_subrule, BaseRule) and not isinstance(i_subrule, dict):
+                raise TypeError(f'{i_subrule} is not of colmto.cse.rule.BaseRule or dict.')
             if isinstance(i_subrule, ExtendableRule):
                 raise TypeError(f'{i_subrule} can\'t be an ExtendableRule.')
 
-        if subrule_operator not in RuleOperator:
-            raise ValueError
+            self._subrules.add(
+                i_subrule if isinstance(i_subrule, BaseRule) else BaseRule.rule_cls(i_subrule.get('type')).from_configuration(i_subrule)
+            )
 
-        self._subrules = set(subrules)
-        self._subrule_operator = subrule_operator
+        self._subrule_operator = subrule_operator if isinstance(subrule_operator, RuleOperator) else RuleOperator.ruleoperator_from_string(subrule_operator, RuleOperator.ANY)
 
         super().__init__()
 
@@ -394,6 +399,7 @@ class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
     '''Base class for vehicle attribute specific rules.'''
     pass
 
+
 class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
     '''Vehicle type based rule: Applies to vehicles with a given SUMO vehicle type'''
 
@@ -533,6 +539,21 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
     Can be extendend by sub-rules.
     '''
+
+    def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
+                 outside=False, subrules=tuple(), subrule_operator=RuleOperator.ANY):
+        '''
+        C'tor
+
+        :todo: add init to other extended*Rules w/ multiple inheritance
+        :param position_bbox: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
+        :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
+        :param subrules: List of sub-rules
+        :param subrule_operator: Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
+        '''
+
+        SUMOPositionRule.__init__(self, position_bbox=position_bbox, outside=outside)
+        ExtendableSUMORule.__init__(self, subrules=subrules, subrule_operator=subrule_operator)
 
     def __str__(self):
         return f'{self.__class__}: ' \
