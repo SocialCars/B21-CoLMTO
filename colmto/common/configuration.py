@@ -51,7 +51,7 @@ _DEFAULT_CONFIG_RUN = {
         {
             'type': 'SUMOPositionRule',
             'args': {
-                'position_bbox': ((0., -2.), (9520., 2.))
+                'bounding_box': ((0., -2.), (9520., 2.))
             },
             'vehicle_rules': {
                 'rule': 'any',

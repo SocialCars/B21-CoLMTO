@@ -68,14 +68,14 @@ def test_sumo_cse():
     l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule(80.)
 
     l_rule_outside_position = colmto.cse.rule.SUMOPositionRule(
-        position_bbox=((0., 0), (64.0, 1)),
+        bounding_box=((0., 0), (64.0, 1)),
         outside=True
     )
 
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_outside_position).add_rule(l_rule_speed)
 
     assert_is_instance(l_sumo_cse, colmto.cse.cse.SumoCSE)
-    assert_is_instance(l_sumo_cse.rules, tuple)
+    assert_is_instance(l_sumo_cse.rules, frozenset)
     assert_in(l_rule_speed, l_sumo_cse.rules)
     assert_in(l_rule_outside_position, l_sumo_cse.rules)
 
@@ -107,8 +107,8 @@ def test_sumo_cse():
             )
 
     assert_equal(
-        colmto.cse.cse.SumoCSE().add_rules_from_cfg({}).rules,
-        tuple()
+        len(colmto.cse.cse.SumoCSE().add_rules_from_cfg({}).rules),
+        0
     )
 
     l_sumo_cse = colmto.cse.cse.SumoCSE().add_rules_from_cfg(
@@ -116,7 +116,7 @@ def test_sumo_cse():
             {
                 'type': 'ExtendableSUMOPositionRule',
                 'args': {
-                    'position_bbox': ((1350., -2.), (2500., 2.))
+                    'bounding_box': ((1350., -2.), (2500., 2.))
                 },
                 'subrule_operator': 'ANY',
                 'subrules': [
@@ -131,9 +131,9 @@ def test_sumo_cse():
         ]
     )
 
-    assert_is_instance(l_sumo_cse.rules[0], colmto.cse.rule.ExtendableSUMOPositionRule)
+    assert_is_instance(tuple(l_sumo_cse.rules)[0], colmto.cse.rule.ExtendableSUMOPositionRule)
 
-    assert_is_instance(l_sumo_cse.rules[0].subrules[0], colmto.cse.rule.SUMOMinimalSpeedRule)
+    # assert_is_instance(tuple(tuple(l_sumo_cse.rules)[0].subrules)[0], colmto.cse.rule.SUMOMinimalSpeedRule)
 
     l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(
         {

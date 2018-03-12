@@ -113,7 +113,7 @@ class SumoCSE(BaseCSE):
         >>>         'type': 'SUMOPositionRule',
         >>>         'behaviour': 'deny',
         >>>         'args': {
-        >>>             'position_bbox': ((0., -2.), (9520., 2.))
+        >>>             bbounding_box((0., -2.), (9520., 2.))
         >>>         },
         >>>     },
         >>> ]

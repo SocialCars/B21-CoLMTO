@@ -132,7 +132,7 @@ class BaseRule(metaclass=ABCMeta):
         >>> position_rule_config = {
         >>>     'type': 'ExtendableSUMOPositionRule',
         >>>     'args': {
-        >>>         'position_bbox': [[0,0], [100,100]]
+        >>>         bbounding_box[[0,0], [100,100]]
         >>>     }
         >>> }
         >>> vtype_rule_config = {
@@ -146,7 +146,7 @@ class BaseRule(metaclass=ABCMeta):
         >>> print(position_rule._valid_rules.keys())
         dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule', 'ExtendableSUMOVTypeRule', 'SUMOMinimalSpeedRule', 'ExtendableSUMOMinimalSpeedRule', 'SUMOPositionRule', 'ExtendableSUMOPositionRule'])
         >>> print(position_rule.add_subrule(vtype_rule))
-        <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: position_bbox = BoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
+        <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: posbounding_boxBoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
 
         :param rule_config: rule configuration
         :return: rule
@@ -234,9 +234,12 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
 
         '''
 
-        # verify rule types
         self._subrules = set()
 
+        if rule_operator not in RuleOperator:
+            raise ValueError
+
+        # verify rule types
         for i_subrule in subrules:
             if not isinstance(i_subrule, BaseRule) and not isinstance(i_subrule, dict):
                 raise TypeError(f'{i_subrule} is not of colmto.cse.rule.BaseRule or dict.')
@@ -336,6 +339,12 @@ class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
     Universal rule, i.e. always applies to any vehicle
     '''
 
+    def __init__(self):
+        '''
+        C'tor
+        '''
+        super().__init__()
+
     # pylint: disable=unused-argument
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -368,6 +377,12 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
     '''
     Null rule, i.e. no restrictions: Applies to no vehicle
     '''
+
+    def __init__(self):
+        '''
+        C'tor
+        '''
+        super().__init__()
 
     # pylint: disable=unused-argument
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
@@ -504,26 +519,26 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
     [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
     '''
 
-    def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)), outside=False):
+    def __init__(self, bounding_box=BoundingBox(Position(0.0, 0), Position(100.0, 1)), outside=False):
         '''
         C'tor.
-        :param position_bbox: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
+        :param bounding_box: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
         :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
         '''
         super().__init__()
-        self._position_bbox = BoundingBox(*position_bbox)
+        self._bounding_box = BoundingBox(*bounding_box)
         self._outside = outside
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'position_bbox = {self._position_bbox}'
+               f'bounding_box = {self._bounding_box}'
 
     @property
-    def position_bbox(self) -> BoundingBox:
+    def bounding_box(self) -> BoundingBox:
         '''
-        :return: position bounding box
+        :return: rule bounding box
         '''
-        return BoundingBox(*self._position_bbox)
+        return BoundingBox(*self._bounding_box)
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -533,7 +548,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
         :return: boolean
 
         '''
-        return self._outside ^ self._position_bbox.contains(vehicle.position)
+        return self._outside ^ self._bounding_box.contains(vehicle.position)
 
 
 class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name='ExtendableSUMOPositionRule'):
@@ -543,24 +558,24 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
     Can be extendend by sub-rules.
     '''
 
-    def __init__(self, position_bbox=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
+    def __init__(self, bounding_box=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
                  outside=False, subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
         C'tor
 
         :todo: add init to other extended*Rules w/ multiple inheritance
-        :param position_bbox: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
+        :param bounding_box: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
         :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
         :param subrules: List of sub-rules
         :param subrule_operator: Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
         '''
 
-        SUMOPositionRule.__init__(self, position_bbox=position_bbox, outside=outside)
+        SUMOPositionRule.__init__(self, bounding_box=bounding_box, outside=outside)
         ExtendableSUMORule.__init__(self, subrules=subrules, subrule_operator=subrule_operator)
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'position_bbox = {self._position_bbox}, ' \
+               f'bounding_box = {self._bounding_box}, ' \
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 

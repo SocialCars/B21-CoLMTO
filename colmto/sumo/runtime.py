@@ -127,10 +127,10 @@ class Runtime(object):
                     traci.polygon.add(
                         polygonID=str(i_rule),
                         shape=(
-                            (i_rule.position_bbox[0][0], 2*(i_rule.position_bbox[0][1])+10),
-                            (i_rule.position_bbox[1][0], 2*(i_rule.position_bbox[0][1])+10),
-                            (i_rule.position_bbox[1][0], 2*(i_rule.position_bbox[1][1])+10),
-                            (i_rule.position_bbox[0][0], 2*(i_rule.position_bbox[1][1])+10)
+                            (i_rule.bounding_box[0][0], 2 * (i_rule.bounding_box[0][1]) + 10),
+                            (i_rule.bounding_box[1][0], 2 * (i_rule.bounding_box[0][1]) + 10),
+                            (i_rule.bounding_box[1][0], 2 * (i_rule.bounding_box[1][1]) + 10),
+                            (i_rule.bounding_box[0][0], 2 * (i_rule.bounding_box[1][1]) + 10)
                         ),
                         color=(255, 0, 0, 255),
                         fill=True,

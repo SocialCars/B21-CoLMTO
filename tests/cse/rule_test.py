@@ -69,8 +69,8 @@ def test_base_rule():
     '''
     Test BaseRule class
     '''
-    l_base_rule = colmto.cse.rule.BaseRule()
-    assert_is_instance(l_base_rule, colmto.cse.rule.BaseRule)
+    with assert_raises(TypeError):
+        colmto.cse.rule.BaseRule()
 
 
 def test_ruleoperatorfromstring():
@@ -137,7 +137,7 @@ def test_sumo_vtype_rule():
                 vehicle_type='passenger'
             ).add_subrule(
                 colmto.cse.rule.SUMOPositionRule(
-                    position_bbox=((0., -1.), (100., 1.))
+                    bounding_box=((0., -1.), (100., 1.))
                 )
             )
         ),
@@ -205,12 +205,12 @@ def test_sumo_extendable_rule():
             subrules=['foo'],
         )
 
-    with assert_raises(ValueError):
-        colmto.cse.rule.ExtendableSUMORule(
-            subrule_operator='foo'
-        )
+    #with assert_raises(TypeError):
+    colmto.cse.rule.ExtendableSUMORule(
+        subrule_operator='foo'
+    )
 
-    with assert_raises(ValueError):
+    with assert_raises(TypeError):
         colmto.cse.rule.ExtendableSUMORule(
             subrules=[colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)],
             subrule_operator='foo'
@@ -346,7 +346,7 @@ def test_sumo_speed_rule():
                 minimal_speed=60.,
             ).add_subrule(
                 colmto.cse.rule.SUMOPositionRule(
-                    position_bbox=((0., -1.), (100., 1.))
+                    bounding_box=((0., -1.), (100., 1.))
                 )
             )
         ),
@@ -358,7 +358,7 @@ def test_sumo_position_rule():
     '''
     Test SUMOPositionRule class
     '''
-    l_sumo_rule = colmto.cse.rule.SUMOPositionRule(position_bbox=((0., -1.), (100., 1.)))
+    l_sumo_rule = colmto.cse.rule.SUMOPositionRule(bounding_box=((0., -1.), (100., 1.)))
     assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMOPositionRule)
 
     l_vehicles = [
@@ -389,20 +389,20 @@ def test_sumo_position_rule():
 
     assert_tuple_equal(
         colmto.cse.rule.SUMOPositionRule(
-            position_bbox=((0., -1.), (100., 1.)),
-        ).position_bbox,
+            bounding_box=((0., -1.), (100., 1.)),
+        ).bounding_box,
         ((0., -1.), (100., 1.))
     )
 
     assert_equal(
         str(
             colmto.cse.rule.ExtendableSUMOPositionRule(
-                position_bbox=((0., -1.), (100., 1.)),
+                bounding_box=((0., -1.), (100., 1.)),
             ).add_subrule(
                 colmto.cse.rule.SUMOMinimalSpeedRule(
                     minimal_speed=60.
                 )
             )
         ),
-        "<class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: position_bbox = BoundingBox(p1=Position(x=0.0, y=-1.0), p2=Position(x=100.0, y=1.0)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
+        "<class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: bounding_box = BoundingBox(p1=Position(x=0.0, y=-1.0), p2=Position(x=100.0, y=1.0)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
     )
