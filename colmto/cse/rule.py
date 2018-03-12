@@ -230,6 +230,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
 
         :param subrules: List of sub-rules
         :param subrule_operator: Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
+        :type subrule_operator: typing.Union[RuleOperator, str]
 
         '''
 
@@ -239,23 +240,25 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
         for i_subrule in subrules:
             if not isinstance(i_subrule, BaseRule) and not isinstance(i_subrule, dict):
                 raise TypeError(f'{i_subrule} is not of colmto.cse.rule.BaseRule or dict.')
-            if isinstance(i_subrule, ExtendableRule):
-                raise TypeError(f'{i_subrule} can\'t be an ExtendableRule.')
 
-            self._subrules.add(
-                i_subrule if isinstance(i_subrule, BaseRule) else BaseRule.rule_cls(i_subrule.get('type')).from_configuration(i_subrule)
+            self.add_subrule(
+                i_subrule
+                if isinstance(i_subrule, BaseRule)
+                else BaseRule.rule_cls(i_subrule.get('type')).from_configuration(i_subrule)
             )
 
-        self._subrule_operator = subrule_operator if isinstance(subrule_operator, RuleOperator) else RuleOperator.ruleoperator_from_string(subrule_operator, RuleOperator.ANY)
+        self._subrule_operator = subrule_operator \
+            if isinstance(subrule_operator, RuleOperator) \
+            else RuleOperator.ruleoperator_from_string(subrule_operator, RuleOperator.ANY)
 
         super().__init__()
 
     @property
-    def subrules(self) -> tuple:
+    def subrules(self) -> frozenset:
         '''
         :return: vehicle related subrules
         '''
-        return tuple(self._subrules)
+        return frozenset(self._subrules)
 
     @property
     def subrules_as_str(self) -> str:
@@ -325,7 +328,7 @@ class ExtendableSUMORule(ExtendableRule, metaclass=ABCMeta):
 
         return self._subrule_operator.evaluate(
             (i_rule.applies_to(vehicle) for i_rule in self._subrules)
-        )
+        ) if len(self._subrules) > 0 else False  # always return False if subrules is empty
 
 
 class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
@@ -445,7 +448,7 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
 
         '''
 
-        return super().applies_to(vehicle) and (self.subrules_apply_to(vehicle) if self._subrules else True)
+        return super().applies_to(vehicle) and self.subrules_apply_to(vehicle)
 
 
 class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
@@ -492,7 +495,7 @@ class ExtendableSUMOMinimalSpeedRule(SUMOMinimalSpeedRule, ExtendableSUMORule, r
         :return: boolean
 
         '''
-        return super().applies_to(vehicle) and (self.applies_to_subrules(vehicle) if self._subrules else True)
+        return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)
 
 
 class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
@@ -569,7 +572,7 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
         :return: boolean
 
         '''
-        return super().applies_to(vehicle) and (self.applies_to_subrules(vehicle) if self._subrules else True)
+        return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)
 
 
 class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRule'):
@@ -627,4 +630,4 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
 
         '''
 
-        return super().applies_to(vehicle) and (self.applies_to_subrules(vehicle) if self._subrules else True)
+        return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)

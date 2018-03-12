@@ -50,15 +50,15 @@ class BaseCSE(object):
         self._rules = set()
 
     @property
-    def rules(self) -> tuple:
+    def rules(self) -> frozenset:
         '''
         Policies of CSE
 
-        :return: rules tuple
+        :return: frozen set of rules
 
         '''
 
-        return tuple(self._rules)
+        return frozenset(self._rules)
 
     def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]]) -> 'BaseCSE':
         '''
