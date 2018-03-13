@@ -111,9 +111,8 @@ class SumoCSE(BaseCSE):
         >>> rules_cfg = [
         >>>     {
         >>>         'type': 'SUMOPositionRule',
-        >>>         'behaviour': 'deny',
         >>>         'args': {
-        >>>             bbounding_box((0., -2.), (9520., 2.))
+        >>>             'bounding_box': ((0., -2.), (9520., 2.))
         >>>         },
         >>>     },
         >>> ]

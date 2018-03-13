@@ -28,8 +28,7 @@ import random
 
 import colmto.cse.rule
 import colmto.environment.vehicle
-
-import numpy
+import colmto.cse.rule
 
 from nose.tools import assert_equal
 from nose.tools import assert_false
@@ -129,7 +128,7 @@ def test_sumo_null_rule():
 
 def test_sumo_vtype_rule():
     '''Test SUMOVTypeRule class'''
-    assert_is_instance(colmto.cse.rule.SUMOVTypeRule(), colmto.cse.rule.SUMOVTypeRule)
+    assert_is_instance(colmto.cse.rule.SUMOVTypeRule('passenger'), colmto.cse.rule.SUMOVTypeRule)
 
     assert_equal(
         str(
@@ -205,16 +204,20 @@ def test_sumo_extendable_rule():
             subrules=['foo'],
         )
 
-    #with assert_raises(TypeError):
-    colmto.cse.rule.ExtendableSUMORule(
-        subrule_operator='foo'
+    assert_equal(
+        colmto.cse.rule.ExtendableSUMORule(
+            subrule_operator='foo'
+        ).subrule_operator,
+        colmto.cse.rule.RuleOperator.ANY
     )
 
-    with assert_raises(TypeError):
+    assert_equal(
         colmto.cse.rule.ExtendableSUMORule(
             subrules=[colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)],
             subrule_operator='foo'
-        )
+        ).subrule_operator,
+        colmto.cse.rule.RuleOperator.ANY
+    )
 
     l_sumo_rule = colmto.cse.rule.ExtendableSUMORule(
         subrules=[colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)],

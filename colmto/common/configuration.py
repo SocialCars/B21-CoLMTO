@@ -49,26 +49,17 @@ _DEFAULT_CONFIG_RUN = {
     'starttimedistribution': 'poisson',
     'rules': [
         {
-            'type': 'SUMOPositionRule',
+            'type': 'ExtendableSUMOPositionRule',
             'args': {
-                'bounding_box': ((0., -2.), (9520., 2.))
-            },
-            'vehicle_rules': {
-                'rule': 'any',
-                'rules': [
+                'bounding_box': ((1350., -2.), (2500., 2.)),
+                'subrule_operator': 'all',
+                'subrules': [
                     {
-                        'type': 'SUMOVTypeRule',
+                        'type': 'SUMOMinimalSpeedRule',
                         'args': {
-                            'vehicle_type': 'truck'
+                            'minimal_speed': 80/3.6
                         },
-                    },
-                    {
-                        'type': 'SUMOVTypeRule',
-                        'args': {
-                            'vehicle_type': 'passenger'
-                        },
-                    },
-
+                    }
                 ]
             }
         }
