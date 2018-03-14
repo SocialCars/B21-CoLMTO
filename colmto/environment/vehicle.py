@@ -222,6 +222,7 @@ class SUMOVehicle(BaseVehicle):
     def travel_stats(self) -> MappingProxyType:
         '''
         :return: MappingProxyType travel stats dictionary
+        :todo: remove
         '''
         return MappingProxyType(self._travel_stats)
 
@@ -244,7 +245,7 @@ class SUMOVehicle(BaseVehicle):
 
         :param time_step: current time step
         :return: future self
-
+        :todo: remove
         '''
 
         # update current travel time
