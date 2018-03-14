@@ -127,7 +127,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 '-> rebuilding/overwriting scenarios if already present'
             )
 
-        # generate color map for vehicle max speeds
+        # generate colour map for vehicle max speeds
         l_global_maxspeed = max(
             [
                 i_scenario.get('parameters').get('speedlimit')
@@ -704,10 +704,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
             l_vattr = {k: str(v) for k, v in i_vehicle.properties.items()}
             l_vattr.update({
                 'id': str(i_vid),
-                'color': f'{i_vehicle.color.red/255.},'
-                         f'{i_vehicle.color.green/255.},'
-                         f'{i_vehicle.color.blue/255.},'
-                         f'{i_vehicle.color.alpha/255.}'
+                'colour': f'{i_vehicle.colour.red/255.},'
+                         f'{i_vehicle.colour.green/255.},'
+                         f'{i_vehicle.colour.blue/255.},'
+                         f'{i_vehicle.colour.alpha/255.}'
             })
 
             # override parameters speedDev, desiredSpeed, and length if defined in run config

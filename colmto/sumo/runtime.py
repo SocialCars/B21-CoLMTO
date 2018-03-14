@@ -127,10 +127,10 @@ class Runtime(object):
                     traci.polygon.add(
                         polygonID=str(i_rule),
                         shape=(
-                            (i_rule.bounding_box[0][0], 2 * (i_rule.bounding_box[0][1]) + 10),
-                            (i_rule.bounding_box[1][0], 2 * (i_rule.bounding_box[0][1]) + 10),
-                            (i_rule.bounding_box[1][0], 2 * (i_rule.bounding_box[1][1]) + 10),
-                            (i_rule.bounding_box[0][0], 2 * (i_rule.bounding_box[1][1]) + 10)
+                            (i_rule.bounding_box.p1.x, 2 * (i_rule.bounding_box.p1.y) + 10),
+                            (i_rule.bounding_box.p2.x, 2 * (i_rule.bounding_box.p1.y) + 10),
+                            (i_rule.bounding_box.p2.x, 2 * (i_rule.bounding_box.p2.y) + 10),
+                            (i_rule.bounding_box.p1.x, 2 * (i_rule.bounding_box.p2.y) + 10)
                         ),
                         color=(255, 0, 0, 255),
                         fill=True,
@@ -171,11 +171,12 @@ class Runtime(object):
                 # allow vehicles access to OTL depending on rule
                 cse.apply_one(
 
-                    # update vehicle position and speed
+                    # update vehicle position, speed and pass timestep to let vehicle calculate statistics
                     l_vehicle.update(
                         i_results.get(traci.constants.VAR_POSITION),
                         i_results.get(traci.constants.VAR_LANE_INDEX),
-                        i_results.get(traci.constants.VAR_SPEED)
+                        i_results.get(traci.constants.VAR_SPEED),
+                        l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
                     )
 
                 )
@@ -195,13 +196,13 @@ class Runtime(object):
                     else:
                         traci.vehicle.setColor(
                             i_vehicle_id,
-                            tuple(l_vehicle.color)
+                            tuple(l_vehicle.colour)
                         )
 
                 # record travel stats to vehicle
-                l_vehicle.record_travel_stats(
-                    l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
-                )
+                # l_vehicle.record_travel_stats(
+                #     l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
+                # )
 
                 # if i_vehicle_id == 'vehicle10':
                 #     self._log.debug(

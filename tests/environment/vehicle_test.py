@@ -67,7 +67,7 @@ def test_sumovehicle():
     assert_equal(l_sumovehicle.speed, 0.0)
     assert_equal(l_sumovehicle.position, (0.0, 0))
     assert_equal(l_sumovehicle.vehicle_type, 'None')
-    assert_equal(l_sumovehicle.color, (255, 255, 0, 255))
+    assert_equal(l_sumovehicle.colour, (255, 255, 0, 255))
 
     # test custom values
     l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
@@ -88,7 +88,7 @@ def test_sumovehicle():
     assert_equal(l_sumovehicle.speed_current, 12.1)
     assert_equal(l_sumovehicle.position, (42.0, 0))
     assert_equal(l_sumovehicle.vehicle_type, 'passenger')
-    assert_equal(l_sumovehicle.color, (128, 64, 255, 255))
+    assert_equal(l_sumovehicle.colour, (128, 64, 255, 255))
     assert_equal(l_sumovehicle.start_time, 13)
     assert_equal(l_sumovehicle.grid_position, (0, 0))
 

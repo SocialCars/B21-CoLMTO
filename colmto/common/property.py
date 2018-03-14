@@ -48,18 +48,16 @@ class Position(namedtuple('Position', ('x', 'y'))):
 
     __slots__ = ()
 
-    def gridify(self, width: float, lane_index: int) -> 'Position':
+    def gridified(self, width: float) -> 'Position':
         '''
         Round position to grid depending on `width` of grid cells and return new Position object.
-        `lane_index` replaces the `y` coordinate.
 
         :param width: grid cell width
-        :param lane_index: Replace `y` coordinate with `lane_index`
-        :return: future Position object with gridified positional attributes
+        :return: new Position object with gridified positional attributes
 
         '''
 
-        return Position(x=int(round(self.x/width)-1), y=int(lane_index))
+        return Position(x=int(round(self.x/width)-1), y=int(round(self.y/width)-1))
 
 
 class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):

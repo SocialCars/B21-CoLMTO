@@ -24,6 +24,9 @@
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
 from types import MappingProxyType
+from pandas import Series
+from pandas import MultiIndex
+import numpy
 
 import colmto.cse.rule
 import colmto.common.model
@@ -81,7 +84,16 @@ class BaseVehicle(object):
 
 
 class SUMOVehicle(BaseVehicle):
-    '''SUMO vehicle class.'''
+    '''SUMO vehicle class.
+
+    **Note on statistics:**
+    To properly store results from SUMO (discrete time vs. "continuous" space),
+    there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series)
+    and a `Series` for grid cells in x-direction (self._grid_based_series).
+    As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`,
+    we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
+
+    '''
 
     # pylint: disable=too-many-arguments
     def __init__(self,
@@ -98,6 +110,7 @@ class SUMOVehicle(BaseVehicle):
         :param speed_deviation:
         :param sigma:
         :param speed_max:
+
         '''
 
         super().__init__()
@@ -107,39 +120,31 @@ class SUMOVehicle(BaseVehicle):
 
         self._properties.update(
             {
-                'color': Colour(red=255, green=255, blue=0, alpha=255),
+                'colour': Colour(red=255, green=255, blue=0, alpha=255),
                 'start_time': 0.0,
                 'speedDev': speed_deviation,
                 'sigma': sigma,
                 'maxSpeed': speed_max,
                 'vType': vehicle_type,
                 'vClass': colmto.cse.rule.SUMORule.to_allowed_class(),
-                'grid_position': Position(x=0, y=0)
+                'grid_position': Position(x=0, y=0),
+                'time_step': 0.0
             }
         )
 
-        self._travel_stats = {
-            'start_time': 0.0,
-            'travel_time': 0.0,
-            'vehicle_type': vehicle_type,
-            'grid': {
-                'pos_x': [],
-                'pos_y': [],
-                'time_loss': [],
-                'relative_time_loss': [],
-                'speed': [],
-                'dissatisfaction': []
-            },
-            'step': {
-                'number': [],
-                'pos_x': [],
-                'pos_y': [],
-                'time_loss': [],
-                'relative_time_loss': [],
-                'speed': [],
-                'dissatisfaction': []
-            }
-        }
+        self._time_based_series = Series(
+            # optionally if numpy.nan is required: [numpy.nan for i in range(30)],  # indices x number of cells of x-axis
+            index=MultiIndex.from_product(
+                iterables=[['position_x', 'position_y', 'dissatisfaction'], range(10)], # range(number of cells of x-axis)
+                names=['type', 'timestep']
+            )
+        )
+
+        self._grid_based_series = Series(
+            index=MultiIndex.from_product(
+                iterables=[['time_step', 'position_y', 'dissatisfaction'], [0]],
+                names=['type', 'grid_position_x'])
+        )
 
     @property
     def grid_position(self) -> Position:
@@ -178,19 +183,19 @@ class SUMOVehicle(BaseVehicle):
         self._properties['start_time'] = float(start_time)
 
     @property
-    def color(self) -> Colour:
+    def colour(self) -> Colour:
         '''
-        :return: color
+        :return: colour
         '''
-        return Colour(*self._properties.get('color'))
+        return Colour(*self._properties.get('colour'))
 
-    @color.setter
-    def color(self, color: Colour):
+    @colour.setter
+    def colour(self, colour: Colour):
         '''
-        Update color
-        :param color: Color (rgba tuple, e.g. (255, 255, 0, 255))
+        Update colour
+        :param colour: Color (rgba tuple, e.g. (255, 255, 0, 255))
         '''
-        self._properties['color'] = Colour(*color)
+        self._properties['colour'] = Colour(*colour)
 
     @property
     def vehicle_class(self) -> str:
@@ -353,7 +358,7 @@ class SUMOVehicle(BaseVehicle):
         self._properties['vClass'] = str(class_name)
         return self
 
-    def update(self, position: Position, lane_index: int, speed: float) -> BaseVehicle:
+    def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:
         '''
         Update current properties of vehicle providing data acquired from TraCI call.
 
@@ -361,16 +366,21 @@ class SUMOVehicle(BaseVehicle):
         cell size and int-rounded. For the y-coordinate take the lane index.
 
         :NOTE: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
+        :todo: make grid-size configurable
 
         :param position: tuple TraCI provided position
         :param lane_index: int TraCI provided lane index
         :param speed: float TraCI provided speed
-        :return: future self Vehicle reference
+        :param time_step: float TraCI provided time step
+        :return: future Vehicle reference
 
         '''
 
         self._properties['position'] = Position(*position)
-        self._properties['grid_position'] = Position(*position).gridify(width=4., lane_index=lane_index)
+        self._properties['grid_position'] = Position(*position).gridified(width=4.)
         self._properties['speed'] = float(speed)
+        self._properties['time_step'] = float(time_step)
+
+
 
         return self
