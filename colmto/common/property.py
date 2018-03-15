@@ -167,3 +167,16 @@ class InitialSorting(enum.Enum):
     def prng(self):
         '''returns numpy PRNG state'''
         return self._prng.value
+
+
+@enum.unique
+class VehicleType(enum.Enum):
+    '''
+    Available vehicle types
+    '''
+    DELIVERY = enum.auto()
+    HEAVYTRANSPORT = enum.auto()
+    PASSENGER = enum.auto()
+    TRACTOR = enum.auto()
+    TRUCK = enum.auto()
+    VAN = enum.auto()

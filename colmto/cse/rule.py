@@ -33,7 +33,7 @@ from typing import Iterable
 
 import enum
 
-from colmto.common.property import Position
+from colmto.common.property import Position, VehicleType
 from colmto.common.property import BoundingBox
 
 @enum.unique
@@ -430,17 +430,17 @@ class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
 class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
     '''Vehicle type based rule: Applies to vehicles with a given SUMO vehicle type'''
 
-    def __init__(self, vehicle_type: str):
+    def __init__(self, vehicle_type: typing.Union[VehicleType, str]):
         '''
         C'tor.
 
-        :todo: change vehicle_type to VehicleType enum
         :param vehicle_type: vehicle type
 
         '''
 
         super().__init__()
-        self._vehicle_type = vehicle_type  # type: str
+        self._vehicle_type = vehicle_type \
+            if isinstance(vehicle_type, VehicleType) else VehicleType[vehicle_type.upper()]
 
     def __str__(self):
         return f'{self.__class__}: ' \
@@ -464,12 +464,11 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
     Can be extendend by sub-rules.
     '''
 
-    def __init__(self, vehicle_type: str,
+    def __init__(self, vehicle_type: typing.Union[VehicleType, str],
                  subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
         C'tor
 
-        :todo: change vehicle_type to VehicleType enum
         :param vehicle_type: vehicle type
         :param subrules: List of sub-rules
         :param subrule_operator: Rule operator of RuleOperator enum for applying sub-rules ANY|ALL

@@ -28,7 +28,7 @@ import pandas
 
 import colmto.cse.rule
 import colmto.common.model
-from colmto.common.property import Position
+from colmto.common.property import Position, VehicleType
 from colmto.common.property import GridPosition
 from colmto.common.property import Colour
 
@@ -201,11 +201,11 @@ class SUMOVehicle(BaseVehicle):
         self._properties['grid_position'] = GridPosition(*position)
 
     @property
-    def _vehicle_type(self) -> str:
+    def vehicle_type(self) -> VehicleType:
         '''
         :return: vehicle type
         '''
-        return str(self._properties.get('vType'))
+        return VehicleType[str(self._properties.get('vType')).upper()]
 
     @property
     def start_time(self) -> float:
