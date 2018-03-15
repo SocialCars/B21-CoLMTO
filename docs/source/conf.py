@@ -18,6 +18,7 @@
 #
 import os
 import sys
+import types
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
@@ -171,7 +172,8 @@ texinfo_documents = [
 
 autodoc_default_flags = [
     'members',
-    'private-members',
+    # 'private-members',
+    'undoc-members',
     'inherited-members',
     'show-inheritance',
 ]
@@ -179,6 +181,14 @@ autodoc_default_flags = [
 autodoc_member_order = 'groupwise'
 
 inheritance_graph_attrs = dict(rankdir='TB')
-inheritance_node_attrs = dict(fontname='"Mononoki bold"')
+inheritance_node_attrs = dict(fontname='"Mononoki"')
 
 graphviz_output_format='svg'
+
+def skip(app, what, name, obj, skip, options):
+    if name == '__init__':
+        return False
+    return skip
+
+def setup(app):
+    app.connect('autodoc-skip-member', skip)
