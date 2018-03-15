@@ -48,7 +48,7 @@ class Position(namedtuple('Position', ('x', 'y'))):
 
     __slots__ = ()
 
-    def gridified(self, width: float) -> 'Position':
+    def gridified(self, width: float) -> 'GridPosition':
         '''
         Round position to grid depending on `width` of grid cells and return new Position object.
 
@@ -57,7 +57,16 @@ class Position(namedtuple('Position', ('x', 'y'))):
 
         '''
 
-        return Position(x=int(round(self.x/width)-1), y=int(round(self.y/width)-1))
+        return GridPosition(x=int(round(self.x/width)-1), y=int(round(self.y/width)-1))
+
+
+class GridPosition(Position):
+    '''
+    Named tuple to represent the vehicle position on a grid.
+
+    '''
+
+    __slots__ = ()
 
 
 class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):

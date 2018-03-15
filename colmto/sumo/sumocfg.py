@@ -236,13 +236,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         l_tripfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                     / '{l_scenarioname}.trip.xml'
+                     / f'{l_scenarioname}.trip.xml'
 
         l_routefile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                      / '{l_scenarioname}.rou.xml'
+                      / f'{l_scenarioname}.rou.xml'
 
         l_configfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                       / '{l_scenarioname}.sumo.cfg'
+                       / f'{l_scenarioname}.sumo.cfg'
 
         l_output_measurements_dir = self.resultsdir / l_scenarioname \
                                     / initial_sorting.name.lower() / str(run_number)
@@ -287,7 +287,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             'tripfile': l_tripfile,
             'routefile': l_routefile,
             'configfile': l_configfile,
-            'fcdfile': l_output_measurements_dir / '{l_scenarioname}.fcd-output.xml',
+            'fcdfile': l_output_measurements_dir / f'{l_scenarioname}.fcd-output.xml',
             'scenario_config': self.scenario_config.get(l_scenarioname)
         }
 
@@ -297,8 +297,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         :param scenarioconfig: Scenario configuration
         :param nodefile: Destination to write node file
-        :param forcerebuildscenarios: rebuild scenarios,
-                                        even if they already exist for current run
+        :param forcerebuildscenarios: rebuild scenarios, even if they already exist for current run
+        :todo make 5% entry lange configurable
+
         '''
 
         if Path(nodefile).exists() and not forcerebuildscenarios:
@@ -311,12 +312,14 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_nbswitches = scenarioconfig.get('parameters').get('switches')
         l_segmentlength = l_length / (l_nbswitches + 1)
 
-        if self._args.onlyoneotlsegment:
-            l_length = 2 * l_segmentlength  # two times segment length
+        if self._args.onlyoneotlsegment:     # for only one 2+1 segment, the
+            l_length = l_segmentlength + 0.1 # total length is just one segment
+                                             # (plus 10cm to fix an issue with SUMO joining the lanes)
 
         l_nodes = etree.Element('nodes')
         etree.SubElement(
-            l_nodes, 'node', attrib={'id': 'enter', 'x': str(-l_segmentlength), 'y': '0'}
+            # add 5% of segment length as entry lane
+            l_nodes, 'node', attrib={'id': 'enter', 'x': str(-0.05*l_segmentlength), 'y': '0'}
         )
         etree.SubElement(
             l_nodes, 'node', attrib={'id': '21start', 'x': '0', 'y': '0'}
@@ -326,6 +329,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # dummy node for easier from-to routing
+        # add 5% of segment length as exit lane
         etree.SubElement(
             l_nodes,
             'node',
@@ -333,8 +337,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 'id': 'exit',
                 'x': str(
                     l_length + 0.1
-                    if l_nbswitches % 2 == 1 or self._args.onlyoneotlsegment
-                    else l_length + l_segmentlength
+                    if l_nbswitches % 2 == 1 and not self._args.onlyoneotlsegment
+                    else l_length
                 ),
                 'y': '0'
             }
@@ -456,7 +460,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if isinstance(l_parameters.get('switchpositions'), (list, tuple)):
             # add splits and joins
             l_add_otl_lane = True
-            for i_segmentpos in l_parameters.get('switchpositions'):
+            for i_segmentpos in l_parameters.get('switchpositions') \
+                    if not self._args.onlyoneotlsegment else l_parameters.get('switchpositions')[:2]:
                 etree.SubElement(
                     edge,
                     'split',
@@ -624,7 +629,18 @@ class SumoConfig(colmto.common.configuration.Configuration):
                         self._run_config.get('vtypedistribution').get(vtype).get('desiredSpeeds')
                     ),
                     self.scenario_config.get(scenario_name).get('parameters').get('speedlimit')
-                )
+                ),
+                environment={  # todo: make 5% entry lane configurable
+                    'length': 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
+                        if not self._args.onlyoneotlsegment
+                        else 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
+                             / (self.scenario_config.get(scenario_name).get('parameters').get('switches') + 1),
+                    'gridcellwidth': self._run_config.get('gridcellwidth'),
+                    'gridlength': int(round(1.05*self.scenario_config.get(scenario_name).get('parameters').get('length') / self._run_config.get('gridcellwidth')))
+                        if not self._args.onlyoneotlsegment
+                        else int(round(1.05*(self.scenario_config.get(scenario_name).get('parameters').get('length')
+                             / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
+                }
             ) for vtype in vtype_list
         ]
 

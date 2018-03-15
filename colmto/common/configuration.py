@@ -57,13 +57,14 @@ _DEFAULT_CONFIG_RUN = {
                     {
                         'type': 'SUMOMinimalSpeedRule',
                         'args': {
-                            'minimal_speed': 80/3.6
+                            'minimal_speed': 80/3.6    # unit: meter/second
                         },
                     }
                 ]
             }
         }
     ],
+    'gridcellwidth': 4,    # unit: meter
     'sumo': {
         'enabled': True,
         'gui-delay': 200,
