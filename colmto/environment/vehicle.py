@@ -24,8 +24,7 @@
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
 from types import MappingProxyType
-from pandas import Series
-from pandas import MultiIndex
+import pandas
 
 import colmto.cse.rule
 import colmto.common.model
@@ -136,8 +135,8 @@ class SUMOVehicle(BaseVehicle):
 
         self._environment = environment
 
-        self._time_based_series = Series(
-            index=MultiIndex.from_product(
+        self._time_based_series = pandas.Series(
+            index=pandas.MultiIndex.from_product(
                 iterables=[
                     [
                         'position_x',
@@ -154,8 +153,8 @@ class SUMOVehicle(BaseVehicle):
             )
         )
 
-        self._grid_based_series = Series(
-            index=MultiIndex.from_product(
+        self._grid_based_series = pandas.Series(
+            index=pandas.MultiIndex.from_product(
                 iterables=[
                     [
                         'time_step',
@@ -209,14 +208,14 @@ class SUMOVehicle(BaseVehicle):
         return str(self._properties.get('vType'))
 
     @property
-    def _start_time(self) -> float:
+    def start_time(self) -> float:
         '''
         :return: start time
         '''
         return float(self._properties.get('start_time'))
 
-    @_start_time.setter
-    def _start_time(self, start_time: float):
+    @start_time.setter
+    def start_time(self, start_time: float):
         '''
         :param start_time: start time
         '''
@@ -304,31 +303,69 @@ class SUMOVehicle(BaseVehicle):
         '''
         return float(self._properties.get('dsat_threshold'))
 
-    @property
-    def statistic_series_grid(self) -> Series:
+    def statistic_series_grid(self, interpolate=False) -> pandas.Series:
         '''
         Recorded travel statistics as `pandas.Series`.
 
         :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series) and a `Series` for grid cells in x-direction (self._grid_based_series).
         As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`, we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
 
+        :param interpolate: return a data copy with NaN values linear interpolated
         :return: grid-based `pandas.Series`
         '''
 
-        return self._grid_based_series
+        return pandas.concat(
+            (
+                self._grid_based_series[i_type].interpolate()
+                for i_type in ('time_step',
+                               'position_y',
+                               'grid_position_y',
+                               'dissatisfaction',
+                               'travel_time',
+                               'time_loss',
+                               'relative_time_loss')
+            ),
+            keys=('time_step',
+                  'position_y',
+                  'grid_position_y',
+                  'dissatisfaction',
+                  'travel_time',
+                  'time_loss',
+                  'relative_time_loss')
+        ) if interpolate else self._grid_based_series
 
-    @property
-    def statistic_series_time(self) -> Series:
+    def statistic_series_time(self, interpolate=False) -> pandas.Series:
         '''
         Recorded travel statistics as `pandas.Series`.
 
         :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series) and a `Series` for grid cells in x-direction (self._grid_based_series).
         As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`, we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
 
+        :param interpolate: return a data copy with NaN values linear interpolated
         :return: timestep-based `pandas.Series`
         '''
 
-        return self._time_based_series
+        return pandas.concat(
+            (
+                self._time_based_series[i_type].interpolate()
+                for i_type in ('position_x',
+                               'position_y',
+                               'grid_position_x',
+                               'grid_position_y',
+                               'dissatisfaction',
+                               'travel_time',
+                               'time_loss',
+                               'relative_time_loss')
+             ),
+            keys=('position_x',
+                  'position_y',
+                  'grid_position_x',
+                  'grid_position_y',
+                  'dissatisfaction',
+                  'travel_time',
+                  'time_loss',
+                  'relative_time_loss')
+        ) if interpolate else self._time_based_series
 
     def change_vehicle_class(self, class_name: str) -> BaseVehicle:
         '''
@@ -364,11 +401,11 @@ class SUMOVehicle(BaseVehicle):
         self._grid_position = Position(*position).gridified(width=self._environment.get('gridcellwidth'))
         self._speed = float(speed)
         self._time_step = float(time_step)
-        self._travel_time = float(time_step) - self._start_time
+        self._travel_time = float(time_step) - self.start_time
 
         # update data series based on grid cell
         l_dissatisfaction = colmto.common.model.dissatisfaction(
-            time_step - self._start_time - self._position.x / self.speed_max,
+            time_step - self.start_time - self._position.x / self.speed_max,
             self._position.x / self.speed_max,
             self.dsat_threshold
         )
@@ -377,8 +414,8 @@ class SUMOVehicle(BaseVehicle):
         self._grid_based_series['grid_position_y', self._grid_position.x] = self._grid_position.y
         self._grid_based_series['dissatisfaction', self._grid_position.x] = l_dissatisfaction
         self._grid_based_series['travel_time', self._grid_position.x] = self._travel_time
-        self._grid_based_series['time_loss', self._grid_position.x] = time_step - self._start_time - self._position.x / self.speed_max
-        self._grid_based_series['relative_time_loss', self._grid_position.x] = (time_step - self._start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
+        self._grid_based_series['time_loss', self._grid_position.x] = time_step - self.start_time - self._position.x / self.speed_max
+        self._grid_based_series['relative_time_loss', self._grid_position.x] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
         self._grid_based_series['time_step', self._grid_position.x] = float(time_step)
 
         # update data series based on time step
@@ -388,7 +425,7 @@ class SUMOVehicle(BaseVehicle):
         self._time_based_series['grid_position_y', int(time_step)] = self._grid_position.y
         self._time_based_series['dissatisfaction', int(time_step)] = l_dissatisfaction
         self._time_based_series['travel_time', int(time_step)] = self._travel_time
-        self._time_based_series['time_loss', int(time_step)] = time_step - self._start_time - self._position.x / self.speed_max
-        self._time_based_series['relative_time_loss', int(time_step)] = (time_step - self._start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
+        self._time_based_series['time_loss', int(time_step)] = time_step - self.start_time - self._position.x / self.speed_max
+        self._time_based_series['relative_time_loss', int(time_step)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         return self

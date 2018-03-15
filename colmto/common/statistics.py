@@ -51,11 +51,14 @@ class Statistics(object):
     @staticmethod
     def merge_vehicle_series(vehicles: typing.Dict[str, SUMOVehicle]) -> pandas.Series:
         l_vehicle_series_grid = pandas.concat(
-            (vehicles[i_vehicle].statistic_series_grid for i_vehicle in sorted(vehicles.keys())),
+            (
+                vehicles[i_vehicle].statistic_series_grid(interpolate=True)
+                for i_vehicle in sorted(vehicles.keys())
+            ),
             axis=1,
             keys=sorted(vehicles.keys())
         )
-        print(l_vehicle_series_grid.T[-3:].T)
+        print(l_vehicle_series_grid.T[-3:]['time_step'].T)
         print(f'length: {len(vehicles)}')
         return l_vehicle_series_grid
 
