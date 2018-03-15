@@ -25,6 +25,8 @@
 
 from collections import namedtuple
 import matplotlib.pyplot as plt
+import enum
+import numpy
 
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
@@ -35,8 +37,24 @@ class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
 
     __slots__ = ()
 
+    def __mul__(self, value):
+        '''
+        Scalars can be attribute-wise multiplied to a Colour.
+
+        :param value: scalar
+        :return: new Colour with attrubutes multiplied with scalar
+
+        '''
+
+        return Colour(
+            red=self.red     * value,
+            green=self.green * value,
+            blue=self.blue   * value,
+            alpha=self.alpha * value
+        )
+
     @staticmethod
-    def map(name: str, max_value: int, value: int):
+    def map(name: str, max_value: float, value: float):
         return Colour(*plt.get_cmap(name=name, lut=max_value)(value))
 
 
@@ -98,3 +116,54 @@ class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
     def contains(self, speed: float):
         '''checks whether speed lies between min and max (including)'''
         return self.min <= speed <= self.max
+
+@enum.unique
+class Distribution(enum.Enum):
+    '''Enumerates distribution types for vehicle starting times'''
+    LINEAR = enum.auto()
+    POISSON = enum.auto()
+    _prng = numpy.random.RandomState()
+
+    def next_timestep(self, lamb, prev_start_time):
+        r'''
+        Calculate next time step in Exponential or linear distribution.
+        Exponential distribution with
+        \f$F(x) := 1 - e^{-\lambda x}\f$
+        by using numpy.random.exponential(lambda).
+        Linear distribution just adds 1/lamb to the previous start time.
+        For every other value of distribution this function just returns the input value of
+        prev_start_time.
+
+        :param lamb: lambda
+        :param prev_start_time: start time
+        :param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
+        :return: next start time
+        '''
+        if self is Distribution.POISSON:
+            return prev_start_time + self._prng.value.exponential(scale=lamb)
+        elif self is Distribution.LINEAR:
+            return prev_start_time + 1 / lamb
+        return prev_start_time
+
+
+@enum.unique
+class InitialSorting(enum.Enum):
+    '''Initial sorting modes of vehicles'''
+    BEST = enum.auto()
+    RANDOM = enum.auto()
+    WORST = enum.auto()
+    _prng = numpy.random.RandomState()
+
+    def order(self, vehicles: list):
+        '''*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)'''
+        if self is InitialSorting.BEST:
+            vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
+        elif self is InitialSorting.WORST:
+            vehicles.sort(key=lambda i_v: i_v.speed_max)
+        elif self is InitialSorting.RANDOM:
+            self.prng.shuffle(vehicles)
+
+    @property
+    def prng(self):
+        '''returns numpy PRNG state'''
+        return self._prng.value

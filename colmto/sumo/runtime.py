@@ -204,15 +204,14 @@ class Runtime(object):
                 #     l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
                 # )
 
-                if i_vehicle_id == 'vehicle10':
-                    self._log.debug(
-                        'pos: %s, %s, act TT: %s, opt TT: %s',
-                        l_vehicle.position,
-                        l_vehicle.grid_position,
-                        l_vehicle.travel_time,
-                        round(l_vehicle.position.x / l_vehicle.speed_max, 2),
-                    )
-                    # print(l_vehicle._grid_based_series)
+                # if i_vehicle_id == 'vehicle10':
+                #     self._log.debug(
+                #         'pos: %s, %s, act TT: %s, opt TT: %s',
+                #         l_vehicle.position,
+                #         l_vehicle.grid_position,
+                #         l_vehicle.travel_time,
+                #         round(l_vehicle.position.x / l_vehicle.speed_max, 2),
+                #     )
 
             traci.simulationStep()
 
@@ -221,9 +220,6 @@ class Runtime(object):
 
         traci.close()
 
-        print('-'*20)
-        print(run_config.get('vehicles').get('vehicle10')._grid_based_series)
-        print('-'*20)
         self._log.info(
             'TraCI run of scenario %s, run %d completed.',
             run_config.get('scenarioname'), run_config.get('runnumber')

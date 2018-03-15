@@ -25,7 +25,6 @@
 # pylint: disable=no-member
 
 import copy
-import enum
 from pathlib import Path
 import subprocess
 from types import MappingProxyType
@@ -33,6 +32,11 @@ import typing
 from collections import OrderedDict
 
 import numpy
+
+from colmto.common.property import Colour
+from colmto.common.property import Distribution
+from colmto.common.property import InitialSorting
+
 try:
     import lxml.etree as etree
 except ImportError:
@@ -45,58 +49,6 @@ import colmto.common.io
 import colmto.common.log
 import colmto.common.visualisation
 import colmto.environment.vehicle
-
-
-@enum.unique
-class InitialSorting(enum.Enum):
-    '''Initial sorting modes of vehicles'''
-    BEST = enum.auto()
-    RANDOM = enum.auto()
-    WORST = enum.auto()
-    _prng = numpy.random.RandomState()
-
-    def order(self, vehicles: list):
-        '''*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)'''
-        if self is InitialSorting.BEST:
-            vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
-        elif self is InitialSorting.WORST:
-            vehicles.sort(key=lambda i_v: i_v.speed_max)
-        elif self is InitialSorting.RANDOM:
-            self.prng.shuffle(vehicles)
-
-    @property
-    def prng(self):
-        '''returns numpy PRNG state'''
-        return self._prng.value
-
-
-@enum.unique
-class Distribution(enum.Enum):
-    '''Enumerates distribution types for vehicle starting times'''
-    LINEAR = enum.auto()
-    POISSON = enum.auto()
-    _prng = numpy.random.RandomState()
-
-    def next_timestep(self, lamb, prev_start_time):
-        r'''
-        Calculate next time step in Exponential or linear distribution.
-        Exponential distribution with
-        \f$F(x) := 1 - e^{-\lambda x}\f$
-        by using numpy.random.exponential(lambda).
-        Linear distribution just adds 1/lamb to the previous start time.
-        For every other value of distribution this function just returns the input value of
-        prev_start_time.
-
-        :param lamb: lambda
-        :param prev_start_time: start time
-        :param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
-        :return: next start time
-        '''
-        if self is Distribution.POISSON:
-            return prev_start_time + self._prng.value.exponential(scale=lamb)
-        elif self is Distribution.LINEAR:
-            return prev_start_time + 1 / lamb
-        return prev_start_time
 
 
 class SumoConfig(colmto.common.configuration.Configuration):
@@ -126,18 +78,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 '--force-rebuild-scenarios set '
                 '-> rebuilding/overwriting scenarios if already present'
             )
-
-        # generate colour map for vehicle max speeds
-        l_global_maxspeed = max(
-            [
-                i_scenario.get('parameters').get('speedlimit')
-                for i_scenario in self.scenario_config.values()
-                ]
-        )
-        self._speed_colormap = colmto.common.visualisation.mapped_cmap(
-            'plasma',
-            l_global_maxspeed
-        )
 
     @property
     def sumo_config_dir(self) -> Path:
@@ -570,7 +510,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_viewsettings = etree.Element('viewsettings')
         etree.SubElement(
             l_viewsettings, 'viewport',
-            attrib={'x': str(scenarioconfig.get('parameters').get('length') / 2),
+            attrib={'x': '0',
                     'y': '0',
                     'zoom': '100'}
         )
@@ -642,7 +582,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                              / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
                 }
             ) for vtype in vtype_list
-        ]
+        ]  # type: typing.List[colmto.environment.vehicle.SUMOVehicle]
 
         # sort speeds according to initial sorting flag
         initialsorting.order(l_vehicle_list)
@@ -650,8 +590,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
         # assign a new id according to sort order and starting time to each vehicle
         l_vehicles = OrderedDict()
         for i, i_vehicle in enumerate(l_vehicle_list):
-            # update colors
-            i_vehicle.color = numpy.array(self._speed_colormap(i_vehicle.speed_max))*255
+            # update colours depending on maximum speed of vehicles
+            i_vehicle.colour = Colour.map(
+                'plasma',
+                self.scenario_config.get(scenario_name).get('parameters').get('speedlimit'),
+                i_vehicle.speed_max
+            ) * 255.
+
             # update start time
             i_vehicle.start_time = Distribution[
                 self.run_config.get('starttimedistribution').upper()
@@ -659,7 +604,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 l_vehps,
                 l_vehicle_list[i - 1].start_time if i > 0 else 0
             )
-            l_vehicles[f'vehicle{i}'] = i_vehicle
+            l_vehicles[f'vehicle_{i:0>4}'] = i_vehicle
         return l_vehicles
 
     def aadt(self, scenario_runs):

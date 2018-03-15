@@ -120,45 +120,45 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
 
                 if self._sumocfg.run_config.get('cse-enabled'):
                     # cse mode: apply cse rules to vehicles and run with TraCI
-                    self._writer.write_hdf5(
+                    #self._writer.write_hdf5(
+                    #    self._statistics.stats_to_hdf5_structure(
 
-                        self._statistics.stats_to_hdf5_structure(
+                    self._statistics.merge_vehicle_series(
 
-                            self._statistics.aggregate_vehicle_grid_stats(
-
-                                self._runtime.run_traci(
-                                    self._sumocfg.generate_run(
-                                        l_scenario,
-                                        InitialSorting[i_initial_sorting.upper()],
-                                        i_run,
-                                        l_vtype_list.get(scenario_name)
-                                    ),
-                                    colmto.cse.cse.SumoCSE(
-                                        self._args
-                                    ).add_rules_from_cfg(
-                                        self._sumocfg.run_config.get('rules')
-                                    )
-                                )
+                        self._runtime.run_traci(
+                            self._sumocfg.generate_run(
+                                l_scenario,
+                                InitialSorting[i_initial_sorting.upper()],
+                                i_run,
+                                l_vtype_list.get(scenario_name)
                             ),
-
-                            run_number=i_run,
-
-                            detector_positions=self._sumocfg.scenario_config.get(scenario_name)
-                            .get('parameters').get('detectorpositions')
-                        ),
-
-                        hdf5_file=self._args.results_hdf5_file if self._args.results_hdf5_file
-                        else self._sumocfg.resultsdir / f'{self._sumocfg.run_prefix}.hdf5',
-                        hdf5_base_path=os.path.join(
-                            scenario_name,
-                            str(self._sumocfg.aadt(self._sumocfg.generate_scenario(scenario_name))),
-                            i_initial_sorting,
-                            str(i_run)
-                        ),
-                        compression='gzip',
-                        compression_opts=9,
-                        fletcher32=True
+                            colmto.cse.cse.SumoCSE(
+                                self._args
+                            ).add_rules_from_cfg(
+                                self._sumocfg.run_config.get('rules')
+                            )
+                        )
                     )
+                    #,
+
+                    #         run_number=i_run,
+                    #
+                    #         detector_positions=self._sumocfg.scenario_config.get(scenario_name)
+                    #         .get('parameters').get('detectorpositions')
+                    #     ),
+                    #
+                    #     hdf5_file=self._args.results_hdf5_file if self._args.results_hdf5_file
+                    #     else self._sumocfg.resultsdir / f'{self._sumocfg.run_prefix}.hdf5',
+                    #     hdf5_base_path=os.path.join(
+                    #         scenario_name,
+                    #         str(self._sumocfg.aadt(self._sumocfg.generate_scenario(scenario_name))),
+                    #         i_initial_sorting,
+                    #         str(i_run)
+                    #     ),
+                    #     compression='gzip',
+                    #     compression_opts=9,
+                    #     fletcher32=True
+                    # )
                 else:
                     self._runtime.run_standalone(
                         self._sumocfg.generate_run(
