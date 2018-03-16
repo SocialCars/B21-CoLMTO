@@ -773,9 +773,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_duarouterprocess = subprocess.check_output(
             [
                 self._binaries.get('duarouter'),
-                '-n', netfile,
-                '-t', tripfile,
-                '-o', routefile
+                '--net-file', netfile,
+                '--route-files', tripfile,
+                '--output-file', routefile
             ],
             stderr=subprocess.STDOUT,
             bufsize=-1,
