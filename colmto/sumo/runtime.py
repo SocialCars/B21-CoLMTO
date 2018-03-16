@@ -27,6 +27,9 @@
 import os
 import subprocess
 import sys
+import typing
+
+from colmto.environment.vehicle import SUMOVehicle
 
 import colmto.common.log
 import colmto.cse.cse
@@ -82,7 +85,7 @@ class Runtime(object):
             l_sumoprocess.decode('utf8').replace('\n', '')
         )
 
-    def run_traci(self, run_config: dict, cse: colmto.cse.cse.SumoCSE) -> list:
+    def run_traci(self, run_config: dict, cse: colmto.cse.cse.SumoCSE) -> typing.Dict[str, SUMOVehicle]:
         '''
         Run provided scenario with TraCI by providing a ref to an optimisation entity.
 

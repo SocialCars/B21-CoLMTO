@@ -139,7 +139,7 @@ class SUMOVehicle(BaseVehicle):
             index=pandas.MultiIndex.from_product(
                 iterables=[
                     [
-                        'position_x',
+                        'position_x',  # todo: use Metrics enum
                         'position_y',
                         'grid_position_x',
                         'grid_position_y',
@@ -149,7 +149,7 @@ class SUMOVehicle(BaseVehicle):
                         'relative_time_loss'
                     ], [0]
                 ],
-                names=['type', 'timestep']
+                names=['metric', 'timestep']
             )
         )
 
@@ -157,7 +157,7 @@ class SUMOVehicle(BaseVehicle):
             index=pandas.MultiIndex.from_product(
                 iterables=[
                     [
-                        'time_step',
+                        'time_step',  # todo: use Metrics enum
                         'position_y',
                         'grid_position_y',
                         'dissatisfaction',
@@ -166,7 +166,7 @@ class SUMOVehicle(BaseVehicle):
                         'relative_time_loss'
                     ], range(int(environment.get('gridlength')))  # range(number of cells of x-axis)
                 ],
-                names=['type', 'grid_position_x']
+                names=['metric', 'grid_position_x']
             )
         )
 
@@ -316,8 +316,8 @@ class SUMOVehicle(BaseVehicle):
 
         return pandas.concat(
             (
-                self._grid_based_series[i_type].interpolate()
-                for i_type in ('time_step',
+                self._grid_based_series[i_metric].interpolate()
+                for i_metric in ('time_step',
                                'position_y',
                                'grid_position_y',
                                'dissatisfaction',

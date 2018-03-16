@@ -125,6 +125,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
 
                     self._statistics.merge_vehicle_series(
 
+                        i_run,
                         self._runtime.run_traci(
                             self._sumocfg.generate_run(
                                 l_scenario,

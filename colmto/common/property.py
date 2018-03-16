@@ -174,9 +174,25 @@ class VehicleType(enum.Enum):
     '''
     Available vehicle types
     '''
-    DELIVERY = enum.auto()
-    HEAVYTRANSPORT = enum.auto()
-    PASSENGER = enum.auto()
-    TRACTOR = enum.auto()
-    TRUCK = enum.auto()
-    VAN = enum.auto()
+    DELIVERY = 'delivery'
+    HEAVYTRANSPORT = 'heavytransport'
+    PASSENGER = 'passenger'
+    TRACTOR = 'tractor'
+    TRUCK = 'truck'
+    VAN = 'van'
+
+
+@enum.unique
+class Metric(enum.Enum):
+    '''
+    Used metrices
+    '''
+    DISSATISFACTION = 'dissatisfaction'
+    GRID_POSITION_X = 'grid_position_x'
+    GRID_POSITION_Y = 'grid_position_y'
+    POSITION_X = 'position_x'
+    POSITION_Y = 'position_y'
+    RELATIVE_TIME_LOSS = 'relative_time_loss'
+    TIME_LOSS = 'time_loss'
+    TIME_STEP = 'time_step'
+    TRAVEL_TIME = 'travel_time'
