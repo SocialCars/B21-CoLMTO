@@ -29,9 +29,10 @@ import pandas
 
 import colmto.cse.rule
 import colmto.common.model
-from colmto.common.property import Position, VehicleType
+from colmto.common.property import Position, VehicleType, StatisticSeries
 from colmto.common.property import GridPosition
 from colmto.common.property import Colour
+from colmto.common.property import Metric
 
 
 class BaseVehicle(object):
@@ -139,35 +140,20 @@ class SUMOVehicle(BaseVehicle):
         self._time_based_series = pandas.Series(
             index=pandas.MultiIndex.from_product(
                 iterables=[
-                    [
-                        'position_x',  # todo: use Metrics enum
-                        'position_y',
-                        'grid_position_x',
-                        'grid_position_y',
-                        'dissatisfaction',
-                        'travel_time',
-                        'time_loss',
-                        'relative_time_loss'
-                    ], [0]
+                    StatisticSeries.TIME.metrics(),
+                    [0]
                 ],
-                names=['metric', 'timestep']
+                names=['metric', Metric.TIME_STEP.value]
             )
         )
 
         self._grid_based_series = pandas.Series(
             index=pandas.MultiIndex.from_product(
                 iterables=[
-                    [
-                        'time_step',  # todo: use Metrics enum
-                        'position_y',
-                        'grid_position_y',
-                        'dissatisfaction',
-                        'travel_time',
-                        'time_loss',
-                        'relative_time_loss'
-                    ], range(int(environment.get('gridlength')))  # range(number of cells of x-axis)
+                    StatisticSeries.GRID.metrics(),
+                    range(int(environment.get('gridlength')))  # range(number of cells of x-axis)
                 ],
-                names=['metric', 'grid_position_x']
+                names=['metric', Metric.GRID_POSITION_X.value]
             )
         )
 
@@ -305,6 +291,7 @@ class SUMOVehicle(BaseVehicle):
         '''
         return float(self._properties.get('dsat_threshold'))
 
+
     def statistic_series_grid(self, interpolate=False) -> pandas.Series:
         '''
         Recorded travel statistics as `pandas.Series`.
@@ -319,22 +306,11 @@ class SUMOVehicle(BaseVehicle):
         return pandas.concat(
             (
                 self._grid_based_series[i_metric].interpolate()
-                for i_metric in ('time_step',
-                               'position_y',
-                               'grid_position_y',
-                               'dissatisfaction',
-                               'travel_time',
-                               'time_loss',
-                               'relative_time_loss')
+                for i_metric in StatisticSeries.GRID.metrics()
             ),
-            keys=('time_step',
-                  'position_y',
-                  'grid_position_y',
-                  'dissatisfaction',
-                  'travel_time',
-                  'time_loss',
-                  'relative_time_loss')
+            keys=StatisticSeries.GRID.metrics()
         ) if interpolate else self._grid_based_series
+
 
     def statistic_series_time(self, interpolate=False) -> pandas.Series:
         '''
@@ -350,23 +326,9 @@ class SUMOVehicle(BaseVehicle):
         return pandas.concat(
             (
                 self._time_based_series[i_type].interpolate()
-                for i_type in ('position_x',
-                               'position_y',
-                               'grid_position_x',
-                               'grid_position_y',
-                               'dissatisfaction',
-                               'travel_time',
-                               'time_loss',
-                               'relative_time_loss')
+                for i_type in StatisticSeries.TIME.metrics()
              ),
-            keys=('position_x',
-                  'position_y',
-                  'grid_position_x',
-                  'grid_position_y',
-                  'dissatisfaction',
-                  'travel_time',
-                  'time_loss',
-                  'relative_time_loss')
+            keys=StatisticSeries.TIME.metrics()
         ) if interpolate else self._time_based_series
 
     def change_vehicle_class(self, class_name: str) -> BaseVehicle:
@@ -412,23 +374,22 @@ class SUMOVehicle(BaseVehicle):
             self._position.x / self.speed_max,
             self.dsat_threshold
         )
-        self._grid_based_series['time_step', self._grid_position.x] = float(time_step)
-        self._grid_based_series['position_y', self._grid_position.x] = self._position.y
-        self._grid_based_series['grid_position_y', self._grid_position.x] = self._grid_position.y
-        self._grid_based_series['dissatisfaction', self._grid_position.x] = l_dissatisfaction
-        self._grid_based_series['travel_time', self._grid_position.x] = self._travel_time
-        self._grid_based_series['time_loss', self._grid_position.x] = time_step - self.start_time - self._position.x / self.speed_max
-        self._grid_based_series['relative_time_loss', self._grid_position.x] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
-        self._grid_based_series['time_step', self._grid_position.x] = float(time_step)
+        self._grid_based_series[Metric.TIME_STEP.value, self._grid_position.x] = float(time_step)
+        self._grid_based_series[Metric.POSITION_Y.value, self._grid_position.x] = self._position.y
+        self._grid_based_series[Metric.GRID_POSITION_Y.value, self._grid_position.x] = self._grid_position.y
+        self._grid_based_series[Metric.DISSATISFACTION.value, self._grid_position.x] = l_dissatisfaction
+        self._grid_based_series[Metric.TRAVEL_TIME.value, self._grid_position.x] = self._travel_time
+        self._grid_based_series[Metric.TIME_LOSS.value, self._grid_position.x] = time_step - self.start_time - self._position.x / self.speed_max
+        self._grid_based_series[Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         # update data series based on time step
-        self._time_based_series['position_x', int(time_step)] = self._position.x
-        self._time_based_series['position_y', int(time_step)] = self._position.y
-        self._time_based_series['grid_position_x', int(time_step)] = self._grid_position.x
-        self._time_based_series['grid_position_y', int(time_step)] = self._grid_position.y
-        self._time_based_series['dissatisfaction', int(time_step)] = l_dissatisfaction
-        self._time_based_series['travel_time', int(time_step)] = self._travel_time
-        self._time_based_series['time_loss', int(time_step)] = time_step - self.start_time - self._position.x / self.speed_max
-        self._time_based_series['relative_time_loss', int(time_step)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
+        self._time_based_series[Metric.POSITION_X.value, int(time_step)] = self._position.x
+        self._time_based_series[Metric.POSITION_Y.value, int(time_step)] = self._position.y
+        self._time_based_series[Metric.GRID_POSITION_X.value, int(time_step)] = self._grid_position.x
+        self._time_based_series[Metric.GRID_POSITION_Y.value, int(time_step)] = self._grid_position.y
+        self._time_based_series[Metric.DISSATISFACTION.value, int(time_step)] = l_dissatisfaction
+        self._time_based_series[Metric.TRAVEL_TIME.value, int(time_step)] = self._travel_time
+        self._time_based_series[Metric.TIME_LOSS.value, int(time_step)] = time_step - self.start_time - self._position.x / self.speed_max
+        self._time_based_series[Metric.RELATIVE_TIME_LOSS.value, int(time_step)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         return self

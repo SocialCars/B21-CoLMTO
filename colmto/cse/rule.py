@@ -36,6 +36,7 @@ import enum
 from colmto.common.property import Position, VehicleType
 from colmto.common.property import BoundingBox
 
+
 @enum.unique
 class Behaviour(enum.Enum):
     '''Behaviour enum for enumerating allow/deny states and corresponding vehicle classes.'''

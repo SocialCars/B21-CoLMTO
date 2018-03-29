@@ -28,6 +28,10 @@ import matplotlib.pyplot as plt
 import enum
 import numpy
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from colmto.environment.vehicle import SUMOVehicle
+
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
     '''
@@ -185,7 +189,7 @@ class VehicleType(enum.Enum):
 @enum.unique
 class Metric(enum.Enum):
     '''
-    Used metrices
+    Statistical metrices
     '''
     DISSATISFACTION = 'dissatisfaction'
     GRID_POSITION_X = 'grid_position_x'
@@ -196,3 +200,46 @@ class Metric(enum.Enum):
     TIME_LOSS = 'time_loss'
     TIME_STEP = 'time_step'
     TRAVEL_TIME = 'travel_time'
+
+    def __str__(self):
+        return self.value
+
+
+@enum.unique
+class StatisticSeries(enum.Enum):
+    GRID = 'grid_based_series'
+    TIME = 'time_based_series'
+
+    def of(self, vehicle: 'SUMOVehicle', interpolate=True):
+        if self is self.GRID:
+            return vehicle.statistic_series_grid(interpolate)
+        return vehicle.statistic_series_time(interpolate)
+
+    def metrics(self):
+        '''
+        Returns a tuple of metrics of grid- or time-based series, depending on passed `seriestype`
+        :raises TypeError if `seriestype` is neither `StatisticSeries.GRID` or `StatisticSeries.TIME`
+        :param seriestype: defines for which type of series the metrics shall be returned
+        :return: tuple of metrics
+        '''
+        if self is StatisticSeries.GRID:
+            return (Metric.TIME_STEP.value,
+                    Metric.POSITION_Y.value,
+                    Metric.GRID_POSITION_Y.value,
+                    Metric.DISSATISFACTION.value,
+                    Metric.TRAVEL_TIME.value,
+                    Metric.TIME_LOSS.value,
+                    Metric.RELATIVE_TIME_LOSS.value)
+
+        if self is StatisticSeries.TIME:
+            return (Metric.POSITION_X.value,
+                    Metric.POSITION_Y.value,
+                    Metric.GRID_POSITION_X.value,
+                    Metric.GRID_POSITION_Y.value,
+                    Metric.DISSATISFACTION.value,
+                    Metric.TRAVEL_TIME.value,
+                    Metric.TIME_LOSS.value,
+                    Metric.RELATIVE_TIME_LOSS.value)
+
+        # raise TypeError
+        raise TypeError(f'{seriestype} is neither {StatisticSeries.GRID} or {StatisticSeries.TIME}.')
