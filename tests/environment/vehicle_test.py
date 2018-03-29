@@ -67,7 +67,7 @@ def test_sumovehicle():
     assert_equal(l_sumovehicle.speed, 0.0)
     assert_equal(l_sumovehicle.position, (0.0, 0))
     assert_equal(l_sumovehicle.vehicle_type, 'None')
-    assert_equal(l_sumovehicle.color, (255, 255, 0, 255))
+    assert_equal(l_sumovehicle.colour, (255, 255, 0, 255))
 
     # test custom values
     l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
@@ -88,7 +88,7 @@ def test_sumovehicle():
     assert_equal(l_sumovehicle.speed_current, 12.1)
     assert_equal(l_sumovehicle.position, (42.0, 0))
     assert_equal(l_sumovehicle.vehicle_type, 'passenger')
-    assert_equal(l_sumovehicle.color, (128, 64, 255, 255))
+    assert_equal(l_sumovehicle.colour, (128, 64, 255, 255))
     assert_equal(l_sumovehicle.start_time, 13)
     assert_equal(l_sumovehicle.grid_position, (0, 0))
 
@@ -237,15 +237,15 @@ def test_record_travel_stats():
         speed=3.
     )
     l_sumovehicle.record_travel_stats(4)
-    assert_almost_equal(
+    assert_list_equal(
         l_sumovehicle.travel_stats.get('grid').get('dissatisfaction'),
-        [[0.0], [0.99036954025194568]]
+        [[0.0], [0.97498989541258152, 0.99036954025194568]]
     )
-    assert_almost_equal(
+    assert_list_equal(
         l_sumovehicle.travel_stats.get('grid').get('time_loss'),
-        [[0.0], [3.9399999999999999]]
+        [[0.0], [2.97, 3.9399999999999999]]
     )
-    assert_almost_equal(
+    assert_list_equal(
         l_sumovehicle.travel_stats.get('grid').get('relative_time_loss'),
-        [[0.0], [65.666666666666671]]
+        [[0.0], [99.00000000000001, 65.666666666666671]]
     )

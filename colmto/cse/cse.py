@@ -50,15 +50,15 @@ class BaseCSE(object):
         self._rules = set()
 
     @property
-    def rules(self) -> tuple:
+    def rules(self) -> frozenset:
         '''
         Policies of CSE
 
-        :return: rules tuple
+        :return: frozen set of rules
 
         '''
 
-        return tuple(self._rules)
+        return frozenset(self._rules)
 
     def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]]) -> 'BaseCSE':
         '''
@@ -99,7 +99,7 @@ class SumoCSE(BaseCSE):
     First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.
     '''
 
-    def add_rules_from_cfg(self, rules_cfg: typing.Iterable) -> 'SumoCSE':
+    def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
         '''
         Create `Rules` from dict-based config and add them to SumoCSE.
 
@@ -111,9 +111,8 @@ class SumoCSE(BaseCSE):
         >>> rules_cfg = [
         >>>     {
         >>>         'type': 'SUMOPositionRule',
-        >>>         'behaviour': 'deny',
         >>>         'args': {
-        >>>             'position_bbox': ((0., -2.), (9520., 2.))
+        >>>             'bounding_box': ((0., -2.), (9520., 2.))
         >>>         },
         >>>     },
         >>> ]

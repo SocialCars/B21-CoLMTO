@@ -25,6 +25,12 @@
 
 from collections import namedtuple
 import matplotlib.pyplot as plt
+import enum
+import numpy
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from colmto.environment.vehicle import SUMOVehicle
 
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
@@ -35,8 +41,24 @@ class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
 
     __slots__ = ()
 
+    def __mul__(self, value):
+        '''
+        Scalars can be attribute-wise multiplied to a Colour.
+
+        :param value: scalar
+        :return: new Colour with attrubutes multiplied with scalar
+
+        '''
+
+        return Colour(
+            red=self.red     * value,
+            green=self.green * value,
+            blue=self.blue   * value,
+            alpha=self.alpha * value
+        )
+
     @staticmethod
-    def map(name: str, max_value: int, value: int):
+    def map(name: str, max_value: float, value: float):
         return Colour(*plt.get_cmap(name=name, lut=max_value)(value))
 
 
@@ -48,18 +70,25 @@ class Position(namedtuple('Position', ('x', 'y'))):
 
     __slots__ = ()
 
-    def gridify(self, width: float, lane_index: int) -> 'Position':
+    def gridified(self, width: float) -> 'GridPosition':
         '''
         Round position to grid depending on `width` of grid cells and return new Position object.
-        `lane_index` replaces the `y` coordinate.
 
         :param width: grid cell width
-        :param lane_index: Replace `y` coordinate with `lane_index`
-        :return: future Position object with gridified positional attributes
+        :return: new Position object with gridified positional attributes
 
         '''
 
-        return Position(x=int(round(self.x/width)-1), y=int(lane_index))
+        return GridPosition(x=int(round(self.x/width)-1), y=int(round(self.y/width)-1))
+
+
+class GridPosition(Position):
+    '''
+    Named tuple to represent the vehicle position on a grid.
+
+    '''
+
+    __slots__ = ()
 
 
 class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
@@ -91,3 +120,126 @@ class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
     def contains(self, speed: float):
         '''checks whether speed lies between min and max (including)'''
         return self.min <= speed <= self.max
+
+@enum.unique
+class Distribution(enum.Enum):
+    '''Enumerates distribution types for vehicle starting times'''
+    LINEAR = enum.auto()
+    POISSON = enum.auto()
+    _prng = numpy.random.RandomState()
+
+    def next_timestep(self, lamb, prev_start_time):
+        r'''
+        Calculate next time step in Exponential or linear distribution.
+        Exponential distribution with
+        \f$F(x) := 1 - e^{-\lambda x}\f$
+        by using numpy.random.exponential(lambda).
+        Linear distribution just adds 1/lamb to the previous start time.
+        For every other value of distribution this function just returns the input value of
+        prev_start_time.
+
+        :param lamb: lambda
+        :param prev_start_time: start time
+        :param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
+        :return: next start time
+        '''
+        if self is Distribution.POISSON:
+            return prev_start_time + self._prng.value.exponential(scale=lamb)
+        elif self is Distribution.LINEAR:
+            return prev_start_time + 1 / lamb
+        return prev_start_time
+
+
+@enum.unique
+class InitialSorting(enum.Enum):
+    '''Initial sorting modes of vehicles'''
+    BEST = enum.auto()
+    RANDOM = enum.auto()
+    WORST = enum.auto()
+    _prng = numpy.random.RandomState()
+
+    def order(self, vehicles: list):
+        '''*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)'''
+        if self is InitialSorting.BEST:
+            vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
+        elif self is InitialSorting.WORST:
+            vehicles.sort(key=lambda i_v: i_v.speed_max)
+        elif self is InitialSorting.RANDOM:
+            self.prng.shuffle(vehicles)
+
+    @property
+    def prng(self):
+        '''returns numpy PRNG state'''
+        return self._prng.value
+
+
+@enum.unique
+class VehicleType(enum.Enum):
+    '''
+    Available vehicle types
+    '''
+    DELIVERY = 'delivery'
+    HEAVYTRANSPORT = 'heavytransport'
+    PASSENGER = 'passenger'
+    TRACTOR = 'tractor'
+    TRUCK = 'truck'
+    VAN = 'van'
+
+
+@enum.unique
+class Metric(enum.Enum):
+    '''
+    Statistical metrices
+    '''
+    DISSATISFACTION = 'dissatisfaction'
+    GRID_POSITION_X = 'grid_position_x'
+    GRID_POSITION_Y = 'grid_position_y'
+    POSITION_X = 'position_x'
+    POSITION_Y = 'position_y'
+    RELATIVE_TIME_LOSS = 'relative_time_loss'
+    TIME_LOSS = 'time_loss'
+    TIME_STEP = 'time_step'
+    TRAVEL_TIME = 'travel_time'
+
+    def __str__(self):
+        return self.value
+
+
+@enum.unique
+class StatisticSeries(enum.Enum):
+    GRID = 'grid_based_series'
+    TIME = 'time_based_series'
+
+    def of(self, vehicle: 'SUMOVehicle', interpolate=True):
+        if self is self.GRID:
+            return vehicle.statistic_series_grid(interpolate)
+        return vehicle.statistic_series_time(interpolate)
+
+    def metrics(self):
+        '''
+        Returns a tuple of metrics of grid- or time-based series, depending on passed `seriestype`
+        :raises TypeError if `seriestype` is neither `StatisticSeries.GRID` or `StatisticSeries.TIME`
+        :param seriestype: defines for which type of series the metrics shall be returned
+        :return: tuple of metrics
+        '''
+        if self is StatisticSeries.GRID:
+            return (Metric.TIME_STEP.value,
+                    Metric.POSITION_Y.value,
+                    Metric.GRID_POSITION_Y.value,
+                    Metric.DISSATISFACTION.value,
+                    Metric.TRAVEL_TIME.value,
+                    Metric.TIME_LOSS.value,
+                    Metric.RELATIVE_TIME_LOSS.value)
+
+        if self is StatisticSeries.TIME:
+            return (Metric.POSITION_X.value,
+                    Metric.POSITION_Y.value,
+                    Metric.GRID_POSITION_X.value,
+                    Metric.GRID_POSITION_Y.value,
+                    Metric.DISSATISFACTION.value,
+                    Metric.TRAVEL_TIME.value,
+                    Metric.TIME_LOSS.value,
+                    Metric.RELATIVE_TIME_LOSS.value)
+
+        # raise TypeError
+        raise TypeError(f'{seriestype} is neither {StatisticSeries.GRID} or {StatisticSeries.TIME}.')
