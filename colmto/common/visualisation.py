@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -577,17 +577,23 @@ _COLORMAP = dict(
 
 
 def cmap_names():
-    '''Returns valid colormap names.'''
+    '''
+    :return: valid colormap names.
+
+    '''
+
     return list(_COLORMAP.keys())
 
 
 def mapped_cmap(cmap_name, range_max):
     '''
-    Return colormap scaled to range_max.
+    :param cmap_name: Colormap name, i.e. a value from `{ magma, magma_r, inferno, inferno_r, plasma, plasma_r, viridis, viridis_r }`
+    :param range_max: scale colormap from 0 up to max value
+    :return: colormap [0,1] scaled from 0 to range_max
 
-    @param cmap_name: Colormap name
-    @param range_max: scale colormap from 0 up to this value
-    @retval colormap scaled to range_max
     '''
-    l_cnorm = matplotlib.colors.Normalize(vmin=0, vmax=range_max)
-    return matplotlib.cm.ScalarMappable(norm=l_cnorm, cmap=_COLORMAP[cmap_name]).to_rgba
+
+    return matplotlib.cm.ScalarMappable(
+        norm=matplotlib.colors.Normalize(vmin=0, vmax=range_max),
+        cmap=_COLORMAP[cmap_name]
+    ).to_rgba

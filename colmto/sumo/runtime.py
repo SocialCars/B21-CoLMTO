@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -24,14 +24,20 @@
 '''Runtime to control SUMO.'''
 
 
-
+import os
 import subprocess
+import sys
+import typing
+
+from colmto.environment.vehicle import SUMOVehicle
 
 import colmto.common.log
 import colmto.cse.cse
 import colmto.cse.rule
 
 try:
+    sys.path.append(os.path.join('sumo', 'tools'))
+    sys.path.append(os.path.join(os.environ.get('SUMO_HOME', os.path.join('..', '..')), 'tools'))
     import traci
 except ImportError:  # pragma: no cover
     raise ImportError('please declare environment variable \'SUMO_HOME\' as the root')
@@ -48,11 +54,11 @@ class Runtime(object):
         self._sumo_binary = sumo_binary
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
 
-    def run_standalone(self, run_config):
+    def run_standalone(self, run_config: dict):
         '''
-        @brief Run provided scenario in one shot.
+        Run provided scenario in one shot.
 
-        @param run_config run configuration object
+        :param run_config: run configuration object
         '''
 
         self._log.info(
@@ -79,14 +85,14 @@ class Runtime(object):
             l_sumoprocess.decode('utf8').replace('\n', '')
         )
 
-    def run_traci(self, run_config, cse):
+    def run_traci(self, run_config: dict, cse: colmto.cse.cse.SumoCSE) -> typing.Dict[str, SUMOVehicle]:
         '''
         Run provided scenario with TraCI by providing a ref to an optimisation entity.
 
-        @param run_config run configuration
-        @param cse central optimisation entity instance of colmto.cse.cse.SumoCSE
+        :param run_config: run configuration
+        :param cse: central optimisation entity instance of colmto.cse.cse.SumoCSE
 
-        @retval list of vehicles, containing travel stats
+        :return: list of vehicles, containing travel stats
         '''
 
         if not isinstance(cse, colmto.cse.cse.SumoCSE):
@@ -124,10 +130,10 @@ class Runtime(object):
                     traci.polygon.add(
                         polygonID=str(i_rule),
                         shape=(
-                            (i_rule.position_bbox[0][0], 2*(i_rule.position_bbox[0][1])+10),
-                            (i_rule.position_bbox[1][0], 2*(i_rule.position_bbox[0][1])+10),
-                            (i_rule.position_bbox[1][0], 2*(i_rule.position_bbox[1][1])+10),
-                            (i_rule.position_bbox[0][0], 2*(i_rule.position_bbox[1][1])+10)
+                            (i_rule.bounding_box.p1.x, 2 * (i_rule.bounding_box.p1.y) + 10),
+                            (i_rule.bounding_box.p2.x, 2 * (i_rule.bounding_box.p1.y) + 10),
+                            (i_rule.bounding_box.p2.x, 2 * (i_rule.bounding_box.p2.y) + 10),
+                            (i_rule.bounding_box.p1.x, 2 * (i_rule.bounding_box.p2.y) + 10)
                         ),
                         color=(255, 0, 0, 255),
                         fill=True,
@@ -168,11 +174,12 @@ class Runtime(object):
                 # allow vehicles access to OTL depending on rule
                 cse.apply_one(
 
-                    # update vehicle position and speed
+                    # update vehicle position, speed and pass timestep to let vehicle calculate statistics
                     l_vehicle.update(
                         i_results.get(traci.constants.VAR_POSITION),
                         i_results.get(traci.constants.VAR_LANE_INDEX),
-                        i_results.get(traci.constants.VAR_SPEED)
+                        i_results.get(traci.constants.VAR_SPEED),
+                        l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
                     )
 
                 )
@@ -192,28 +199,21 @@ class Runtime(object):
                     else:
                         traci.vehicle.setColor(
                             i_vehicle_id,
-                            tuple(l_vehicle.color)
+                            tuple(l_vehicle.colour)
                         )
 
                 # record travel stats to vehicle
-                l_vehicle.record_travel_stats(
-                    l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
-                )
+                # l_vehicle.record_travel_stats(
+                #     l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
+                # )
 
                 # if i_vehicle_id == 'vehicle10':
                 #     self._log.debug(
-                #         'pos: %s, %s, act TT: %s, opt TT: %s, time loss: %s (%s pct.), dsat: %s',
+                #         'pos: %s, %s, act TT: %s, opt TT: %s',
                 #         l_vehicle.position,
                 #         l_vehicle.grid_position,
                 #         l_vehicle.travel_time,
-                #         round(l_vehicle.position[0] / l_vehicle.speed_max, 2),
-                #         round(l_vehicle.travel_stats.get('step').get('time_loss')[-1], 2),
-                #         round(
-                #             l_vehicle.travel_stats.get('step').get('time_loss')[-1] /
-                #             (l_vehicle.position[0] / l_vehicle.speed_max) * 100,
-                #             2
-                #         ),
-                #         round(l_vehicle.travel_stats.get('step').get('dissatisfaction')[-1], 32)
+                #         round(l_vehicle.position.x / l_vehicle.speed_max, 2),
                 #     )
 
             traci.simulationStep()

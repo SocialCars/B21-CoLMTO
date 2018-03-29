@@ -23,7 +23,6 @@
 [![Codacy](https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg)](https://www.codacy.com/app/masc/socialcars_colmto)
 
 [![html documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://socialcars.github.io/colmto/docs/sources/index.html)
-[![pdf documentation](https://img.shields.io/badge/documentation-PDF-blue.svg)](http://socialcars.github.io/colmto/docs/CoLMTO-doc.pdf)
 
 ## Execution Model
 
@@ -42,7 +41,6 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
 ### Prerequisites
 
 * [Python 3.6](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
-  * [doxypy](https://pypi.python.org/pypi/doxypy)
   * [defusedxml](https://pypi.python.org/pypi/defusedxml)
   * [h5py](https://pypi.python.org/pypi/h5py)
   * [lxml](https://pypi.python.org/pypi/lxml)
@@ -50,6 +48,8 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
   * [nose](https://pypi.python.org/pypi/nose)
   * [PyYAML](https://pypi.python.org/pypi/PyYAML)
   * [sh](https://pypi.python.org/pypi/sh)
+  * [sphinx_rtd_theme](https://github.com/rtfd/sphinx_rtd_theme.git) (documentation)
+  * [pygments-style-solarized](https://pypi.python.org/pypi/pygments-style-solarized) (documentation)
 * libhdf5
 * libxml
 * libyaml
@@ -71,32 +71,35 @@ Feel free to use any other version, but make sure to set the `SUMO_HOME` environ
 
 ```sh
 sudo portmaster devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
+
 cd colmto/sumo/sumo
 make -f Makefile.cvs
-./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local
-make -jN
+./configure CXX=clang++ --with-xerces-libraries=/usr/local/lib --with-proj-libraries=/usr/local/lib --with-proj-includes=/usr/local/include --with-fox-config=/usr/local/bin/fox-config --enable-pic
+make -j $(getconf NPROCESSORS_CONF)
 ```
 
 #### MacOS
 
 ```sh
 brew install Caskroom/cask/xquartz autoconf automake gdal proj xerces-c fox
+
 export CPPFLAGS="$CPPFLAGS -I/opt/X11/include/"
 export LDFLAGS="-L/opt/X11/lib"
 cd colmto/sumo/sumo
 make -f Makefile.cvs
-./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local
-make -jN
+./configure --with-xerces=/usr/local --with-proj-gdal=/usr/local --enable-pic
+make -j $(getconf NPROCESSORS_CONF)
 ```
 
-#### Ubuntu (Yakkety)
+#### Ubuntu
 
 ```sh
 sudo apt-get install autoconf libproj-dev proj-bin proj-data libtool libgdal-dev libxerces-c-dev libfox-1.6-0 libfox-1.6-dev
+
 cd colmto/sumo/sumo
 make -f Makefile.cvs
-./configure
-make -jN
+./configure --enable-pic
+make -j $(getconf NPROCESSORS_CONF)
 ```
 
 ### Install Required System Packages

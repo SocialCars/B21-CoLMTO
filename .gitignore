@@ -5,7 +5,6 @@
 !codecov.yml
 !setup.cfg
 !colmto/resources/*.yaml
-!site/*
 !*.txt
 !*.py
 !*.md
@@ -13,3 +12,12 @@
 !build-sumo-osx.sh
 !.pre-commit-config.yaml
 !*.coveragerc
+docs/build/**/*
+!docs/Makefile
+!docs/pylint.sh
+!docs/radon.sh
+!docs/source/**/*.png
+!docs/source/**/*.py
+!docs/source/**/*.rst
+!docs/source/_static/style.css
+!docs/source/_templates/layout.html

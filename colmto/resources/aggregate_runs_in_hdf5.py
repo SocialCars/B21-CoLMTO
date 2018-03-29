@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -34,9 +34,9 @@ import colmto.common.io
 def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
     '''
     Aggregates statistics of runs by applying the median.
-    @param hdf5_stats: run stats as a hdf5 object
-    @param detector_positions:
-    @retval updated run_stats dictionary with aggregated stats (key: 'aggregated')
+    :param hdf5_stats: run stats as a hdf5 object
+    :param detector_positions:
+    :return: updated run_stats dictionary with aggregated stats (key: 'aggregated')
     '''
 
     l_aggregated = {
@@ -193,7 +193,7 @@ def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
 def main(argv):
     '''
     Main function
-    @param argv cmdline arguments
+    :param argv: cmdline arguments
     '''
     l_writer = colmto.common.io.Writer()
 

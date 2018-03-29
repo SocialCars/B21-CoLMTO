@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -29,6 +29,7 @@ import typing
 import colmto.common.log
 import colmto.cse.rule
 import colmto.environment.vehicle
+from colmto.cse.rule import BaseRule
 
 
 class BaseCSE(object):
@@ -37,121 +38,121 @@ class BaseCSE(object):
     def __init__(self, args=None):
         '''
         C'tor
-        @param args: argparse configuration
+
+        :param args: argparse configuration
+
         '''
+
         if args is not None:
             self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._log = colmto.common.log.logger(__name__)
         self._vehicles = set()
-        self._rules = []
+        self._rules = set()
 
     @property
-    def rules(self) -> tuple:
+    def rules(self) -> frozenset:
         '''
         Policies of CSE
-        @retval rules tuple
-        '''
-        return tuple(self._rules)
 
-    def apply(self, vehicles: typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]):
+        :return: frozen set of rules
+
+        '''
+
+        return frozenset(self._rules)
+
+    def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]]) -> 'BaseCSE':
         '''
         Apply rules to vehicles
-        @param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
-        @retval self
+
+        :param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
+        :return: `BaseCSE` as future reference
+
         '''
-        for i_vehicle in iter(vehicles.values()) if isinstance(vehicles, dict) else vehicles:
+
+        for i_vehicle in (iter(vehicles.values()) if isinstance(vehicles, dict) else vehicles):
             self.apply_one(i_vehicle)
 
         return self
 
-    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle):
+    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle) -> 'BaseCSE':
         '''
-        Apply rules to one vehicles
-        @param vehicle: Vehicle
-        @retval self
+        Apply rules to one vehicle
+
+        :param vehicle: Vehicle
+        :return: `BaseCSE` as future reference
+
         '''
+
         for i_rule in self._rules:
-            if i_rule.applies_to(vehicle) \
-                    and i_rule.behaviour == colmto.cse.rule.Behaviour.DENY:
-                vehicle.change_vehicle_class(
-                    colmto.cse.rule.SUMORule.to_disallowed_class()
-                )
+            if i_rule.applies_to(vehicle):
+                vehicle.change_vehicle_class(colmto.cse.rule.SUMORule.to_disallowed_class())
                 return self
 
         # default case: no applicable rule found
-        vehicle.change_vehicle_class(
-            colmto.cse.rule.SUMORule.to_allowed_class()
-        )
+        vehicle.change_vehicle_class(colmto.cse.rule.SUMORule.to_allowed_class())
 
         return self
 
 
 class SumoCSE(BaseCSE):
-    '''First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.'''
+    '''
+    First-come-first-served CSE (basically do nothing and allow all vehicles access to OTL.
+    '''
 
-    _valid_rules = {
-        'SUMOUniversalRule': colmto.cse.rule.SUMOUniversalRule,
-        'SUMONullRule': colmto.cse.rule.SUMONullRule,
-        'SUMOSpeedRule': colmto.cse.rule.SUMOSpeedRule,
-        'SUMOPositionRule': colmto.cse.rule.SUMOPositionRule,
-        'SUMOVTypeRule': colmto.cse.rule.SUMOVTypeRule
-    }
-
-    def add_rule(self, rule: colmto.cse.rule.SUMOVehicleRule, rule_cfg=None):
+    def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
         '''
-        Add rule to SumoCSE.
-        @param rule: rule object
-        @param rule_cfg: rule configuration
-        @retval self
+        Create `Rules` from dict-based config and add them to SumoCSE.
+
+        :param rules_cfg: dict-based config (see example)
+        :return: `SumoCSE` as future reference
+
+        Example:
+
+        >>> rules_cfg = [
+        >>>     {
+        >>>         'type': 'SUMOPositionRule',
+        >>>         'args': {
+        >>>             'bounding_box': ((0., -2.), (9520., 2.))
+        >>>         },
+        >>>     },
+        >>> ]
+        >>> colmto.cse.cse.SumoCSE(args).add_rules_from_cfg(rules_cfg)
+
         '''
 
-        if not isinstance(rule, colmto.cse.rule.SUMOVehicleRule):
-            raise TypeError
-
-        if rule_cfg is not None \
-                and rule_cfg.get('vehicle_rules', {}).get('rule', False):
-            # look for sub-rules
-            rule.rule = colmto.cse.rule.BaseRule.ruleoperator_from_string(
-                rule_cfg.get('vehicle_rules', {}).get('rule'),
-                colmto.cse.rule.RuleOperator.ALL
-            )
-            for i_subrule in rule_cfg.get('vehicle_rules', {}).get('rules', []):
-                rule.add_rule(
-                    self._valid_rules.get(i_subrule.get('type'))(
-                        behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
-                            i_subrule.get('behaviour'),
-                            colmto.cse.rule.Behaviour.DENY
-                        ),
-                        **i_subrule.get('args')
-                    )
-                )
-
-        self._rules.append(
-            rule
+        self.add_rules(
+            BaseRule.rule_cls(i_rule.get('type')).from_configuration(i_rule)
+            for i_rule in rules_cfg
         )
 
         return self
 
-    def add_rules_from_cfg(self, rules_config: typing.Union[typing.List[dict], None]):
+    def add_rule(self, rule: colmto.cse.rule.BaseRule) -> 'SumoCSE':
         '''
-        Add rules to SumoCSE based on run config's 'rules' section.
-        @param rules_config: run config's 'rules' section
-        @retval self
+        Add rule to SumoCSE.
+
+        :param rule: `SUMOVehicleRule` object
+        :return: `SumoCSE` as future reference
+
         '''
 
-        if rules_config is None:
-            return self
+        if isinstance(rule, colmto.cse.rule.BaseRule):
+            self._rules.add(rule)
+        else:
+            raise TypeError
 
-        for i_rule in rules_config:
-            self.add_rule(
-                self._valid_rules.get(i_rule.get('type'))(
-                    behaviour=colmto.cse.rule.BaseRule.behaviour_from_string(
-                        i_rule.get('behaviour'),
-                        colmto.cse.rule.Behaviour.DENY
-                    ),
-                    **i_rule.get('args')
-                ),
-                i_rule
-            )
+        return self
+
+    def add_rules(self, rules: typing.Iterable[colmto.cse.rule.BaseRule]) -> 'SumoCSE':
+        '''
+        Add iterable of rules to SumoCSE.
+
+        :param rules: iterable of `SUMOVehicleRule` objects
+        :return: `SumoCSE` as future reference
+
+        '''
+
+        for i_rule in rules:
+            self.add_rule(i_rule)
 
         return self

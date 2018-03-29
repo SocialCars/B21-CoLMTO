@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -25,7 +25,6 @@
 # pylint: disable=no-member
 
 import copy
-import enum
 from pathlib import Path
 import subprocess
 from types import MappingProxyType
@@ -33,6 +32,11 @@ import typing
 from collections import OrderedDict
 
 import numpy
+
+from colmto.common.property import Colour
+from colmto.common.property import Distribution
+from colmto.common.property import InitialSorting
+
 try:
     import lxml.etree as etree
 except ImportError:
@@ -45,58 +49,6 @@ import colmto.common.io
 import colmto.common.log
 import colmto.common.visualisation
 import colmto.environment.vehicle
-
-
-@enum.unique
-class InitialSorting(enum.Enum):
-    '''Initial sorting modes of vehicles'''
-    BEST = enum.auto()
-    RANDOM = enum.auto()
-    WORST = enum.auto()
-    _prng = numpy.random.RandomState()
-
-    def order(self, vehicles: list):
-        '''*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)'''
-        if self is InitialSorting.BEST:
-            vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
-        elif self is InitialSorting.WORST:
-            vehicles.sort(key=lambda i_v: i_v.speed_max)
-        elif self is InitialSorting.RANDOM:
-            self.prng.shuffle(vehicles)
-
-    @property
-    def prng(self):
-        '''returns numpy PRNG state'''
-        return self._prng.value
-
-
-@enum.unique
-class Distribution(enum.Enum):
-    '''Enumerates distribution types for vehicle starting times'''
-    LINEAR = enum.auto()
-    POISSON = enum.auto()
-    _prng = numpy.random.RandomState()
-
-    def next_timestep(self, lamb, prev_start_time):
-        r'''
-        Calculate next time step in Exponential or linear distribution.
-        Exponential distribution with
-        \f$F(x) := 1 - e^{-\lambda x}\f$
-        by using numpy.random.exponential(lambda).
-        Linear distribution just adds 1/lamb to the previous start time.
-        For every other value of distribution this function just returns the input value of
-        prev_start_time.
-
-        @param lamb: lambda
-        @param prev_start_time: start time
-        @param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
-        @retval next start time
-        '''
-        if self is Distribution.POISSON:
-            return prev_start_time + self._prng.value.exponential(scale=lamb)
-        elif self is Distribution.LINEAR:
-            return prev_start_time + 1 / lamb
-        return prev_start_time
 
 
 class SumoConfig(colmto.common.configuration.Configuration):
@@ -127,47 +79,31 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 '-> rebuilding/overwriting scenarios if already present'
             )
 
-        # generate color map for vehicle max speeds
-        l_global_maxspeed = max(
-            [
-                i_scenario.get('parameters').get('speedlimit')
-                for i_scenario in self.scenario_config.values()
-                ]
-        )
-        self._speed_colormap = colmto.common.visualisation.mapped_cmap(
-            'plasma',
-            l_global_maxspeed
-        )
-
     @property
     def sumo_config_dir(self) -> Path:
         '''
-        Returns:
-             directory of SUMO config
+        :return: directory of SUMO config
         '''
         return self.output_dir / 'SUMO'
 
     @property
     def runsdir(self) -> Path:
         '''
-        Returns:
-             directory of runs
+        :return: directory of runs
         '''
         return self.output_dir / 'SUMO' / self.run_prefix / 'runs'
 
     @property
     def resultsdir(self) -> Path:
         '''
-        Returns:
-            directory for results
+        :return: directory for results
         '''
         return self.output_dir / 'SUMO' / self.run_prefix / 'results'
 
     @property
     def sumo_run_config(self):
         '''
-        Returns:
-             copy of sumo run config
+        :return: copy of sumo run config
         '''
         return copy.copy(
             self.run_config.get('sumo')
@@ -217,11 +153,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
             vtype_list):
         '''generate run configurations
 
-        @param scenario_run_config: run configuration of scenario
-        @param initial_sorting: initial sorting of vehicles (InitialSorting enum)
-        @param run_number: number of current run
-        @retval
-            run configuration dictionary
+        :param scenario_run_config: run configuration of scenario
+        :param initial_sorting: initial sorting of vehicles (InitialSorting enum)
+        :param run_number: number of current run
+        :return: run configuration dictionary
         '''
         self._log.debug(
             'Generating run %s for %s sorting', run_number, initial_sorting.name.lower()
@@ -241,13 +176,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         l_tripfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                     / '{l_scenarioname}.trip.xml'
+                     / f'{l_scenarioname}.trip.xml'
 
         l_routefile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                      / '{l_scenarioname}.rou.xml'
+                      / f'{l_scenarioname}.rou.xml'
 
         l_configfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
-                       / '{l_scenarioname}.sumo.cfg'
+                       / f'{l_scenarioname}.sumo.cfg'
 
         l_output_measurements_dir = self.resultsdir / l_scenarioname \
                                     / initial_sorting.name.lower() / str(run_number)
@@ -292,7 +227,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             'tripfile': l_tripfile,
             'routefile': l_routefile,
             'configfile': l_configfile,
-            'fcdfile': l_output_measurements_dir / '{l_scenarioname}.fcd-output.xml',
+            'fcdfile': l_output_measurements_dir / f'{l_scenarioname}.fcd-output.xml',
             'scenario_config': self.scenario_config.get(l_scenarioname)
         }
 
@@ -300,10 +235,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's node configuration file.
 
-        @param scenarioconfig: Scenario configuration
-        @param nodefile: Destination to write node file
-        @param forcerebuildscenarios: rebuild scenarios,
-                                        even if they already exist for current run
+        :param scenarioconfig: Scenario configuration
+        :param nodefile: Destination to write node file
+        :param forcerebuildscenarios: rebuild scenarios, even if they already exist for current run
+        :todo make 5% entry lange configurable
+
         '''
 
         if Path(nodefile).exists() and not forcerebuildscenarios:
@@ -316,12 +252,14 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_nbswitches = scenarioconfig.get('parameters').get('switches')
         l_segmentlength = l_length / (l_nbswitches + 1)
 
-        if self._args.onlyoneotlsegment:
-            l_length = 2 * l_segmentlength  # two times segment length
+        if self._args.onlyoneotlsegment:     # for only one 2+1 segment, the
+            l_length = l_segmentlength + 0.1 # total length is just one segment
+                                             # (plus 10cm to fix an issue with SUMO joining the lanes)
 
         l_nodes = etree.Element('nodes')
         etree.SubElement(
-            l_nodes, 'node', attrib={'id': 'enter', 'x': str(-l_segmentlength), 'y': '0'}
+            # add 5% of segment length as entry lane
+            l_nodes, 'node', attrib={'id': 'enter', 'x': str(-0.05*l_segmentlength), 'y': '0'}
         )
         etree.SubElement(
             l_nodes, 'node', attrib={'id': '21start', 'x': '0', 'y': '0'}
@@ -331,6 +269,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # dummy node for easier from-to routing
+        # add 5% of segment length as exit lane
         etree.SubElement(
             l_nodes,
             'node',
@@ -338,8 +277,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 'id': 'exit',
                 'x': str(
                     l_length + 0.1
-                    if l_nbswitches % 2 == 1 or self._args.onlyoneotlsegment
-                    else l_length + l_segmentlength
+                    if l_nbswitches % 2 == 1 and not self._args.onlyoneotlsegment
+                    else l_length
                 ),
                 'y': '0'
             }
@@ -355,10 +294,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's edge configuration file.
 
-        @param scenario_name: Name of scenario (required to id detector positions)
-        @param scenario_config: Scenario configuration
-        @param edgefile: Destination to write edge file
-        @param forcerebuildscenarios: Rebuild scenarios,
+        :param scenario_name: Name of scenario (required to id detector positions)
+        :param scenario_config: Scenario configuration
+        :param edgefile: Destination to write edge file
+        :param forcerebuildscenarios: Rebuild scenarios,
                                         even if they already exist for current run
         '''
 
@@ -448,8 +387,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate switches if not pre-defined in scenario config.
 
-        @param edge: edge
-        @param scenario_config: scenario config dictionary
+        :param edge: edge
+        :param scenario_config: scenario config dictionary
         '''
         self._log.debug('generating switches')
 
@@ -461,7 +400,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
         if isinstance(l_parameters.get('switchpositions'), (list, tuple)):
             # add splits and joins
             l_add_otl_lane = True
-            for i_segmentpos in l_parameters.get('switchpositions'):
+            for i_segmentpos in l_parameters.get('switchpositions') \
+                    if not self._args.onlyoneotlsegment else l_parameters.get('switchpositions')[:2]:
                 etree.SubElement(
                     edge,
                     'split',
@@ -504,10 +444,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's main configuration file.
 
-        @param config_files: Dictionary of config file locations,
+        :param config_files: Dictionary of config file locations,
                              i.e. netfile, routefile, settingsfile
-        @param simtimeinterval: Time interval of simulation
-        @param forcerebuildscenarios: Rebuild scenarios,
+        :param simtimeinterval: Time interval of simulation
+        :param forcerebuildscenarios: Rebuild scenarios,
                                         even if they already exist for current run
         '''
         if not isinstance(simtimeinterval, list):
@@ -558,10 +498,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's settings configuration file.
 
-        @param scenarioconfig: Scenario configuration
-        @param runcfg: Run configuration
-        @param settingsfile: Destination to write settings file
-        @param forcerebuildscenarios: Rebuild scenarios,
+        :param scenarioconfig: Scenario configuration
+        :param runcfg: Run configuration
+        :param settingsfile: Destination to write settings file
+        :param forcerebuildscenarios: Rebuild scenarios,
                                         even if they already exist for current run
         '''
         if Path(settingsfile).exists() and not forcerebuildscenarios:
@@ -570,7 +510,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_viewsettings = etree.Element('viewsettings')
         etree.SubElement(
             l_viewsettings, 'viewport',
-            attrib={'x': str(scenarioconfig.get('parameters').get('length') / 2),
+            attrib={'x': '0',
                     'y': '0',
                     'zoom': '100'}
         )
@@ -596,11 +536,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Create a distribution of vehicles based on
 
-        @param vtype_list: list of vehicle types
-        @param aadt: annual average daily traffic (vehicles/day/lane)
-        @param initialsorting: initial sorting of vehicles (by max speed), i.e. InitialSorting enum
-        @param scenario_name: name of scenario
-        @retval OrderedDict of ID -> colmto.environment.vehicle.Vehicle
+        :param vtype_list: list of vehicle types
+        :param aadt: annual average daily traffic (vehicles/day/lane)
+        :param initialsorting: initial sorting of vehicles (by max speed), i.e. InitialSorting enum
+        :param scenario_name: name of scenario
+        :return: OrderedDict of ID -> colmto.environment.vehicle.Vehicle
         '''
 
         if not isinstance(initialsorting, InitialSorting):
@@ -629,9 +569,20 @@ class SumoConfig(colmto.common.configuration.Configuration):
                         self._run_config.get('vtypedistribution').get(vtype).get('desiredSpeeds')
                     ),
                     self.scenario_config.get(scenario_name).get('parameters').get('speedlimit')
-                )
+                ),
+                environment={  # todo: make 5% entry lane configurable
+                    'length': 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
+                        if not self._args.onlyoneotlsegment
+                        else 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
+                             / (self.scenario_config.get(scenario_name).get('parameters').get('switches') + 1),
+                    'gridcellwidth': self._run_config.get('gridcellwidth'),
+                    'gridlength': int(round(1.05*self.scenario_config.get(scenario_name).get('parameters').get('length') / self._run_config.get('gridcellwidth')))
+                        if not self._args.onlyoneotlsegment
+                        else int(round(1.05*(self.scenario_config.get(scenario_name).get('parameters').get('length')
+                             / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
+                }
             ) for vtype in vtype_list
-        ]
+        ]  # type: typing.List[colmto.environment.vehicle.SUMOVehicle]
 
         # sort speeds according to initial sorting flag
         initialsorting.order(l_vehicle_list)
@@ -639,8 +590,13 @@ class SumoConfig(colmto.common.configuration.Configuration):
         # assign a new id according to sort order and starting time to each vehicle
         l_vehicles = OrderedDict()
         for i, i_vehicle in enumerate(l_vehicle_list):
-            # update colors
-            i_vehicle.color = numpy.array(self._speed_colormap(i_vehicle.speed_max))*255
+            # update colours depending on maximum speed of vehicles
+            i_vehicle.colour = Colour.map(
+                'plasma',
+                self.scenario_config.get(scenario_name).get('parameters').get('speedlimit'),
+                i_vehicle.speed_max
+            ) * 255.
+
             # update start time
             i_vehicle.start_time = Distribution[
                 self.run_config.get('starttimedistribution').upper()
@@ -648,7 +604,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 l_vehps,
                 l_vehicle_list[i - 1].start_time if i > 0 else 0
             )
-            l_vehicles[f'vehicle{i}'] = i_vehicle
+            l_vehicles[f'vehicle_{i:0>4}'] = i_vehicle
         return l_vehicles
 
     def aadt(self, scenario_runs):
@@ -676,11 +632,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's trip file.
 
-        @param scenario_runs:
-        @param initialsorting:
-        @param tripfile:
-        @param forcerebuildscenarios:
-        @retval vehicles
+        :param scenario_runs:
+        :param initialsorting:
+        :param tripfile:
+        :param forcerebuildscenarios:
+        :return: vehicles
         '''
 
         if Path(tripfile).exists() and not forcerebuildscenarios:
@@ -709,10 +665,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
             l_vattr = {k: str(v) for k, v in i_vehicle.properties.items()}
             l_vattr.update({
                 'id': str(i_vid),
-                'color': f'{i_vehicle.color[0]/255.},'
-                         f'{i_vehicle.color[1]/255.},'
-                         f'{i_vehicle.color[2]/255.},'
-                         f'{i_vehicle.color[3]/255.}'
+                'colour': f'{i_vehicle.colour.red/255.},'
+                         f'{i_vehicle.colour.green/255.},'
+                         f'{i_vehicle.colour.blue/255.},'
+                         f'{i_vehicle.colour.alpha/255.}'
             })
 
             # override parameters speedDev, desiredSpeed, and length if defined in run config
@@ -774,10 +730,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's net xml.
 
-        @param nodefile:
-        @param edgefile:
-        @param netfile:
-        @param forcerebuildscenarios:
+        :param nodefile:
+        :param edgefile:
+        :param netfile:
+        :param forcerebuildscenarios:
         '''
 
         if Path(netfile).exists() and not forcerebuildscenarios:
@@ -805,10 +761,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's route xml.
 
-        @param netfile:
-        @param tripfile:
-        @param routefile:
-        @param forcerebuildscenarios:
+        :param netfile:
+        :param tripfile:
+        :param routefile:
+        :param forcerebuildscenarios:
         '''
 
         if Path(routefile).exists() and not forcerebuildscenarios:
@@ -817,9 +773,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_duarouterprocess = subprocess.check_output(
             [
                 self._binaries.get('duarouter'),
-                '-n', netfile,
-                '-t', tripfile,
-                '-o', routefile
+                '--net-file', netfile,
+                '--route-files', tripfile,
+                '--output-file', routefile
             ],
             stderr=subprocess.STDOUT,
             bufsize=-1,

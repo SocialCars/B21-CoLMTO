@@ -5,7 +5,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -22,11 +22,13 @@
 # @endcond
 '''setup.py'''
 import sys
-
+import os
 from setuptools import find_packages
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
+from sphinx.setup_command import BuildDoc
 
+os.environ['SUMO_HOME'] = os.path.abspath('../sumo')
 
 class PyTest(TestCommand):
     '''pytest class'''
@@ -40,12 +42,14 @@ class PyTest(TestCommand):
         sys.exit(pytest.main(self.test_args))
 
 
-VERSION = '0.1.1'
+VERSION = '0.1.2'
+NAME = 'colmto'
+DESCRIPTION = 'Cooperative Lane Management and Traffic flow Optimisation'
 
 setup(
-    name='colmto',
+    name=NAME,
     version=VERSION,
-    description='Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)',
+    description=DESCRIPTION,
     long_description=open('readme.md').read(),
     # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -63,8 +67,17 @@ setup(
     include_package_data=True,
     zip_safe=False,
     tests_require=['pytest'],
-    cmdclass={'test': PyTest},
-
+    cmdclass={
+        'test': PyTest,
+        'build_sphinx': BuildDoc
+    },
+    command_options={
+        'build_sphinx': {
+            'project': ('setup.py', DESCRIPTION),
+            'version': ('setup.py', VERSION),
+            'release': ('setup.py', VERSION),
+        }
+    },
     install_requires=[
         'doxypypy',
         'defusedxml',
@@ -75,6 +88,7 @@ setup(
         'pytest',
         'PyYAML',
         'sh',
+        'pygments-style-solarized',
     ],
 
     entry_points={

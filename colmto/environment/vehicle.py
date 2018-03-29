@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -25,19 +25,13 @@
 
 from collections import namedtuple
 from types import MappingProxyType
-import numpy
+import pandas
 
 import colmto.cse.rule
-
-
-class Position(namedtuple('Position', ('x', 'y'))):
-    '''named tuple to represent the vehicle position'''
-    __slots__ = ()
-
-
-class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
-    '''named tuple to represent rgba values'''
-    __slots__ = ()
+import colmto.common.model
+from colmto.common.property import Position, VehicleType
+from colmto.common.property import GridPosition
+from colmto.common.property import Colour
 
 
 class BaseVehicle(object):
@@ -54,14 +48,14 @@ class BaseVehicle(object):
     @property
     def properties(self) -> MappingProxyType:
         '''
-        @retval vehicle properties as MappingProxyType dictionary bundle
+        :return: vehicle properties as MappingProxyType dictionary bundle
         '''
         return MappingProxyType(self._properties)
 
     @property
     def speed(self) -> float:
         '''
-        @retval current speed at time step
+        :return: current speed at time step
         '''
         return self._properties.get('speed')
 
@@ -69,14 +63,14 @@ class BaseVehicle(object):
     def speed(self, speed: float):
         '''
         Set vehicle speed
-        @param speed current position
+        :param speed: current position
         '''
         self._properties['speed'] = float(speed)
 
     @property
     def position(self) -> Position:
         '''
-        @retval current position
+        :return: current position
         '''
         return self._properties.get('position')
 
@@ -84,16 +78,26 @@ class BaseVehicle(object):
     def position(self, position: Position):
         '''
         Set vehicle position
-        @param position current position
+        :param position: current position
         '''
         self._properties['position'] = Position(*position)
 
 
 class SUMOVehicle(BaseVehicle):
-    '''SUMO vehicle class.'''
+    '''SUMO vehicle class.
+
+    **Note on statistics:**
+    To properly store results from SUMO (discrete time vs. "continuous" space),
+    there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series)
+    and a `Series` for grid cells in x-direction (self._grid_based_series).
+    As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`,
+    we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
+
+    '''
 
     # pylint: disable=too-many-arguments
     def __init__(self,
+                 environment: dict,
                  vehicle_type=None,
                  vtype_sumo_cfg=None,
                  speed_deviation=0.0,
@@ -102,11 +106,13 @@ class SUMOVehicle(BaseVehicle):
         '''
         C'tor.
 
-        @param vehicle_type
-        @param vtype_sumo_cfg
-        @param speed_deviation
-        @param sigma
-        @param speed_max
+        :param vehicle_type:
+        :param vtype_sumo_cfg:
+        :param speed_deviation:
+        :param sigma:
+        :param speed_max:
+        :param grid_length:
+
         '''
 
         super().__init__()
@@ -116,289 +122,266 @@ class SUMOVehicle(BaseVehicle):
 
         self._properties.update(
             {
-                'color': Colour(red=255, green=255, blue=0, alpha=255),
+                'colour': Colour(red=255, green=255, blue=0, alpha=255),
                 'start_time': 0.0,
                 'speedDev': speed_deviation,
                 'sigma': sigma,
                 'maxSpeed': speed_max,
                 'vType': vehicle_type,
                 'vClass': colmto.cse.rule.SUMORule.to_allowed_class(),
-                'grid_position': Position(x=0, y=0)
+                'grid_position': Position(x=0, y=0),
+                'time_step': 0.0
             }
         )
 
-        self._travel_stats = {
-            'start_time': 0.0,
-            'travel_time': 0.0,
-            'vehicle_type': vehicle_type,
-            'grid': {
-                'pos_x': [],
-                'pos_y': [],
-                'time_loss': [],
-                'relative_time_loss': [],
-                'speed': [],
-                'dissatisfaction': []
-            },
-            'step': {
-                'number': [],
-                'pos_x': [],
-                'pos_y': [],
-                'time_loss': [],
-                'relative_time_loss': [],
-                'speed': [],
-                'dissatisfaction': []
-            }
-        }
+        self._environment = environment
+
+        self._time_based_series = pandas.Series(
+            index=pandas.MultiIndex.from_product(
+                iterables=[
+                    [
+                        'position_x',  # todo: use Metrics enum
+                        'position_y',
+                        'grid_position_x',
+                        'grid_position_y',
+                        'dissatisfaction',
+                        'travel_time',
+                        'time_loss',
+                        'relative_time_loss'
+                    ], [0]
+                ],
+                names=['metric', 'timestep']
+            )
+        )
+
+        self._grid_based_series = pandas.Series(
+            index=pandas.MultiIndex.from_product(
+                iterables=[
+                    [
+                        'time_step',  # todo: use Metrics enum
+                        'position_y',
+                        'grid_position_y',
+                        'dissatisfaction',
+                        'travel_time',
+                        'time_loss',
+                        'relative_time_loss'
+                    ], range(int(environment.get('gridlength')))  # range(number of cells of x-axis)
+                ],
+                names=['metric', 'grid_position_x']
+            )
+        )
 
     @property
-    def grid_position(self) -> Position:
+    def _position(self) -> Position:
         '''
-        @retval current grid position
+        :return: current position
         '''
-        return Position(*self._properties.get('grid_position'))
+        return Position(*self._properties.get('position'))
 
-    @grid_position.setter
-    def grid_position(self, position: Position):
+    @_position.setter
+    def _position(self, position: Position):
         '''
         Updates current position
-        @param position current grid position
+        :param position: current position
         '''
-        self._properties['grid_position'] = Position(*position)
+        self._properties['position'] = Position(*position)
 
     @property
-    def vehicle_type(self) -> str:
+    def _grid_position(self) -> GridPosition:
         '''
-        @retval vehicle type
+        :return: current grid position
         '''
-        return str(self._properties.get('vType'))
+        return GridPosition(*self._properties.get('grid_position'))
+
+    @_grid_position.setter
+    def _grid_position(self, position: GridPosition):
+        '''
+        Updates current position
+        :param position: current grid position
+        '''
+        self._properties['grid_position'] = GridPosition(*position)
+
+    @property
+    def vehicle_type(self) -> VehicleType:
+        '''
+        :return: vehicle type
+        '''
+        return VehicleType[str(self._properties.get('vType')).upper()]
 
     @property
     def start_time(self) -> float:
         '''
-        Returns start time
-
-        @retval start time
+        :return: start time
         '''
         return float(self._properties.get('start_time'))
 
     @start_time.setter
     def start_time(self, start_time: float):
         '''
-        Sets start time.
-
-        @param start_time start time
+        :param start_time: start time
         '''
         self._properties['start_time'] = float(start_time)
 
     @property
-    def color(self) -> Colour:
+    def _travel_time(self) -> float:
         '''
-        Returns:
-            color
+        :return: current travel time
         '''
-        return Colour(*self._properties.get('color'))
+        return float(self._properties['travel_time'])
 
-    @color.setter
-    def color(self, color: Position):
+    @_travel_time.setter
+    def _travel_time(self, travel_time: float):
         '''
-        Update color
-        @param color Color (rgba tuple, e.g. (255, 255, 0, 255))
+        Updates current travel time
+        :param travel_time: current travel time
         '''
-        self._properties['color'] = Colour(*color)
+        self._properties['travel_time'] = float(travel_time)
+
+    @property
+    def _time_step(self) -> float:
+        '''
+        Current time step
+        :return: time step
+        '''
+        return float(self._properties['time_step'])
+
+    @_time_step.setter
+    def _time_step(self, time_step: float):
+        '''
+        Updates current time step
+        :param time_step: time step
+        '''
+        self._properties['time_step'] = float(time_step)
+
+    @property
+    def colour(self) -> Colour:
+        '''
+        :return: colour
+        '''
+        return Colour(*self._properties.get('colour'))
+
+    @colour.setter
+    def colour(self, colour: Colour):
+        '''
+        Update colour
+        :param colour: Color (rgba tuple, e.g. (255, 255, 0, 255))
+        '''
+        self._properties['colour'] = Colour(*colour)
 
     @property
     def vehicle_class(self) -> str:
         '''
-        @retval SUMO vehicle class
+        :return: SUMO vehicle class
         '''
         return str(self._properties.get('vClass'))
 
     @property
+    def _speed(self) -> float:
+        '''
+        :return: self._properties.get('speed')
+        '''
+        return float(self._properties.get('speed'))
+
+    @_speed.setter
+    def _speed(self, speed: float):
+        '''
+        Updates current speed.
+
+        @retval travel time
+        '''
+        self._properties['speed'] = float(speed)
+
+    @property
     def speed_max(self) -> float:
         '''
-        @retval self._properties.get('maxSpeed')
+        :return: self._properties.get('maxSpeed')
         '''
         return float(self._properties.get('maxSpeed'))
 
     @property
-    def travel_time(self) -> float:
-        '''
-        Returns current travel time
-
-        @retval travel time
-        '''
-        return float(self._travel_stats.get('travel_time'))
-
-    @property
-    def travel_stats(self) -> MappingProxyType:
-        '''
-        @brief Returns MappingProxyType travel stats dictionary
-
-        @retval self._travel_stats
-        '''
-        return MappingProxyType(self._travel_stats)
-
-    @property
     def dsat_threshold(self) -> float:
         '''
-        returns dissatisfaction threshold
-        @retval self.properties.get('dsat_threshold')
+        :return: dissatisfaction threshold, i.e. `self.properties.get('dsat_threshold')`
         '''
         return float(self._properties.get('dsat_threshold'))
 
-    @dsat_threshold.setter
-    def dsat_threshold(self, threshold: float):
-        ''' sets dissatisfaction threshold '''
-        self._properties['dsat_threshold'] = float(threshold)
+    def statistic_series_grid(self, interpolate=False) -> pandas.Series:
+        '''
+        Recorded travel statistics as `pandas.Series`.
 
-    @staticmethod
-    def dissatisfaction(
-            time_loss: float,
-            optimal_travel_time: float,
-            time_loss_threshold=0.2) -> float:
-        r'''Calculate driver's dissatisfaction.
-        Calculate driver's dissatisfaction.
-        \f{eqnarray*}{
-            TT &:=& \text{travel time}, \\
-            TT^{*} &:=& \text{optimal travel time}, \\
-            TL &:=& \text{time loss}, \\
-            TLT &:=& \text{time loss threshold}, \\
-            \text{dissatisfaction} &:=& dsat(TL, TT^{*}, TLT) \\
-            &=&\frac{1}{1+e^{(-TL + TLT \cdot TT^{*}) \cdot 0{.}5}}.\\
-            &&\text{note: using a smoothening factor of 0.5 to make the transition not that sharp}
-        \f}
-        @param time_loss time loss
-        @param time_loss_threshold cut-off point of acceptable time loss
-            relative to optimal travel time in [0,1]
-        @param optimal_travel_time optimal travel time
-        @retval dissatisfaction ([0,1] normalised)
+        :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series) and a `Series` for grid cells in x-direction (self._grid_based_series).
+        As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`, we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
+
+        :param interpolate: return a data copy with NaN values linear interpolated
+        :return: grid-based `pandas.Series`
         '''
 
-        # pylint: disable=no-member
-        return numpy.divide(
-            1.,
-            1 + numpy.exp((-time_loss + time_loss_threshold * optimal_travel_time)) * .5
-        )
-        # pylint: enable=no-member
+        return pandas.concat(
+            (
+                self._grid_based_series[i_metric].interpolate()
+                for i_metric in ('time_step',
+                               'position_y',
+                               'grid_position_y',
+                               'dissatisfaction',
+                               'travel_time',
+                               'time_loss',
+                               'relative_time_loss')
+            ),
+            keys=('time_step',
+                  'position_y',
+                  'grid_position_y',
+                  'dissatisfaction',
+                  'travel_time',
+                  'time_loss',
+                  'relative_time_loss')
+        ) if interpolate else self._grid_based_series
 
-    def record_travel_stats(self, time_step: float) -> BaseVehicle:
-        r'''Record travel statistics to vehicle.
-        Write travel stats, i.e. travel time, time loss, position,
-        and dissatisfaction of vehicle for a given time step into self._travel_stats
+    def statistic_series_time(self, interpolate=False) -> pandas.Series:
+        '''
+        Recorded travel statistics as `pandas.Series`.
 
-        @param time_step current time step
-        @retval self
+        :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series) and a `Series` for grid cells in x-direction (self._grid_based_series).
+        As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`, we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
+
+        :param interpolate: return a data copy with NaN values linear interpolated
+        :return: timestep-based `pandas.Series`
         '''
 
-        # update current travel time
-        self._travel_stats['travel_time'] = float(time_step) - self.start_time
-
-        # current step number
-        self._travel_stats.get('step').get('number').append(float(time_step))
-
-        # position
-        self._travel_stats.get('step').get('pos_x').append(self.position[0])
-        self._travel_stats.get('step').get('pos_y').append(self.position[1])
-
-        # grid based stats
-        # check whether vehicle stayed in this grid cell
-        if len(self._travel_stats.get('grid').get('pos_x')) + \
-                len(self._travel_stats.get('grid').get('pos_y')) > 0 \
-                and isinstance(self._travel_stats.get('grid').get('pos_x')[-1], list) \
-                and isinstance(self._travel_stats.get('grid').get('pos_y')[-1], list) \
-                and self._travel_stats.get('grid').get('pos_x')[-1][0] == self.grid_position[0] \
-                and self._travel_stats.get('grid').get('pos_y')[-1][0] == self.grid_position[1]:
-            self._travel_stats.get('grid').get('pos_x')[-1].append(self.grid_position[0])
-            self._travel_stats.get('grid').get('pos_y')[-1].append(self.grid_position[1])
-            self._travel_stats.get('grid').get('speed')[-1].append(self.speed)
-            self._travel_stats.get('grid').get('time_loss')[-1].append(
-                time_step - self.start_time - self.position[0] / self.speed_max
-            )
-            self._travel_stats.get('grid').get('relative_time_loss')[-1].append(
-                (time_step - self.start_time - self.position[0] / self.speed_max) /
-                (self.position[0] / self.speed_max)
-            )
-
-            self._travel_stats.get('grid').get('dissatisfaction')[-1].append(
-                self.dissatisfaction(
-                    time_step - self.start_time - self.position[0] / self.speed_max,
-                    self.position[0] / self.speed_max,
-                    self._properties.get('dsat_threshold')
-                )
-            )
-
-        else:
-            self._travel_stats.get('grid').get('pos_x').append([self.grid_position[0]])
-            self._travel_stats.get('grid').get('pos_y').append([self.grid_position[1]])
-            self._travel_stats.get('grid').get('speed').append([self.speed])
-            self._travel_stats.get('grid').get('time_loss').append(
-                [time_step - self.start_time - self.position[0] / self.speed_max]
-            )
-            self._travel_stats.get('grid').get('relative_time_loss').append(
-                [
-                    (time_step - self.start_time - self.position[0] / self.speed_max) /
-                    (self.position[0] / self.speed_max)
-                ]
-            )
-            self._travel_stats.get('grid').get('dissatisfaction').append(
-                [
-                    self.dissatisfaction(
-                        time_step - self.start_time - self.position[0] / self.speed_max,
-                        self.position[0] / self.speed_max,
-                        self._properties.get('dsat_threshold')
-                    )
-                ]
-            )
-
-        # step based stats
-        self._travel_stats.get('step').get('time_loss').append(
-            time_step - self.start_time - self.position[0] / self.speed_max
-        )
-        self._travel_stats.get('step').get('relative_time_loss').append(
-            (time_step - self.start_time - self.position[0] / self.speed_max) /
-            (self.position[0] / self.speed_max)
-        )
-
-        self._travel_stats.get('step').get('speed').append(self.speed)
-
-        self._travel_stats.get('step').get('dissatisfaction').append(
-            self.dissatisfaction(
-                time_step - self.start_time - self.position[0] / self.speed_max,
-                self.position[0] / self.speed_max,
-                self._properties.get('dsat_threshold')
-            )
-        )
-
-        # force dissatisfaction of first entry to 0.0 to avoid start-time quirks introduced by SUMO
-        if self._travel_stats.get('grid').get('dissatisfaction')[0] != [0.]:
-            self._travel_stats.get('grid').get('dissatisfaction')[0] = [0.]
-        if self._travel_stats.get('step').get('dissatisfaction')[0] != 0.:
-            self._travel_stats.get('step').get('dissatisfaction')[0] = 0.
-
-        # force time_loss of first entry to 0.0 to avoid start-time quirks
-        if self._travel_stats.get('grid').get('time_loss')[0] != [0.]:
-            self._travel_stats.get('grid').get('time_loss')[0] = [0.]
-        if self._travel_stats.get('step').get('time_loss')[0] != 0.:
-            self._travel_stats.get('step').get('time_loss')[0] = 0.
-
-        # force relative_time_loss of first entry to 0.0 to avoid start-time quirks
-        if self._travel_stats.get('grid').get('relative_time_loss')[0] != [0.]:
-            self._travel_stats.get('grid').get('relative_time_loss')[0] = [0.]
-        if self._travel_stats.get('step').get('relative_time_loss')[0] != 0.:
-            self._travel_stats.get('step').get('relative_time_loss')[0] = 0.
-
-        return self
+        return pandas.concat(
+            (
+                self._time_based_series[i_type].interpolate()
+                for i_type in ('position_x',
+                               'position_y',
+                               'grid_position_x',
+                               'grid_position_y',
+                               'dissatisfaction',
+                               'travel_time',
+                               'time_loss',
+                               'relative_time_loss')
+             ),
+            keys=('position_x',
+                  'position_y',
+                  'grid_position_x',
+                  'grid_position_y',
+                  'dissatisfaction',
+                  'travel_time',
+                  'time_loss',
+                  'relative_time_loss')
+        ) if interpolate else self._time_based_series
 
     def change_vehicle_class(self, class_name: str) -> BaseVehicle:
         '''
         Change vehicle class
-        @param class_name vehicle class
-        @retval self
+
+        :param class_name: vehicle class
+        :return: future self
+
         '''
+
         self._properties['vClass'] = str(class_name)
         return self
 
-    def update(self, position: Position, lane_index: int, speed: float) -> BaseVehicle:
+    def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:
         '''
         Update current properties of vehicle providing data acquired from TraCI call.
 
@@ -406,17 +389,46 @@ class SUMOVehicle(BaseVehicle):
         cell size and int-rounded. For the y-coordinate take the lane index.
         NOTE: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
 
-        @param position: tuple TraCI provided position
-        @param lane_index: int TraCI provided lane index
-        @param speed: float TraCI provided speed
-        @retval self Vehicle reference
+        :NOTE: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
+
+        :param position: tuple TraCI provided position
+        :param lane_index: int TraCI provided lane index
+        :param speed: float TraCI provided speed
+        :param time_step: float TraCI provided time step
+        :return: future Vehicle reference
+
         '''
 
-        self._properties['position'] = Position(*position)
-        self._properties['grid_position'] = Position(
-            x=int(round(self._properties.get('grid_position').x/4.)-1),
-            y=int(lane_index)
+        # update current vehicle properties
+        self._position = Position(*position)
+        self._grid_position = Position(*position).gridified(width=self._environment.get('gridcellwidth'))
+        self._speed = float(speed)
+        self._time_step = float(time_step)
+        self._travel_time = float(time_step) - self.start_time
+
+        # update data series based on grid cell
+        l_dissatisfaction = colmto.common.model.dissatisfaction(
+            time_step - self.start_time - self._position.x / self.speed_max,
+            self._position.x / self.speed_max,
+            self.dsat_threshold
         )
-        self._properties['speed'] = float(speed)
+        self._grid_based_series['time_step', self._grid_position.x] = float(time_step)
+        self._grid_based_series['position_y', self._grid_position.x] = self._position.y
+        self._grid_based_series['grid_position_y', self._grid_position.x] = self._grid_position.y
+        self._grid_based_series['dissatisfaction', self._grid_position.x] = l_dissatisfaction
+        self._grid_based_series['travel_time', self._grid_position.x] = self._travel_time
+        self._grid_based_series['time_loss', self._grid_position.x] = time_step - self.start_time - self._position.x / self.speed_max
+        self._grid_based_series['relative_time_loss', self._grid_position.x] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
+        self._grid_based_series['time_step', self._grid_position.x] = float(time_step)
+
+        # update data series based on time step
+        self._time_based_series['position_x', int(time_step)] = self._position.x
+        self._time_based_series['position_y', int(time_step)] = self._position.y
+        self._time_based_series['grid_position_x', int(time_step)] = self._grid_position.x
+        self._time_based_series['grid_position_y', int(time_step)] = self._grid_position.y
+        self._time_based_series['dissatisfaction', int(time_step)] = l_dissatisfaction
+        self._time_based_series['travel_time', int(time_step)] = self._travel_time
+        self._time_based_series['time_loss', int(time_step)] = time_step - self.start_time - self._position.x / self.speed_max
+        self._time_based_series['relative_time_loss', int(time_step)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         return self

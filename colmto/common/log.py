@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -26,11 +26,21 @@ import logging
 import logging.handlers
 from pathlib import Path
 import sys
+import warnings
+import functools
 
 
 def logger(name: str, loglevel=logging.NOTSET, quiet=False,
            logfile=Path('~/.colmto/colmto.log').expanduser()) -> logging.Logger:
-    '''Create a logger instance.'''
+    '''
+    Create a logger instance.
+
+    :param name: name of the logger, e.g. class/module name
+    :param loglevel: loglevel from logging module, e.g. `logging.DEBUG`. Default: `logging.NOTSET`
+    :param quiet: if true, suppress output to console
+    :param logfile: Path where to write logfile. Default: ``~/.colmto/colmto.log``
+    :return: Logger object
+    '''
 
     if not isinstance(loglevel, (int, str)):
         raise TypeError('Unknown log level type %s' % type(loglevel))
@@ -76,3 +86,24 @@ def logger(name: str, loglevel=logging.NOTSET, quiet=False,
             l_log.addHandler(l_shandler)
 
     return l_log
+
+def deprecated(func):
+    '''
+    This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used.
+
+    :see: https://wiki.python.org/moin/PythonDecoratorLibrary#Generating_Deprecation_Warnings
+    '''
+
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        '''wrapper function'''
+        warnings.warn_explicit(
+            'Call to deprecated function {}.'.format(func.__name__),
+            category=DeprecationWarning,
+            filename=func.func_code.co_filename,
+            lineno=func.func_code.co_firstlineno + 1
+        )
+        return func(*args, **kwargs)
+    return new_func

@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -112,35 +112,6 @@ def test_closestpositiontodetector():
         -1
     )
     # pylint: enable=protected-access
-
-
-def test_h_spread():
-    '''
-    Test H-Spread function.
-
-    Example data taken from http://mathworld.wolfram.com/Hinge.html
-    '''
-
-    assert_equal(
-        colmto.common.statistics.Statistics.h_spread(
-            numpy.array(
-                (
-                    150, 250, 688, 795, 795, 795, 895, 895, 895,
-                    1099, 1166, 1333, 1499, 1693, 1699, 1775, 1895
-                )
-            )
-        ),
-        704
-    )
-
-    assert_equal(
-        colmto.common.statistics.Statistics.h_spread(
-            numpy.array(
-                range(10 ** 6)
-            )
-        ),
-        499999.5
-    )
 
 
 def test_aggregate_hdf5():

@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -32,7 +32,7 @@ import h5py
 def main(argv):
     '''
     main
-    @param argv: cmdline args
+    :param argv: cmdline args
     '''
     if len(sys.argv) != 3:
         print('Usage: merge_scenario_hdf5.py hdf5-input-file hdf5-output-file')

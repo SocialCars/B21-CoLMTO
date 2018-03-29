@@ -6,7 +6,7 @@
 # #                                                                           #
 # # This file is part of the Cooperative Lane Management and Traffic flow     #
 # # Optimisation project.                                                     #
-# # Copyright (c) 2017, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
+# # Copyright (c) 2018, Malte Aschermann (malte.aschermann@tu-clausthal.de)   #
 # # This program is free software: you can redistribute it and/or modify      #
 # # it under the terms of the GNU Lesser General Public License as            #
 # # published by the Free Software Foundation, either version 3 of the        #
@@ -49,33 +49,22 @@ _DEFAULT_CONFIG_RUN = {
     'starttimedistribution': 'poisson',
     'rules': [
         {
-            'type': 'SUMOPositionRule',
-            'behaviour': 'deny',
+            'type': 'ExtendableSUMOPositionRule',
             'args': {
-                'position_bbox': ((0., -2.), (9520., 2.))
-            },
-            'vehicle_rules': {
-                'rule': 'any',
-                'rules': [
+                'bounding_box': ((1350., -2.), (2500., 2.)),
+                'subrule_operator': 'all',
+                'subrules': [
                     {
-                        'type': 'SUMOVTypeRule',
-                        'behaviour': 'deny',
+                        'type': 'SUMOMinimalSpeedRule',
                         'args': {
-                            'vehicle_type': 'truck'
+                            'minimal_speed': 80/3.6    # unit: meter/second
                         },
-                    },
-                    {
-                        'type': 'SUMOVTypeRule',
-                        'behaviour': 'deny',
-                        'args': {
-                            'vehicle_type': 'passenger'
-                        },
-                    },
-
+                    }
                 ]
             }
         }
     ],
+    'gridcellwidth': 4,    # unit: meter
     'sumo': {
         'enabled': True,
         'gui-delay': 200,
@@ -385,41 +374,41 @@ class Configuration(object):
     @property
     def run_config(self) -> MappingProxyType:
         '''
-        @retval run config
+        :return: run config
         '''
         return MappingProxyType(self._run_config)
 
     @property
     def scenario_config(self) -> MappingProxyType:
         '''
-        @retval scenario config
+        :return: scenario config
         '''
         return MappingProxyType(self._scenario_config)
 
     @property
     def scenario_dir(self) -> Path:
         '''
-        @retval scenario directory.
+        :return: scenario directory.
         '''
         return self._args.scenario_dir
 
     @property
     def vtypes_config(self) -> MappingProxyType:
         '''
-        @retval vehicle type config
+        :return: vehicle type config
         '''
         return MappingProxyType(self._vtypes_config)
 
     @property
     def output_dir(self) -> Path:
         '''
-        @retval destination dir
+        :return: destination dir
         '''
         return self._args.output_dir
 
     @property
     def run_prefix(self) -> str:
         '''
-        @retval run prefix
+        :return: run prefix
         '''
         return self._args.run_prefix
