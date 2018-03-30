@@ -54,10 +54,10 @@ jobs:
 #                  command: python3 setup.py test
             - run:
                   name: Run Simulation for Scenario NI-B210 (1/2)
-                  command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1
+                  command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1 --debug
             - run:
                   name: Run Simulation for Scenario NI-B210 with CSE (2/2)
-                  command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1
+                  command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1 --debug
 #            - run:
 #                  name: Run Nosetests for Codecov
 #                  command: nosetests -w tests --with-coverage
