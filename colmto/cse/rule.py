@@ -33,8 +33,8 @@ from typing import Iterable
 
 import enum
 
-from colmto.common.property import Position, VehicleType
-from colmto.common.property import BoundingBox
+from colmto.common.helper import Position, VehicleType
+from colmto.common.helper import BoundingBox
 
 
 @enum.unique

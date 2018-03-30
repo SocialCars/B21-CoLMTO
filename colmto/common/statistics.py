@@ -31,9 +31,9 @@ import matplotlib.pyplot as plt
 import colmto.common.io
 import colmto.common.log
 import colmto.common.model
-from colmto.common.property import VehicleType
-from colmto.common.property import Metric
-from colmto.common.property import StatisticSeries
+from colmto.common.helper import VehicleType
+from colmto.common.helper import Metric
+from colmto.common.helper import StatisticSeries
 from colmto.environment.vehicle import SUMOVehicle
 
 

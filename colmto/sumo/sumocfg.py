@@ -33,9 +33,9 @@ from collections import OrderedDict
 
 import numpy
 
-from colmto.common.property import Colour
-from colmto.common.property import Distribution
-from colmto.common.property import InitialSorting
+from colmto.common.helper import Colour
+from colmto.common.helper import Distribution
+from colmto.common.helper import InitialSorting
 
 try:
     import lxml.etree as etree
@@ -238,7 +238,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
         :param scenarioconfig: Scenario configuration
         :param nodefile: Destination to write node file
         :param forcerebuildscenarios: rebuild scenarios, even if they already exist for current run
-        :todo make 5% entry lange configurable
+
+        :todo make 5% entry lane configurable
 
         '''
 

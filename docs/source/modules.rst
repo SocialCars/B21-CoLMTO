@@ -24,6 +24,13 @@ Modules
     
 .. automodule:: colmto.common.configuration
 
+.. _modules_common_helper:
+
+`colmto.common.helper`
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: colmto.common.helper
+
 .. _modules_common_io:
 
 `colmto.common.io`
@@ -44,13 +51,6 @@ Modules
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: colmto.common.model
-
-.. _modules_common_property:
-
-`colmto.common.property`
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: colmto.common.property
 
 .. _modules_common_statistics:
 

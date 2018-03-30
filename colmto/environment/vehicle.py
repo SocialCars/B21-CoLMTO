@@ -29,10 +29,10 @@ import pandas
 
 import colmto.cse.rule
 import colmto.common.model
-from colmto.common.property import Position, VehicleType, StatisticSeries
-from colmto.common.property import GridPosition
-from colmto.common.property import Colour
-from colmto.common.property import Metric
+from colmto.common.helper import Position, VehicleType, StatisticSeries
+from colmto.common.helper import GridPosition
+from colmto.common.helper import Colour
+from colmto.common.helper import Metric
 
 
 class BaseVehicle(object):
@@ -273,7 +273,7 @@ class SUMOVehicle(BaseVehicle):
         '''
         Updates current speed.
 
-        @retval travel time
+        :return: travel time
         '''
         self._properties['speed'] = float(speed)
 
@@ -301,6 +301,7 @@ class SUMOVehicle(BaseVehicle):
 
         :param interpolate: return a data copy with NaN values linear interpolated
         :return: grid-based `pandas.Series`
+
         '''
 
         return pandas.concat(
