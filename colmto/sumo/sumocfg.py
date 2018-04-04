@@ -253,7 +253,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_nbswitches = scenarioconfig.get('parameters').get('switches')
         l_segmentlength = l_length / (l_nbswitches + 1)
 
-        if self._args.onlyoneotlsegment:     # for only one 2+1 segment, the
+        if self._run_config.get('onlyoneotlsegment'):     # for only one 2+1 segment, the
             l_length = l_segmentlength + 0.1 # total length is just one segment
                                              # (plus 10cm to fix an issue with SUMO joining the lanes)
 
@@ -278,7 +278,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 'id': 'exit',
                 'x': str(
                     l_length + 0.1
-                    if l_nbswitches % 2 == 1 and not self._args.onlyoneotlsegment
+                    if l_nbswitches % 2 == 1 and not self._run_config.get('onlyoneotlsegment')
                     else l_length
                 ),
                 'y': '0'
@@ -402,7 +402,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             # add splits and joins
             l_add_otl_lane = True
             for i_segmentpos in l_parameters.get('switchpositions') \
-                    if not self._args.onlyoneotlsegment else l_parameters.get('switchpositions')[:2]:
+                    if not self._run_config.get('onlyoneotlsegment') else l_parameters.get('switchpositions')[:2]:
                 etree.SubElement(
                     edge,
                     'split',
@@ -420,7 +420,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             # compute and add splits and joins
             l_add_otl_lane = True
             for i_segmentpos in range(0, int(l_length), int(l_segmentlength)) \
-                    if not self._args.onlyoneotlsegment \
+                    if not self._run_config.get('onlyoneotlsegment') \
                     else range(0, int(2 * l_segmentlength - 1), int(l_segmentlength)):
                 etree.SubElement(
                     edge,
@@ -573,12 +573,12 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 ),
                 environment={  # todo: make 5% entry lane configurable
                     'length': 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
-                        if not self._args.onlyoneotlsegment
+                        if not self._run_config.get('onlyoneotlsegment')
                         else 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
                              / (self.scenario_config.get(scenario_name).get('parameters').get('switches') + 1),
                     'gridcellwidth': self._run_config.get('gridcellwidth'),
                     'gridlength': int(round(1.05*self.scenario_config.get(scenario_name).get('parameters').get('length') / self._run_config.get('gridcellwidth')))
-                        if not self._args.onlyoneotlsegment
+                        if not self._run_config.get('onlyoneotlsegment')
                         else int(round(1.05*(self.scenario_config.get(scenario_name).get('parameters').get('length')
                              / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
                 }

@@ -43,6 +43,7 @@ _DEFAULT_CONFIG_RUN = {
         'enabled': False,
         'value': 30
     },
+    'onlyoneotlsegment': False,
     'runs': 1000,
     'scenarios': ['NI-B210'],
     'simtimeinterval': [0, 1800],
@@ -361,6 +362,8 @@ class Configuration(object):
             self._run_config.get('sumo')['headless'] = True
         if self._args.gui:
             self._run_config.get('sumo')['headless'] = False
+        if self._args.onlyoneotlsegment:
+            self._run_config['onlyoneotlsegment'] = True
         if self._args.cse_enabled:
             self._run_config['cse-enabled'] = True
         if self._args.runs is not None:
