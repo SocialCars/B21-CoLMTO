@@ -139,12 +139,12 @@ class SUMOVehicle(BaseVehicle):
 
         # prepare time and grid-based series using OrderedDicts to maintain the order of keys
         self._time_based_series_dict = {
-            i_metric : OrderedDict()
+            i_metric.value : OrderedDict()
             for i_metric in StatisticSeries.TIME.metrics()
         }
 
         self._grid_based_series_dict = {
-            i_metric : OrderedDict()
+            i_metric.value : OrderedDict()
             for i_metric in StatisticSeries.GRID.metrics()
         }
 
@@ -298,7 +298,7 @@ class SUMOVehicle(BaseVehicle):
         l_grid_based_series = pandas.Series(
             index=pandas.MultiIndex.from_product(
                 iterables=(
-                    StatisticSeries.GRID.metrics(),
+                    (i_metric.value for i_metric in StatisticSeries.GRID.metrics()),
                     range(int(self._environment.get('gridlength')))  # range(number of cells of x-axis)
                 ),
                 names=('metric', Metric.GRID_POSITION_X.value)
@@ -306,15 +306,15 @@ class SUMOVehicle(BaseVehicle):
         )
 
         for i_metric in StatisticSeries.GRID.metrics():
-            for k, v in self._grid_based_series_dict.get(i_metric).items():
-                l_grid_based_series[i_metric, k] = v
+            for k, v in self._grid_based_series_dict.get(i_metric.value).items():
+                l_grid_based_series[i_metric.value, k] = v
 
         return pandas.concat(
             (
-                l_grid_based_series[i_metric].interpolate()
+                l_grid_based_series[i_metric.value].interpolate()
                 for i_metric in StatisticSeries.GRID.metrics()
             ),
-            keys=StatisticSeries.GRID.metrics()
+            keys=(i_metric.value for i_metric in StatisticSeries.GRID.metrics())
         ) if interpolate else l_grid_based_series
 
 
@@ -332,7 +332,7 @@ class SUMOVehicle(BaseVehicle):
         l_time_based_series = pandas.Series(
             index=pandas.MultiIndex.from_product(
                 iterables=[
-                    StatisticSeries.TIME.metrics(),
+                    (i_metric.value for i_metric in StatisticSeries.TIME.metrics()),
                     (0,)
                 ],
                 names=('metric', Metric.TIME_STEP.value)
@@ -340,15 +340,15 @@ class SUMOVehicle(BaseVehicle):
         )
 
         for i_metric in StatisticSeries.TIME.metrics():
-            for k, v in self._time_based_series_dict.get(i_metric).items():
-                l_time_based_series[i_metric, k] = v
+            for k, v in self._time_based_series_dict.get(i_metric.value).items():
+                l_time_based_series[i_metric.value, k] = v
 
         return pandas.concat(
             (
-                l_time_based_series[i_type].interpolate()
-                for i_type in StatisticSeries.TIME.metrics()
+                l_time_based_series[i_metric.value].interpolate()
+                for i_metric in StatisticSeries.TIME.metrics()
              ),
-            keys=StatisticSeries.TIME.metrics()
+            keys=(i_metric.value for i_metric in StatisticSeries.TIME.metrics())
         ) if interpolate else l_time_based_series
 
     def change_vehicle_class(self, class_name: str) -> BaseVehicle:

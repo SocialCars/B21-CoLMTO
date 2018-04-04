@@ -223,23 +223,23 @@ class StatisticSeries(enum.Enum):
         :return: tuple of metrics
         '''
         if self is StatisticSeries.GRID:
-            return (Metric.TIME_STEP.value,
-                    Metric.POSITION_Y.value,
-                    Metric.GRID_POSITION_Y.value,
-                    Metric.DISSATISFACTION.value,
-                    Metric.TRAVEL_TIME.value,
-                    Metric.TIME_LOSS.value,
-                    Metric.RELATIVE_TIME_LOSS.value)
+            return (Metric.TIME_STEP,
+                    Metric.POSITION_Y,
+                    Metric.GRID_POSITION_Y,
+                    Metric.DISSATISFACTION,
+                    Metric.TRAVEL_TIME,
+                    Metric.TIME_LOSS,
+                    Metric.RELATIVE_TIME_LOSS)
 
         if self is StatisticSeries.TIME:
-            return (Metric.POSITION_X.value,
-                    Metric.POSITION_Y.value,
-                    Metric.GRID_POSITION_X.value,
-                    Metric.GRID_POSITION_Y.value,
-                    Metric.DISSATISFACTION.value,
-                    Metric.TRAVEL_TIME.value,
-                    Metric.TIME_LOSS.value,
-                    Metric.RELATIVE_TIME_LOSS.value)
+            return (Metric.POSITION_X,
+                    Metric.POSITION_Y,
+                    Metric.GRID_POSITION_X,
+                    Metric.GRID_POSITION_Y,
+                    Metric.DISSATISFACTION,
+                    Metric.TRAVEL_TIME,
+                    Metric.TIME_LOSS,
+                    Metric.RELATIVE_TIME_LOSS)
 
         # raise TypeError
         raise TypeError(f'{seriestype} is neither {StatisticSeries.GRID} or {StatisticSeries.TIME}.')

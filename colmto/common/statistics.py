@@ -56,7 +56,7 @@ class Statistics(object):
         return {
             i_series.value: {
                 'all': {
-                    i_metric: {
+                    i_metric.value: {
                         'value': pandas.concat(
                             (
                                 i_series.of(vehicles[i_vehicle], interpolate=True)
@@ -64,7 +64,7 @@ class Statistics(object):
                             ),
                             axis=1,
                             keys=sorted(vehicles.keys())
-                        ).T[i_metric],
+                        ).T[i_metric.value],
                         'attr': {'type': 'pandas.DataFrame'}
                     }
                     for i_metric in i_series.metrics()
@@ -72,7 +72,7 @@ class Statistics(object):
                 },
                 **{
                     i_vtype.value : {
-                        i_metric : {
+                        i_metric.value : {
                             'value' : pandas.concat(
                                 (
                                     i_series.of(vehicles[i_vehicle], interpolate=True)
@@ -80,7 +80,7 @@ class Statistics(object):
                                 ),
                                 axis=1,
                                 keys=sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
-                            ).T[i_metric],
+                            ).T[i_metric.value],
                             'attr': {'type': 'pandas.DataFrame'}
                         }
                         for i_metric in i_series.metrics()
