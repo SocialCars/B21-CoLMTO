@@ -161,7 +161,7 @@ class Writer(object):
                     i_object_value.get('value').to_hdf(
                         f'{Path(hdf5_file).parent}/{Path(hdf5_file).stem}_pandas{Path(hdf5_file).suffix}',
                         f'/{hdf5_base_path}/{i_path}',
-                        complib=kwargs.get('compression') if kwargs.get('compression') in ('zlib', 'lzo', 'bzip2', 'blosc') else 'blosc:zstd',
+                        complib=kwargs.get('compression') if kwargs.get('compression') in ('zlib', 'lzo', 'bzip2', 'blosc') else 'zlib',
                         complevel=kwargs.get('compression_opts'),
                         fletcher32=kwargs.get('fletcher32')
                     )
