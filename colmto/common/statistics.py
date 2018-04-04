@@ -59,7 +59,7 @@ class Statistics(object):
                     i_metric: {
                         'value': pandas.concat(
                             (
-                                i_series.of(vehicles[i_vehicle])
+                                i_series.of(vehicles[i_vehicle], interpolate=True)
                                 for i_vehicle in sorted(vehicles.keys())
                             ),
                             axis=1,
@@ -75,7 +75,7 @@ class Statistics(object):
                         i_metric : {
                             'value' : pandas.concat(
                                 (
-                                    i_series.of(vehicles[i_vehicle])
+                                    i_series.of(vehicles[i_vehicle], interpolate=True)
                                     for i_vehicle in sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
                                 ),
                                 axis=1,

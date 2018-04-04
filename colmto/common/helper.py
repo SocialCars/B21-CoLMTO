@@ -210,7 +210,7 @@ class StatisticSeries(enum.Enum):
     GRID = 'grid_based_series'
     TIME = 'time_based_series'
 
-    def of(self, vehicle: 'SUMOVehicle', interpolate=True):
+    def of(self, vehicle: 'SUMOVehicle', interpolate=False):
         if self is self.GRID:
             return vehicle.statistic_series_grid(interpolate)
         return vehicle.statistic_series_time(interpolate)
