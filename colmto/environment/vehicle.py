@@ -23,9 +23,9 @@
 # @endcond
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
-from collections import namedtuple
 from types import MappingProxyType
 import pandas
+from collections import OrderedDict
 
 import colmto.cse.rule
 import colmto.common.model
@@ -137,13 +137,14 @@ class SUMOVehicle(BaseVehicle):
 
         self._environment = environment
 
+        # prepare time and grid-based series using OrderedDicts to maintain the order of keys
         self._time_based_series_dict = {
-            i_metric : []
+            i_metric : OrderedDict()
             for i_metric in StatisticSeries.TIME.metrics()
         }
 
         self._grid_based_series_dict = {
-            i_metric : []
+            i_metric : OrderedDict()
             for i_metric in StatisticSeries.GRID.metrics()
         }
 
@@ -296,16 +297,16 @@ class SUMOVehicle(BaseVehicle):
 
         l_grid_based_series = pandas.Series(
             index=pandas.MultiIndex.from_product(
-                iterables=[
+                iterables=(
                     StatisticSeries.GRID.metrics(),
                     range(int(self._environment.get('gridlength')))  # range(number of cells of x-axis)
-                ],
-                names=['metric', Metric.GRID_POSITION_X.value]
+                ),
+                names=('metric', Metric.GRID_POSITION_X.value)
             )
         )
-        # todo: simplify and merge into series construction via dict data and not tuples
+
         for i_metric in StatisticSeries.GRID.metrics():
-            for k, v in self._grid_based_series_dict.get(i_metric):
+            for k, v in self._grid_based_series_dict.get(i_metric).items():
                 l_grid_based_series[i_metric, k] = v
 
         return pandas.concat(
@@ -332,14 +333,14 @@ class SUMOVehicle(BaseVehicle):
             index=pandas.MultiIndex.from_product(
                 iterables=[
                     StatisticSeries.TIME.metrics(),
-                    [0]
+                    (0,)
                 ],
-                names=['metric', Metric.TIME_STEP.value]
+                names=('metric', Metric.TIME_STEP.value)
             )
         )
-        # todo: simplify and merge into series construction via dict data and not tuples
+
         for i_metric in StatisticSeries.TIME.metrics():
-            for k, v in self._time_based_series_dict.get(i_metric):
+            for k, v in self._time_based_series_dict.get(i_metric).items():
                 l_time_based_series[i_metric, k] = v
 
         return pandas.concat(
@@ -394,22 +395,22 @@ class SUMOVehicle(BaseVehicle):
             self.dsat_threshold
         )
 
-        self._grid_based_series_dict.get(Metric.TIME_STEP.value).append((self._grid_position.x, float(time_step)))
-        self._grid_based_series_dict.get(Metric.POSITION_Y.value).append((self._grid_position.x, self._position.y))
-        self._grid_based_series_dict.get(Metric.GRID_POSITION_Y.value).append((self._grid_position.x, self._grid_position.y))
-        self._grid_based_series_dict.get(Metric.DISSATISFACTION.value).append((self._grid_position.x, l_dissatisfaction))
-        self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value).append((self._grid_position.x, self._travel_time))
-        self._grid_based_series_dict.get(Metric.TIME_LOSS.value).append((self._grid_position.x, time_step - self.start_time - self._position.x / self.speed_max))
-        self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value).append((self._grid_position.x, (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)))
+        self._grid_based_series_dict.get(Metric.TIME_STEP.value)[self._grid_position.x] = float(time_step)
+        self._grid_based_series_dict.get(Metric.POSITION_Y.value)[self._grid_position.x] = self._position.y
+        self._grid_based_series_dict.get(Metric.GRID_POSITION_Y.value)[self._grid_position.x] = self._grid_position.y
+        self._grid_based_series_dict.get(Metric.DISSATISFACTION.value)[self._grid_position.x] = l_dissatisfaction
+        self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[self._grid_position.x] = self._travel_time
+        self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[self._grid_position.x] = time_step - self.start_time - self._position.x / self.speed_max
+        self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[self._grid_position.x] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         # update data series based on time step
-        self._time_based_series_dict.get(Metric.POSITION_X.value).append((int(time_step), self._position.x))
-        self._time_based_series_dict.get(Metric.POSITION_Y.value).append((int(time_step), self._position.y))
-        self._time_based_series_dict.get(Metric.GRID_POSITION_X.value).append((int(time_step), self._grid_position.x))
-        self._time_based_series_dict.get(Metric.GRID_POSITION_Y.value).append((int(time_step), self._grid_position.y))
-        self._time_based_series_dict.get(Metric.DISSATISFACTION.value).append((int(time_step), l_dissatisfaction))
-        self._time_based_series_dict.get(Metric.TRAVEL_TIME.value).append((int(time_step), self._travel_time))
-        self._time_based_series_dict.get(Metric.TIME_LOSS.value).append((int(time_step), time_step - self.start_time - self._position.x / self.speed_max))
-        self._time_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value).append((int(time_step), (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)))
+        self._time_based_series_dict.get(Metric.POSITION_X.value)[int(time_step)] = self._position.x
+        self._time_based_series_dict.get(Metric.POSITION_Y.value)[int(time_step)] = self._position.y
+        self._time_based_series_dict.get(Metric.GRID_POSITION_X.value)[int(time_step)] = self._grid_position.x
+        self._time_based_series_dict.get(Metric.GRID_POSITION_Y.value)[int(time_step)] = self._grid_position.y
+        self._time_based_series_dict.get(Metric.DISSATISFACTION.value)[int(time_step)] = l_dissatisfaction
+        self._time_based_series_dict.get(Metric.TRAVEL_TIME.value)[int(time_step)] = self._travel_time
+        self._time_based_series_dict.get(Metric.TIME_LOSS.value)[int(time_step)] = time_step - self.start_time - self._position.x / self.speed_max
+        self._time_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[int(time_step)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         return self

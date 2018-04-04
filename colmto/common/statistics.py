@@ -50,13 +50,16 @@ class Statistics(object):
 
 
     def merge_vehicle_series(self, run: int, vehicles: typing.Dict[str, SUMOVehicle]) -> typing.Dict[str, dict]:
-        l_run_stats = {
-            StatisticSeries.GRID.value: {
+
+        self._log.debug('Merging vehicle series of run %d', run)
+
+        return {
+            i_series.value: {
                 'all': {
                     i_metric: {
                         'value': pandas.concat(
                             (
-                                StatisticSeries.GRID.of(vehicles[i_vehicle])
+                                i_series.of(vehicles[i_vehicle])
                                 for i_vehicle in sorted(vehicles.keys())
                             ),
                             axis=1,
@@ -64,7 +67,7 @@ class Statistics(object):
                         ).T[i_metric],
                         'attr': {'type': 'pandas.DataFrame'}
                     }
-                    for i_metric in StatisticSeries.GRID.metrics()
+                    for i_metric in i_series.metrics()
                     if len(vehicles) > 0
                 },
                 **{
@@ -72,7 +75,7 @@ class Statistics(object):
                         i_metric : {
                             'value' : pandas.concat(
                                 (
-                                    StatisticSeries.GRID.of(vehicles[i_vehicle])
+                                    i_series.of(vehicles[i_vehicle])
                                     for i_vehicle in sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
                                 ),
                                 axis=1,
@@ -80,12 +83,11 @@ class Statistics(object):
                             ).T[i_metric],
                             'attr': {'type': 'pandas.DataFrame'}
                         }
-                        for i_metric in StatisticSeries.GRID.metrics()
+                        for i_metric in i_series.metrics()
                         if len(list(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))) > 0
                     }
                     for i_vtype in VehicleType
                 }
             }
+            for i_series in StatisticSeries
         }
-
-        return l_run_stats
