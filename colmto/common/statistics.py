@@ -53,31 +53,35 @@ class Statistics(object):
         l_run_stats = {
             StatisticSeries.GRID.value: {
                 'all': {
-                    'value': {
-                        i_metric : pandas.concat(
+                    i_metric: {
+                        'value': pandas.concat(
                             (
                                 StatisticSeries.GRID.of(vehicles[i_vehicle])
                                 for i_vehicle in sorted(vehicles.keys())
                             ),
                             axis=1,
                             keys=sorted(vehicles.keys())
-                        ).T[i_metric] if len(vehicles) > 0 else None
-                        for i_metric in StatisticSeries.GRID.metrics()
+                        ).T[i_metric],
+                        'attr': {'type': 'pandas.DataFrame'}
                     }
+                    for i_metric in StatisticSeries.GRID.metrics()
+                    if len(vehicles) > 0
                 },
                 **{
                     i_vtype.value : {
-                        'value' : {
-                            i_metric : pandas.concat(
+                        i_metric : {
+                            'value' : pandas.concat(
                                 (
                                     StatisticSeries.GRID.of(vehicles[i_vehicle])
                                     for i_vehicle in sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
                                 ),
                                 axis=1,
                                 keys=sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
-                            ).T[i_metric] if len(list(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))) > 0 else None
-                            for i_metric in StatisticSeries.GRID.metrics()
+                            ).T[i_metric],
+                            'attr': {'type': 'pandas.DataFrame'}
                         }
+                        for i_metric in StatisticSeries.GRID.metrics()
+                        if len(list(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))) > 0
                     }
                     for i_vtype in VehicleType
                 }
@@ -85,16 +89,3 @@ class Statistics(object):
         }
 
         return l_run_stats
-
-        # write to hdf5
-        # todo: move to_hdf call to io module
-        # self._log.debug(f'results for {StatisticSeries.GRID.value}')
-        # for i_vtype in l_run_stats.get(StatisticSeries.GRID.value).keys():
-        #     self._log.debug(f'\ttype {i_vtype}')
-        #     for i_metric in l_run_stats.get(StatisticSeries.GRID.value).get(i_vtype).keys():
-        #         if l_run_stats.get(StatisticSeries.GRID.value).get(i_vtype).get(i_metric) is not None:
-        #             self._log.debug(f'\t\tmetric {i_metric} with {len(l_run_stats.get(StatisticSeries.GRID.value).get(i_vtype).get(i_metric))} vehicles')
-        #             l_run_stats.get(StatisticSeries.GRID.value).get(i_vtype).get(i_metric).to_hdf('runs.hdf5', f'/{StatisticSeries.GRID.value}/{run}/{i_vtype}/{i_metric}')
-
-        # l_all_vehicle_series_grid.T['dissatisfaction'].boxplot()
-        # plt.savefig('ALL-boxplot29.png', dpi=600)
