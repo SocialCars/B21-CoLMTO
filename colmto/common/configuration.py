@@ -44,6 +44,7 @@ _DEFAULT_CONFIG_RUN = {
         'value': 30
     },
     'onlyoneotlsegment': False,
+    'entrylanepercent': 5,
     'runs': 1000,
     'scenarios': ['NI-B210'],
     'simtimeinterval': [0, 1800],

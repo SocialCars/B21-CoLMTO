@@ -571,15 +571,15 @@ class SumoConfig(colmto.common.configuration.Configuration):
                     ),
                     self.scenario_config.get(scenario_name).get('parameters').get('speedlimit')
                 ),
-                environment={  # todo: make 5% entry lane configurable
-                    'length': 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
+                environment={
+                    'length': (1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length')
                         if not self._run_config.get('onlyoneotlsegment')
-                        else 1.05*self.scenario_config.get(scenario_name).get('parameters').get('length')
+                        else (1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length')
                              / (self.scenario_config.get(scenario_name).get('parameters').get('switches') + 1),
                     'gridcellwidth': self._run_config.get('gridcellwidth'),
-                    'gridlength': int(round(1.05*self.scenario_config.get(scenario_name).get('parameters').get('length') / self._run_config.get('gridcellwidth')))
+                    'gridlength': int(round((1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length') / self._run_config.get('gridcellwidth')))
                         if not self._run_config.get('onlyoneotlsegment')
-                        else int(round(1.05*(self.scenario_config.get(scenario_name).get('parameters').get('length')
+                        else int(round((1 + self._run_config.get('entrylanepercent') / 100.) * (self.scenario_config.get(scenario_name).get('parameters').get('length')
                              / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
                 }
             ) for vtype in vtype_list
