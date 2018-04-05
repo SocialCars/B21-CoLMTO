@@ -186,7 +186,7 @@ inheritance_node_attrs = dict(fontname='"Mononoki"')
 graphviz_output_format='svg'
 
 def skip(app, what, name, obj, skip, options):
-    if name == '__init__' or 'metric':
+    if name == '__init__':
         return False
     return skip
 
