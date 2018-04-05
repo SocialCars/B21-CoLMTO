@@ -23,16 +23,12 @@
 # @endcond
 '''Statistics module'''
 
-import bisect
-import numpy
 import typing
 import pandas
-import matplotlib.pyplot as plt
 import colmto.common.io
 import colmto.common.log
 import colmto.common.model
 from colmto.common.helper import VehicleType
-from colmto.common.helper import Metric
 from colmto.common.helper import StatisticSeries
 from colmto.environment.vehicle import SUMOVehicle
 
