@@ -87,12 +87,12 @@ class BaseVehicle(object):
 class SUMOVehicle(BaseVehicle):
     '''SUMO vehicle class.
 
-    **Note on statistics:**
-    To properly store results from SUMO (discrete time vs. "continuous" space),
-    there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series)
-    and a `Series` for grid cells in x-direction (self._grid_based_series).
-    As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`,
-    we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
+    :note: **Note on statistics:**
+      To properly store results from SUMO (discrete time vs. "continuous" space),
+      there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series)
+      and a `Series` for grid cells in x-direction (self._grid_based_series).
+      As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`,
+      we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
 
     '''
 
@@ -287,8 +287,12 @@ class SUMOVehicle(BaseVehicle):
         '''
         Recorded travel statistics as `pandas.Series`.
 
-        :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series) and a `Series` for grid cells in x-direction (self._grid_based_series).
-        As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`, we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
+        :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a
+          `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_
+          related to the current time step (self._time_based_series) and a `Series` for grid cells in
+          x-direction (self._grid_based_series). As vehicles are expected to "jump" over cells while
+          traveling faster than `cell width / time step`, we create an entry for each cell
+          (initialised as `NaN`) and linear interpolate the missing values afterwards.
 
         :param interpolate: return a data copy with NaN values linear interpolated
         :return: grid-based `pandas.Series`
@@ -322,11 +326,16 @@ class SUMOVehicle(BaseVehicle):
         '''
         Recorded travel statistics as `pandas.Series`.
 
-        :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_ related to the current time step (self._time_based_series) and a `Series` for grid cells in x-direction (self._grid_based_series).
-        As vehicles are expected to "jump" over cells while traveling faster than `cell width / time step`, we create an entry for each cell (initialised as `NaN`) and linear interpolate the missing values afterwards.
+        :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a
+          `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_
+          related to the current time step (self._time_based_series) and a `Series` for grid cells in
+          x-direction (self._grid_based_series). As vehicles are expected to "jump" over cells while
+          traveling faster than `cell width / time step`, we create an entry for each cell
+          (initialised as `NaN`) and linear interpolate the missing values afterwards.
 
         :param interpolate: return a data copy with NaN values linear interpolated
         :return: timestep-based `pandas.Series`
+
         '''
 
         l_time_based_series = pandas.Series(
@@ -369,9 +378,8 @@ class SUMOVehicle(BaseVehicle):
 
         For the grid cell the vehicle is in, take the global position in x-direction divided by grid
         cell size and int-rounded. For the y-coordinate take the lane index.
-        NOTE: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
 
-        :NOTE: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
+        :note: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
 
         :param position: tuple TraCI provided position
         :param lane_index: int TraCI provided lane index
