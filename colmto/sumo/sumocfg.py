@@ -157,6 +157,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         :param initial_sorting: initial sorting of vehicles (InitialSorting enum)
         :param run_number: number of current run
         :return: run configuration dictionary
+
         '''
         self._log.debug(
             'Generating run %s for %s sorting', run_number, initial_sorting.name.lower()
@@ -239,8 +240,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
         :param nodefile: Destination to write node file
         :param forcerebuildscenarios: rebuild scenarios, even if they already exist for current run
 
-        :todo make 5% entry lane configurable
-
         '''
 
         if Path(nodefile).exists() and not forcerebuildscenarios:
@@ -259,8 +258,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         l_nodes = etree.Element('nodes')
         etree.SubElement(
-            # add 5% of segment length as entry lane
-            l_nodes, 'node', attrib={'id': 'enter', 'x': str(-0.05*l_segmentlength), 'y': '0'}
+            # add a configurable percentage of segment length as entry lane
+            l_nodes, 'node', attrib={
+                'id': 'enter',
+                'x': str(-self.run_config.get('entrylanepercent')/100. * l_segmentlength), 'y': '0'
+            }
         )
         etree.SubElement(
             l_nodes, 'node', attrib={'id': '21start', 'x': '0', 'y': '0'}
