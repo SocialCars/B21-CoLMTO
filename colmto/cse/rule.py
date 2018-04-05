@@ -24,81 +24,16 @@
 # pylint: disable=too-few-public-methods
 '''Rule related classes'''
 import typing
+
 from abc import ABCMeta
 from abc import abstractclassmethod
-
-from typing import Any
-from typing import Generator
-from typing import Iterable
-
-import enum
 
 from colmto.common.helper import Position, VehicleType
 from colmto.common.helper import BoundingBox
 
+from colmto.common.helper import Behaviour
+from colmto.common.helper import RuleOperator
 
-@enum.unique
-class Behaviour(enum.Enum):
-    '''Behaviour enum for enumerating allow/deny states and corresponding vehicle classes.'''
-    ALLOW = 'custom2'
-    DENY = 'custom1'
-
-    @property
-    def vclass(self) -> str:
-        '''returns vehicle class string'''
-        return self.value
-
-    @staticmethod
-    def behaviour_from_string(behaviour: str, or_else: 'Behaviour') -> 'Behaviour':
-        '''
-        Transforms string argument of behaviour, i.e. 'allow', 'deny' case insensitive to
-        Behaviour enum value. Otherwise return passed or_else argument.
-
-        :param behaviour: string 'allow', 'deny'
-        :param or_else: otherwise returned argument
-        :type or_else: Behaviour
-        :return: Behaviour.ALLOW, Behaviour.DENY, or_else
-
-        '''
-
-        try:
-            return Behaviour[behaviour.upper()]
-        except KeyError:
-            return or_else
-
-
-@enum.unique
-class RuleOperator(enum.Enum):
-    '''
-    Operator to be applied to logical rule expressions.
-
-    Denotes whether an iterable with boolean expressions is True,
-    iff all elements are True (all()) or iff at least one element has to be True (any())
-    '''
-    ALL = all
-    ANY = any
-
-    def evaluate(self, args: Iterable):
-        '''evaluate iterable args'''
-        return self.value(args)  # pylint: disable=too-many-function-args
-
-    @staticmethod
-    def ruleoperator_from_string(rule_operator: str, or_else: 'RuleOperator') -> 'RuleOperator':
-        '''
-        Transforms string argument of rule operator, i.e. 'any', 'all' case insensitive to
-        RuleOperator enum value. Otherwise return passed or_else argument.
-
-        :param rule_operator: str ('any'|'all')
-        :param or_else: otherwise returned argument
-        :type or_else: RuleOperator
-        :return: RuleOperator.ANY, RuleOperator.ALL, or_else
-
-        '''
-
-        try:
-            return RuleOperator[rule_operator.upper()]
-        except KeyError:
-            return or_else
 
 class BaseRule(metaclass=ABCMeta):
     '''Base Rule'''
@@ -212,7 +147,7 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         '''
         pass
 
-    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
+    def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
         '''
         Apply rule to vehicles.
 
@@ -367,7 +302,7 @@ class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
 
         return True
 
-    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
+    def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
         '''
         Apply rule to vehicles.
 
@@ -407,7 +342,7 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
         return False
 
     # pylint: disable=no-self-use
-    def apply(self, vehicles: Iterable['SUMOVehicle']) -> Generator['SUMOVehicle', Any, None]:
+    def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
         '''
         Apply rule to vehicles.
 

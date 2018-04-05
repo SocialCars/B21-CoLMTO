@@ -22,7 +22,7 @@
 # #############################################################################
 # @endcond
 '''Classes and functions to realise property structures, e.g. Position, Colour, ...'''
-
+import typing
 from collections import namedtuple
 import matplotlib.pyplot as plt
 import enum
@@ -243,3 +243,68 @@ class StatisticSeries(enum.Enum):
 
         # raise TypeError
         raise TypeError(f'{seriestype} is neither {StatisticSeries.GRID} or {StatisticSeries.TIME}.')
+
+
+
+@enum.unique
+class Behaviour(enum.Enum):
+    '''Behaviour enum for enumerating allow/deny states and corresponding vehicle classes.'''
+    ALLOW = 'custom2'
+    DENY = 'custom1'
+
+    @property
+    def vclass(self) -> str:
+        '''returns vehicle class string'''
+        return self.value
+
+    @staticmethod
+    def behaviour_from_string(behaviour: str, or_else: 'Behaviour') -> 'Behaviour':
+        '''
+        Transforms string argument of behaviour, i.e. 'allow', 'deny' case insensitive to
+        Behaviour enum value. Otherwise return passed or_else argument.
+
+        :param behaviour: string 'allow', 'deny'
+        :param or_else: otherwise returned argument
+        :type or_else: Behaviour
+        :return: Behaviour.ALLOW, Behaviour.DENY, or_else
+
+        '''
+
+        try:
+            return Behaviour[behaviour.upper()]
+        except KeyError:
+            return or_else
+
+
+@enum.unique
+class RuleOperator(enum.Enum):
+    '''
+    Operator to be applied to logical rule expressions.
+
+    Denotes whether an iterable with boolean expressions is True,
+    iff all elements are True (all()) or iff at least one element has to be True (any())
+    '''
+    ALL = all
+    ANY = any
+
+    def evaluate(self, args: typing.Iterable):
+        '''evaluate iterable args'''
+        return self.value(args)  # pylint: disable=too-many-function-args
+
+    @staticmethod
+    def ruleoperator_from_string(rule_operator: str, or_else: 'RuleOperator') -> 'RuleOperator':
+        '''
+        Transforms string argument of rule operator, i.e. 'any', 'all' case insensitive to
+        RuleOperator enum value. Otherwise return passed or_else argument.
+
+        :param rule_operator: str ('any'|'all')
+        :param or_else: otherwise returned argument
+        :type or_else: RuleOperator
+        :return: RuleOperator.ANY, RuleOperator.ALL, or_else
+
+        '''
+
+        try:
+            return RuleOperator[rule_operator.upper()]
+        except KeyError:
+            return or_else
