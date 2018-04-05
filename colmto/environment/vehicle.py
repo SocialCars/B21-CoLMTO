@@ -379,7 +379,7 @@ class SUMOVehicle(BaseVehicle):
         For the grid cell the vehicle is in, take the global position in x-direction divided by grid
         cell size and int-rounded. For the y-coordinate take the lane index.
 
-        :note: We assume a fixed grid cell size of 4 meters. This has to be set via cfg in future.
+        :note: The cell width can be set via 'gridcellwidth' in the run config.
 
         :param position: tuple TraCI provided position
         :param lane_index: int TraCI provided lane index
