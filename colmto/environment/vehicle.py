@@ -333,7 +333,7 @@ class SUMOVehicle(BaseVehicle):
             index=pandas.MultiIndex.from_product(
                 iterables=[
                     (i_metric.value for i_metric in StatisticSeries.TIME.metrics()),
-                    (0,)
+                    range(int(self._time_step))
                 ],
                 names=('metric', Metric.TIME_STEP.value)
             )
