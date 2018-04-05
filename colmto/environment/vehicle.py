@@ -311,7 +311,7 @@ class SUMOVehicle(BaseVehicle):
 
         for i_metric in StatisticSeries.GRID.metrics():
             for k, v in self._grid_based_series_dict.get(i_metric.value).items():
-                l_grid_based_series[i_metric.value, k] = v
+                l_grid_based_series[i_metric.value, int(k)] = v
 
         return pandas.concat(
             (
@@ -340,17 +340,17 @@ class SUMOVehicle(BaseVehicle):
 
         l_time_based_series = pandas.Series(
             index=pandas.MultiIndex.from_product(
-                iterables=[
+                iterables=(
                     (i_metric.value for i_metric in StatisticSeries.TIME.metrics()),
                     range(int(self._time_step))
-                ],
+                ),
                 names=('metric', Metric.TIME_STEP.value)
             )
         )
 
         for i_metric in StatisticSeries.TIME.metrics():
             for k, v in self._time_based_series_dict.get(i_metric.value).items():
-                l_time_based_series[i_metric.value, k] = v
+                l_time_based_series[i_metric.value, int(k)] = v
 
         return pandas.concat(
             (
