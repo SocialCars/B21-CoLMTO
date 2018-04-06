@@ -155,16 +155,16 @@ class Writer(object):
                     self._log.debug('removing previous path %s', i_path)
                     del l_group[i_path]
 
-                # If object is a pandas.DataFrame, write it to a separate hdf5 file (f_hdf5 with '_pandas' suffix) to avoid interfering with f_hdf5.
-                # The DataFrame itself will also be stored in f_hdf5, but converted to a numpy array.
-                if isinstance(i_object_value.get('value'), pandas.DataFrame):
-                    i_object_value.get('value').to_hdf(
-                        f'{Path(hdf5_file).parent}/{Path(hdf5_file).stem}_pandas{Path(hdf5_file).suffix}',
-                        f'/{hdf5_base_path}/{i_path}',
-                        complib=kwargs.get('compression') if kwargs.get('compression') in ('zlib', 'lzo', 'bzip2', 'blosc') else 'zlib',
-                        complevel=kwargs.get('compression_opts'),
-                        fletcher32=kwargs.get('fletcher32')
-                    )
+                # # If object is a pandas.DataFrame, write it to a separate hdf5 file (f_hdf5 with '_pandas' suffix) to avoid interfering with f_hdf5.
+                # # The DataFrame itself will also be stored in f_hdf5, but converted to a numpy array.
+                # if isinstance(i_object_value.get('value'), pandas.DataFrame):
+                #     i_object_value.get('value').to_hdf(
+                #         f'{Path(hdf5_file).parent}/{Path(hdf5_file).stem}_pandas{Path(hdf5_file).suffix}',
+                #         f'/{hdf5_base_path}/{i_path}',
+                #         complib=kwargs.get('compression') if kwargs.get('compression') in ('zlib', 'lzo', 'bzip2', 'blosc') else 'zlib',
+                #         complevel=kwargs.get('compression_opts'),
+                #         fletcher32=kwargs.get('fletcher32')
+                #     )
 
                 if i_object_value.get('value') is not None \
                         and i_object_value.get('attr') is not None:
