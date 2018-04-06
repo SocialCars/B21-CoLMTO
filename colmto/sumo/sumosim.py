@@ -122,19 +122,21 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
                     # cse mode: apply cse rules to vehicles and run with TraCI
 
                     self._writer.write_hdf5(
-                        self._statistics.merge_vehicle_series(
-                            i_run,
-                            self._runtime.run_traci(
-                                self._sumocfg.generate_run(
-                                    l_scenario,
-                                    InitialSorting[i_initial_sorting.upper()],
-                                    i_run,
-                                    l_vtype_list.get(scenario_name)
-                                ),
-                                colmto.cse.cse.SumoCSE(
-                                    self._args
-                                ).add_rules_from_cfg(
-                                    self._sumocfg.run_config.get('rules')
+                        self._statistics.global_stats(
+                            self._statistics.merge_vehicle_series(
+                                i_run,
+                                self._runtime.run_traci(
+                                    self._sumocfg.generate_run(
+                                        l_scenario,
+                                        InitialSorting[i_initial_sorting.upper()],
+                                        i_run,
+                                        l_vtype_list.get(scenario_name)
+                                    ),
+                                    colmto.cse.cse.SumoCSE(
+                                        self._args
+                                    ).add_rules_from_cfg(
+                                        self._sumocfg.run_config.get('rules')
+                                    )
                                 )
                             )
                         ),

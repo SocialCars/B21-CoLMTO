@@ -26,11 +26,11 @@
 import numpy
 
 # pylint: disable=no-member,len-as-condition
-def h_spread(data: numpy.ndarray) -> numpy.float64:
+def unfairness(data: numpy.ndarray) -> numpy.float64:
     r'''
-    Calculate H-Spread of Hinge for given data points.
+    Calculate the unfairness by means of the H-Spread of Hinges for given data points.
 
-    Using numpy.percentile (speedup) with linear (=default) interpolation.
+    note: Using numpy.percentile (speedup) with linear (=default) interpolation.
 
     .. math::
         :nowrap:
@@ -107,3 +107,12 @@ def dissatisfaction(
         1 + numpy.exp((-time_loss + time_loss_threshold * optimal_travel_time)) * .5
     )
     # pylint: enable=no-member
+
+def inefficiency(data):
+    '''
+
+    :param data:
+    :return:
+    '''
+
+    return numpy.sum(data)

@@ -70,7 +70,7 @@ def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
                         'relative_time_loss_delta'
                     ]
                 } for i_vtype in ['alltypes', 'passenger', 'truck', 'tractor']
-            } for i_view in ['fairness', 'driver']
+            } for i_view in ['global_stats', 'driver']
         },
         'intervals': {
             '{}-{}'.format(*i_interval): {
@@ -112,7 +112,7 @@ def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
                             'relative_time_loss_delta'
                         ]
                     } for i_vtype in ['alltypes', 'passenger', 'truck', 'tractor']
-                } for i_view in ['fairness', 'driver']
+                } for i_view in ['global_stats', 'driver']
             } for i_interval in zip(detector_positions[:-1], detector_positions[1:])
         }
     }

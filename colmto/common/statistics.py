@@ -25,10 +25,13 @@
 
 import typing
 import pandas
+import numpy
+
 import colmto.common.io
 import colmto.common.log
 import colmto.common.model
-from colmto.common.helper import VehicleType
+
+from colmto.common.helper import VehicleType, Metric
 from colmto.common.helper import StatisticSeries
 from colmto.environment.vehicle import SUMOVehicle
 
@@ -43,7 +46,6 @@ class Statistics(object):
         else:
             self._log = colmto.common.log.logger(__name__)
             self._writer = colmto.common.io.Writer(None)
-
 
     def merge_vehicle_series(self, run: int, vehicles: typing.Dict[str, SUMOVehicle]) -> typing.Dict[str, dict]:
 
@@ -87,3 +89,26 @@ class Statistics(object):
             }
             for i_series in StatisticSeries
         }
+
+    def global_stats(self, merged_series: typing.Dict[str, dict]):
+        '''
+        Inplace ddd global statistics, i.e. unfairness and inefficiency for each series element.
+        :param merged_series: data aquired by calling `merge_vehicle_series`
+        :return: inplace updated `merged series data`
+        '''
+
+        for i_series in merged_series:
+            # for the individual vehicle types
+            for i_vtype in merged_series.get(i_series):
+                if merged_series.get(i_series).get(i_vtype):
+                    l_stat = merged_series.get(i_series).get(i_vtype).get(Metric.RELATIVE_TIME_LOSS.value).get('value').dropna() # type: pandas.DataFrame
+                    merged_series.get(i_series).get(i_vtype)['unfairness'] = {
+                        'value': numpy.array([colmto.common.model.unfairness(numpy.array(l_stat[i_column])) for i_column in l_stat]), # todo: make pandas.DataFrame
+                        'attr': {'description': f'unfairness for each cell of {i_vtype} vehicles with {Metric.RELATIVE_TIME_LOSS.value} != NaN'}
+                    }
+                    merged_series.get(i_series).get(i_vtype)['inefficiency'] = {
+                        'value': numpy.array([colmto.common.model.inefficiency(numpy.array(l_stat[i_column])) for i_column in l_stat]), # todo: make pandas.DataFrame,
+                        'attr': {'description':f'inefficiency for each cell of {i_vtype} vehicles with {Metric.RELATIVE_TIME_LOSS.value} != NaN'}
+                    }
+
+        return merged_series
