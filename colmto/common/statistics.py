@@ -63,7 +63,10 @@ class Statistics(object):
                             axis=1,
                             keys=sorted(vehicles.keys())
                         ).T[i_metric.value],
-                        'attr': {'type': 'pandas.DataFrame'}
+                        'attr': {
+                            'description': f'{i_series.value}-based data for all vehicle types',
+                            'metric': i_metric.value,
+                        }
                     }
                     for i_metric in i_series.metrics()
                     if len(vehicles) > 0
@@ -79,7 +82,11 @@ class Statistics(object):
                                 axis=1,
                                 keys=sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
                             ).T[i_metric.value],
-                            'attr': {'type': 'pandas.DataFrame'}
+                            'attr': {
+                                'description': f'{i_series.value}-based data of {i_vtype}s',
+                                'metric': i_metric.value,
+                                'vtype': i_vtype.value,
+                            }
                         }
                         for i_metric in i_series.metrics()
                         if len(list(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))) > 0
