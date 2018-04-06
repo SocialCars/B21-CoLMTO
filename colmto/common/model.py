@@ -24,13 +24,16 @@
 '''Classes and functions to realise models regarding dissatisfaction, inefficiency and unfairness.'''
 
 import numpy
+import pandas
+import typing
+
 
 # pylint: disable=no-member,len-as-condition
-def unfairness(data: numpy.ndarray) -> numpy.float64:
+def unfairness(data: pandas.Series) -> numpy.float64:
     r'''
     Calculate the unfairness by means of the H-Spread of Hinges for given data points.
 
-    note: Using numpy.percentile (speedup) with linear (=default) interpolation.
+    note: Using `pandas.Series.quantile([.75, .25])` with linear (=default) interpolation.
 
     .. math::
         :nowrap:
@@ -64,18 +67,18 @@ def unfairness(data: numpy.ndarray) -> numpy.float64:
 
     :see: Weisstein, Eric W. H-Spread. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/H-Spread.html
     :see: Weisstein, Eric W. Hinge. From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/Hinge.html
-    :param data: Numpy ndarray of data elements (preferably) :math:`4n+5` for :math:`n=0,1,...,N`, i.e. minimum length is :math:`5`.
+    :param data: pandas.Series of data elements (preferably) :math:`4n+5` for :math:`n=0,1,...,N`, i.e. minimum length is :math:`5`.
     :return: Hinge of type numpy.float64
 
     '''
 
-    return numpy.subtract(*numpy.percentile(data, [75, 25])) if len(data) else numpy.float64(0)
+    return numpy.subtract(*data.quantile([.75, .25])) if len(data) else numpy.float64(0)
 
 
 def dissatisfaction(
         time_loss: float,
         optimal_travel_time: float,
-        time_loss_threshold=0.2) -> float:
+        time_loss_threshold=0.2) -> numpy.float64:
     r'''
     Calculate driver's dissatisfaction.
 
@@ -89,7 +92,7 @@ def dissatisfaction(
         TLT &:=& \text{time loss threshold}, \\
         \text{dissatisfaction} &:=& dsat(TL, TT^{*}, TLT) \\
         &=&\frac{1}{1+e^{(-TL + TLT \cdot TT^{*}) \cdot \rho}}.\\
-        &&\text{Note: Using a smoothening factor of $\rho = 0{.}5$}\\
+        &&\text{Note: Using a smoothening factor of $\rho = 0{.}05$}\\
         &&\text{to make the transition not that sharp}
         \end{eqnarray*}
 
@@ -104,15 +107,16 @@ def dissatisfaction(
     # pylint: disable=no-member
     return numpy.divide(
         1.,
-        1 + numpy.exp((-time_loss + time_loss_threshold * optimal_travel_time)) * .5
+        1 + numpy.exp((-time_loss + time_loss_threshold * optimal_travel_time) * .05 )
     )
     # pylint: enable=no-member
 
-def inefficiency(data):
+def inefficiency(data: pandas.Series) -> typing.Union[numpy.int64, numpy.float64]:
+    '''
+    Inefficiency model, i.e. sum of data
+
+    :param data: pandas.Series
+    :return: sum of data points
     '''
 
-    :param data:
-    :return:
-    '''
-
-    return numpy.sum(data)
+    return data.sum()

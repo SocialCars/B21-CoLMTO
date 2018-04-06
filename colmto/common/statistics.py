@@ -103,11 +103,11 @@ class Statistics(object):
                 if merged_series.get(i_series).get(i_vtype):
                     l_stat = merged_series.get(i_series).get(i_vtype).get(Metric.RELATIVE_TIME_LOSS.value).get('value').dropna() # type: pandas.DataFrame
                     merged_series.get(i_series).get(i_vtype)['unfairness'] = {
-                        'value': numpy.array([colmto.common.model.unfairness(numpy.array(l_stat[i_column])) for i_column in l_stat]), # todo: make pandas.DataFrame
+                        'value': numpy.array([colmto.common.model.unfairness(l_stat[i_column]) for i_column in l_stat]),
                         'attr': {'description': f'unfairness for each cell of {i_vtype} vehicles with {Metric.RELATIVE_TIME_LOSS.value} != NaN'}
                     }
                     merged_series.get(i_series).get(i_vtype)['inefficiency'] = {
-                        'value': numpy.array([colmto.common.model.inefficiency(numpy.array(l_stat[i_column])) for i_column in l_stat]), # todo: make pandas.DataFrame,
+                        'value': numpy.array([colmto.common.model.inefficiency(l_stat[i_column]) for i_column in l_stat]),
                         'attr': {'description':f'inefficiency for each cell of {i_vtype} vehicles with {Metric.RELATIVE_TIME_LOSS.value} != NaN'}
                     }
 
