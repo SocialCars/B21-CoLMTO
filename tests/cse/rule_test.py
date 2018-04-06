@@ -107,8 +107,11 @@ def test_sumo_null_rule():
     assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMONullRule)
 
     l_vehicles = [
-        colmto.environment.vehicle.SUMOVehicle() for _ in range(23)
-        ]
+        colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200, 'gridcellwidth': 4}
+        ) for _ in range(23)
+    ]
+
     for i_vehicle in l_vehicles:
         i_vehicle.change_vehicle_class(
             random.choice(
@@ -140,7 +143,7 @@ def test_sumo_vtype_rule():
                 )
             )
         ),
-        "<class 'colmto.cse.rule.ExtendableSUMOVTypeRule'>: vehicle_type = passenger, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
+        "<class 'colmto.cse.rule.ExtendableSUMOVTypeRule'>: vehicle_type = VehicleType.PASSENGER, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
     )
 
     assert_true(
@@ -148,6 +151,7 @@ def test_sumo_vtype_rule():
             vehicle_type='passenger'
         ).applies_to(
             colmto.environment.vehicle.SUMOVehicle(
+                environment={'gridlength': 200, 'gridcellwidth': 4},
                 vehicle_type='passenger'
             )
         )
@@ -158,6 +162,7 @@ def test_sumo_vtype_rule():
             vehicle_type='truck'
         ).applies_to(
             colmto.environment.vehicle.SUMOVehicle(
+                environment={'gridlength': 200, 'gridcellwidth': 4},
                 vehicle_type='passenger'
             )
         )
@@ -168,7 +173,12 @@ def test_sumo_vtype_rule():
             colmto.cse.rule.SUMOVTypeRule(
                 vehicle_type='passenger'
             ).apply(
-                [colmto.environment.vehicle.SUMOVehicle(vehicle_type='passenger')]
+                (
+                    colmto.environment.vehicle.SUMOVehicle(
+                        environment={'gridlength': 200, 'gridcellwidth': 4},
+                        vehicle_type='passenger'
+                    ),
+                )
             )
         ).vehicle_class,
         colmto.cse.rule.Behaviour.DENY.value
@@ -179,7 +189,12 @@ def test_sumo_vtype_rule():
             colmto.cse.rule.SUMOVTypeRule(
                 vehicle_type='passenger'
             ).apply(
-                [colmto.environment.vehicle.SUMOVehicle(vehicle_type='passenger')]
+                (
+                    colmto.environment.vehicle.SUMOVehicle(
+                        environment={'gridlength': 200, 'gridcellwidth': 4},
+                        vehicle_type='passenger'
+                    ),
+                )
             )
         ).vehicle_class,
         colmto.cse.rule.Behaviour.DENY.value
@@ -190,7 +205,12 @@ def test_sumo_vtype_rule():
             colmto.cse.rule.SUMOVTypeRule(
                 vehicle_type='truck'
             ).apply(
-                [colmto.environment.vehicle.SUMOVehicle(vehicle_type='passenger')]
+                (
+                    colmto.environment.vehicle.SUMOVehicle(
+                        environment={'gridlength': 200, 'gridcellwidth': 4},
+                        vehicle_type='passenger'
+                    ),
+                )
             )
         ).vehicle_class,
         colmto.cse.rule.Behaviour.ALLOW.value
@@ -245,7 +265,8 @@ def test_sumo_extendable_rule():
     assert_true(
         l_sumo_rule.applies_to_subrules(
             colmto.environment.vehicle.SUMOVehicle(
-                speed_max=30.,
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=30.
             )
         )
     )
@@ -253,7 +274,8 @@ def test_sumo_extendable_rule():
     assert_true(
         l_sumo_sub_rule.applies_to(
             colmto.environment.vehicle.SUMOVehicle(
-                speed_max=30.,
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=30.
             )
         )
     )
@@ -267,7 +289,8 @@ def test_sumo_extendable_rule():
     assert_true(
         l_sumo_rule.applies_to_subrules(
             colmto.environment.vehicle.SUMOVehicle(
-                speed_max=30.,
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=30.
             )
         )
     )
@@ -275,7 +298,8 @@ def test_sumo_extendable_rule():
     assert_false(
         l_sumo_rule.applies_to_subrules(
             colmto.environment.vehicle.SUMOVehicle(
-                speed_max=60.,
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=60.
             )
         )
     )
@@ -283,7 +307,8 @@ def test_sumo_extendable_rule():
     assert_true(
         l_sumo_sub_rule.applies_to(
             colmto.environment.vehicle.SUMOVehicle(
-                speed_max=30.,
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=30.
             )
         )
     )
@@ -291,7 +316,8 @@ def test_sumo_extendable_rule():
     assert_false(
         l_sumo_sub_rule.applies_to(
             colmto.environment.vehicle.SUMOVehicle(
-                speed_max=60.,
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=60.
             )
         )
     )
@@ -302,14 +328,14 @@ def test_sumo_universal_rule():
 
     assert_true(
         colmto.cse.rule.SUMOUniversalRule().applies_to(
-            colmto.environment.vehicle.SUMOVehicle()
+            colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4})
         )
     )
 
     assert_equal(
         next(
             colmto.cse.rule.SUMOUniversalRule().apply(
-                (colmto.environment.vehicle.SUMOVehicle(),)
+                (colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4}),)
             )
         ).vehicle_class,
         'custom1'
@@ -325,6 +351,7 @@ def test_sumo_speed_rule():
 
     l_vehicles = [
         colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200, 'gridcellwidth': 4},
             speed_max=random.randrange(0, 120)
         ) for _ in range(4711)
         ]
@@ -365,7 +392,8 @@ def test_sumo_position_rule():
     assert_is_instance(l_sumo_rule, colmto.cse.rule.SUMOPositionRule)
 
     l_vehicles = [
-        colmto.environment.vehicle.SUMOVehicle() for _ in range(4711)
+        colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4})
+        for _ in range(4711)
     ]
     for i_vehicle in l_vehicles:
         i_vehicle.position = (random.randrange(0, 200), 0.)

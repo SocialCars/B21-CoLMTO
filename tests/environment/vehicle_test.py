@@ -31,6 +31,7 @@ from nose.tools import assert_list_equal
 
 
 import colmto.environment.vehicle
+from colmto.common.helper import Position, VehicleType
 
 
 def test_basevehicle():
@@ -61,18 +62,21 @@ def test_sumovehicle():
     '''
 
     # test default values
-    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle()
+    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
+        environment={'gridlength': 200, 'gridcellwidth': 4}
+    )
 
     assert_equal(l_sumovehicle.speed_max, 0.0)
     assert_equal(l_sumovehicle.speed, 0.0)
     assert_equal(l_sumovehicle.position, (0.0, 0))
-    assert_equal(l_sumovehicle.vehicle_type, 'None')
+    assert_equal(l_sumovehicle.vehicle_type, VehicleType.UNDEFINED)
     assert_equal(l_sumovehicle.colour, (255, 255, 0, 255))
 
     # test custom values
     l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
         speed_max=27.777,
         speed_deviation=1.2,
+        environment={'gridlength': 200, 'gridcellwidth': 4},
         vehicle_type='passenger',
         vtype_sumo_cfg={
             'length': 3.00,
@@ -80,172 +84,47 @@ def test_sumovehicle():
         }
     )
     l_sumovehicle.position = numpy.array([42.0, 0])
-    l_sumovehicle.color = (128, 64, 255, 255)
+    l_sumovehicle.colour = (128, 64, 255, 255)
     l_sumovehicle.speed_current = 12.1
     l_sumovehicle.start_time = 13
 
     assert_equal(l_sumovehicle.speed_max, 27.777)
     assert_equal(l_sumovehicle.speed_current, 12.1)
     assert_equal(l_sumovehicle.position, (42.0, 0))
-    assert_equal(l_sumovehicle.vehicle_type, 'passenger')
+    assert_equal(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
     assert_equal(l_sumovehicle.colour, (128, 64, 255, 255))
     assert_equal(l_sumovehicle.start_time, 13)
-    assert_equal(l_sumovehicle.grid_position, (0, 0))
+    assert_equal(l_sumovehicle._grid_position, (0, 0))
 
-    l_sumovehicle.grid_position = (1, 2)
+    l_sumovehicle._grid_position = (1, 2)
 
-    assert_equal(l_sumovehicle.grid_position, (1, 2))
+    assert_equal(l_sumovehicle._grid_position, (1, 2))
     assert_equal(l_sumovehicle.properties.get('grid_position'), (1, 2))
-    assert_equal(l_sumovehicle.travel_time, 0.0)
-    assert_equal(
-        l_sumovehicle.travel_stats,
-        {
-            'start_time': 0.0,
-            'travel_time': 0.0,
-            'vehicle_type': l_sumovehicle.vehicle_type,
-            'step': {
-                'dissatisfaction': [],
-                'number': [],
-                'pos_x': [],
-                'pos_y': [],
-                'relative_time_loss': [],
-                'speed': [],
-                'time_loss': []
-            },
-            'grid': {
-                'dissatisfaction': [],
-                'pos_x': [],
-                'pos_y': [],
-                'relative_time_loss': [],
-                'speed': [],
-                'time_loss': []
-            }
-        }
-    )
+    assert_equal(l_sumovehicle._travel_time, 0.0)
 
 
 def test_update():
     '''Test update'''
-    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle()
+    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
+        environment={'gridlength': 200, 'gridcellwidth': 4},
+        speed_max=10,
+        vtype_sumo_cfg={'dsat_threshold': 0.2}
+    )
     l_sumovehicle.update(
-        position=colmto.environment.vehicle.Position(1, 2),
+        position=colmto.environment.vehicle.Position(20, 2),
         lane_index=1,
-        speed=12.1
+        speed=12.1,
+        time_step=2
     )
     assert_equal(
         l_sumovehicle.position,
-        (1, 2)
+        (20, 2)
     )
     assert_equal(
         l_sumovehicle.speed,
         12.1
     )
     assert_equal(
-        l_sumovehicle.grid_position,
-        (-1, 1)
-    )
-
-
-def test_record_travel_stats():
-    '''Test colmto.environment.vehicle.SUMOVehicle.record_travel_stats'''
-    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
-        vehicle_type='passenger',
-        speed_deviation=0.0,
-        speed_max=100.,
-    )
-    l_sumovehicle.position = (1.0, 1.0)
-    l_sumovehicle.dsat_threshold = 0.0
-    l_sumovehicle.record_travel_stats(1)
-    l_sumovehicle.record_travel_stats(2)
-    assert_equal(
-        l_sumovehicle.travel_stats.get('travel_time'),
-        2.0
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('step').get('number'),
-        [1, 2]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('step').get('pos_x'),
-        [1, 1]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('step').get('pos_y'),
-        [1, 1]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('step').get('time_loss'),
-        [0.0, 1.99]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('step').get('relative_time_loss'),
-        [0.0, 199.0]
-    )
-    assert_almost_equal(
-        l_sumovehicle.travel_stats.get('step').get('dissatisfaction')[0],
-        0.0
-    )
-    assert_almost_equal(
-        l_sumovehicle.travel_stats.get('step').get('dissatisfaction')[1],
-        0.93602484293379284
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('dissatisfaction'),
-        [[0.0]]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('pos_x'),
-        [[0, 0]]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('pos_y'),
-        [[0, 0]]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('speed'),
-        [[0.0, 0.0]]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('time_loss'),
-        [[0.0]]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('relative_time_loss'),
-        [[0.0]]
-    )
-    l_sumovehicle.update(
-        position=colmto.environment.vehicle.Position(3., 0.),
-        lane_index=0,
-        speed=3.
-    )
-    l_sumovehicle.record_travel_stats(3)
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('dissatisfaction')[0],
-        [0.0]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('time_loss')[0],
-        [0.0]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('relative_time_loss')[0],
-        [0.0]
-    )
-    l_sumovehicle.update(
-        position=colmto.environment.vehicle.Position(6., 0.),
-        lane_index=0,
-        speed=3.
-    )
-    l_sumovehicle.record_travel_stats(4)
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('dissatisfaction'),
-        [[0.0], [0.97498989541258152, 0.99036954025194568]]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('time_loss'),
-        [[0.0], [2.97, 3.9399999999999999]]
-    )
-    assert_list_equal(
-        l_sumovehicle.travel_stats.get('grid').get('relative_time_loss'),
-        [[0.0], [99.00000000000001, 65.666666666666671]]
+        l_sumovehicle._grid_position,
+        (round(20/4)-1, -1)
     )
