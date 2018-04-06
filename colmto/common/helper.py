@@ -184,6 +184,7 @@ class VehicleType(enum.Enum):
     TRACTOR = 'tractor'
     TRUCK = 'truck'
     VAN = 'van'
+    UNDEFINED = 'undefined'
 
 
 @enum.unique

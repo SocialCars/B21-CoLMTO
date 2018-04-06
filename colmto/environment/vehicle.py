@@ -131,7 +131,8 @@ class SUMOVehicle(BaseVehicle):
                 'vType': vehicle_type,
                 'vClass': colmto.cse.rule.SUMORule.to_allowed_class(),
                 'grid_position': Position(x=0, y=0),
-                'time_step': 0.0
+                'time_step': 0.0,
+                'travel_time': 0.0
             }
         )
 
@@ -183,7 +184,9 @@ class SUMOVehicle(BaseVehicle):
         '''
         :return: vehicle type
         '''
-        return VehicleType[str(self._properties.get('vType')).upper()]
+        return VehicleType[str(self._properties.get('vType')).upper()] \
+            if self._properties.get('vType') else VehicleType.UNDEFINED
+
 
     @property
     def start_time(self) -> float:
