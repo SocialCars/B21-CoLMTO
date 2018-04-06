@@ -87,7 +87,7 @@ class Statistics(object):
                     for i_vtype in VehicleType
                 }
             }
-            for i_series in StatisticSeries
+            for i_series in (StatisticSeries.GRID,)
         }
 
     def global_stats(self, merged_series: typing.Dict[str, dict]):

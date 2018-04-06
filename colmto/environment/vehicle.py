@@ -326,44 +326,44 @@ class SUMOVehicle(BaseVehicle):
         ) if interpolate else l_grid_based_series
 
 
-    def statistic_series_time(self, interpolate=False) -> pandas.Series:
-        '''
-        Recorded travel statistics as `pandas.Series`.
-
-        :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a
-          `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_
-          related to the current time step (self._time_based_series) and a `Series` for grid cells in
-          x-direction (self._grid_based_series). As vehicles are expected to "jump" over cells while
-          traveling faster than `cell width / time step`, we create an entry for each cell
-          (initialised as `NaN`) and linear interpolate the missing values afterwards.
-
-        :param interpolate: return a data copy with NaN values linear interpolated
-        :return: timestep-based `pandas.Series`
-
-        '''
-
-        l_time_based_series = pandas.Series(
-            index=pandas.MultiIndex.from_product(
-                iterables=(
-                    (i_metric.value for i_metric in StatisticSeries.TIME.metrics()),
-                    range(int(self._time_step))
-                ),
-                names=('metric', Metric.TIME_STEP.value)
-            )
-        )
-
-        for i_metric in StatisticSeries.TIME.metrics():
-            l_time_based_series.update(
-                pandas.Series(data=self._time_based_series_dict.get(i_metric.value))
-            )
-
-        return pandas.concat(
-            (
-                l_time_based_series[i_metric.value].interpolate()
-                for i_metric in StatisticSeries.TIME.metrics()
-             ),
-            keys=(i_metric.value for i_metric in StatisticSeries.TIME.metrics())
-        ) if interpolate else l_time_based_series
+    # def statistic_series_time(self, interpolate=False) -> pandas.Series:
+    #     '''
+    #     Recorded travel statistics as `pandas.Series`.
+    #
+    #     :note: To properly store results from SUMO (discrete time vs. "continuous" space), there exists a
+    #       `pandas.Series <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html>`_
+    #       related to the current time step (self._time_based_series) and a `Series` for grid cells in
+    #       x-direction (self._grid_based_series). As vehicles are expected to "jump" over cells while
+    #       traveling faster than `cell width / time step`, we create an entry for each cell
+    #       (initialised as `NaN`) and linear interpolate the missing values afterwards.
+    #
+    #     :param interpolate: return a data copy with NaN values linear interpolated
+    #     :return: timestep-based `pandas.Series`
+    #
+    #     '''
+    #
+    #     l_time_based_series = pandas.Series(
+    #         index=pandas.MultiIndex.from_product(
+    #             iterables=(
+    #                 (i_metric.value for i_metric in StatisticSeries.TIME.metrics()),
+    #                 range(int(self._time_step))
+    #             ),
+    #             names=('metric', Metric.TIME_STEP.value)
+    #         )
+    #     )
+    #
+    #     for i_metric in StatisticSeries.TIME.metrics():
+    #         l_time_based_series.update(
+    #             pandas.Series(data=self._time_based_series_dict.get(i_metric.value))
+    #         )
+    #
+    #     return pandas.concat(
+    #         (
+    #             l_time_based_series[i_metric.value].interpolate()
+    #             for i_metric in StatisticSeries.TIME.metrics()
+    #          ),
+    #         keys=(i_metric.value for i_metric in StatisticSeries.TIME.metrics())
+    #     ) if interpolate else l_time_based_series
 
     def change_vehicle_class(self, class_name: str) -> BaseVehicle:
         '''
@@ -417,13 +417,13 @@ class SUMOVehicle(BaseVehicle):
         self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         # update data series based on time step
-        self._time_based_series_dict.get(Metric.POSITION_X.value)[(Metric.POSITION_X.value, int(time_step))] = self._position.x
-        self._time_based_series_dict.get(Metric.POSITION_Y.value)[(Metric.POSITION_Y.value, int(time_step))] = self._position.y
-        self._time_based_series_dict.get(Metric.GRID_POSITION_X.value)[(Metric.GRID_POSITION_X.value, int(time_step))] = self._grid_position.x
-        self._time_based_series_dict.get(Metric.GRID_POSITION_Y.value)[(Metric.GRID_POSITION_Y.value, int(time_step))] = self._grid_position.y
-        self._time_based_series_dict.get(Metric.DISSATISFACTION.value)[(Metric.DISSATISFACTION.value, int(time_step))] = l_dissatisfaction
-        self._time_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, int(time_step))] = self._travel_time
-        self._time_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, int(time_step))] = time_step - self.start_time - self._position.x / self.speed_max
-        self._time_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, int(time_step))] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
+        # self._time_based_series_dict.get(Metric.POSITION_X.value)[(Metric.POSITION_X.value, int(time_step))] = self._position.x
+        # self._time_based_series_dict.get(Metric.POSITION_Y.value)[(Metric.POSITION_Y.value, int(time_step))] = self._position.y
+        # self._time_based_series_dict.get(Metric.GRID_POSITION_X.value)[(Metric.GRID_POSITION_X.value, int(time_step))] = self._grid_position.x
+        # self._time_based_series_dict.get(Metric.GRID_POSITION_Y.value)[(Metric.GRID_POSITION_Y.value, int(time_step))] = self._grid_position.y
+        # self._time_based_series_dict.get(Metric.DISSATISFACTION.value)[(Metric.DISSATISFACTION.value, int(time_step))] = l_dissatisfaction
+        # self._time_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, int(time_step))] = self._travel_time
+        # self._time_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, int(time_step))] = time_step - self.start_time - self._position.x / self.speed_max
+        # self._time_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, int(time_step))] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
 
         return self
