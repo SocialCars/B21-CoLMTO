@@ -209,17 +209,14 @@ class Metric(enum.Enum):
 @enum.unique
 class StatisticSeries(enum.Enum):
     GRID = 'grid_based_series'
-    TIME = 'time_based_series'
 
     def of(self, vehicle: 'SUMOVehicle', interpolate=False):
         if self is self.GRID:
             return vehicle.statistic_series_grid(interpolate)
-        return vehicle.statistic_series_time(interpolate)
 
     def metrics(self):
         '''
-        Returns a tuple of metrics of grid- or time-based series, depending on passed `seriestype`
-        :raises TypeError if `seriestype` is neither `StatisticSeries.GRID` or `StatisticSeries.TIME`
+        Returns a tuple of metrics for grid-based series
         :param seriestype: defines for which type of series the metrics shall be returned
         :return: tuple of metrics
         '''
@@ -231,20 +228,6 @@ class StatisticSeries(enum.Enum):
                     Metric.TRAVEL_TIME,
                     Metric.TIME_LOSS,
                     Metric.RELATIVE_TIME_LOSS)
-
-        if self is StatisticSeries.TIME:
-            return (Metric.POSITION_X,
-                    Metric.POSITION_Y,
-                    Metric.GRID_POSITION_X,
-                    Metric.GRID_POSITION_Y,
-                    Metric.DISSATISFACTION,
-                    Metric.TRAVEL_TIME,
-                    Metric.TIME_LOSS,
-                    Metric.RELATIVE_TIME_LOSS)
-
-        # raise TypeError
-        raise TypeError(f'{seriestype} is neither {StatisticSeries.GRID} or {StatisticSeries.TIME}.')
-
 
 
 @enum.unique
