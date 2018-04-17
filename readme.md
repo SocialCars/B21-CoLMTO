@@ -70,7 +70,7 @@ Feel free to use any other version, but make sure to set the `SUMO_HOME` environ
 #### FreeBSD
 
 ```sh
-sudo portmaster devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
+sudo portmaster devel/git lang/python36 devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
 
 cd colmto/sumo/sumo
 make -f Makefile.cvs
@@ -107,7 +107,7 @@ make -j $(getconf NPROCESSORS_CONF)
 #### FreeBSD
 
 ```sh
-sudo portmaster textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2
+sudo portmaster -d devel/py-pip@py36 math/py-numpy@py36 science/py-h5py@py36 math/py-matplotlib@py36 textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2 
 ```
 
 #### MacOS
@@ -137,17 +137,17 @@ pip3 install -r requirements.txt --user
 
 Build package
 ```sh
-python3 setup.py build
+python3.6 setup.py build
 ```
 
 Run unit tests
 ```sh
-python3 setup.py test
+python3.6 setup.py test
 ```
 
 Install (local)
 ```sh
-python3 setup.py install --user
+python3.6 setup.py install --user
 ```
 
 ## Run CoLMTO
@@ -163,7 +163,7 @@ colmto --runs 1
 If you have not installed CoLMTO in the previous section, run it inside the project directory as module.
 ```sh
 cd colmto
-python3 -m colmto --runs 1
+python3.6 -m colmto --runs 1
 ```
 
 Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
