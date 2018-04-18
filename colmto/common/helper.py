@@ -22,6 +22,7 @@
 # #############################################################################
 # @endcond
 '''Classes and functions to realise property structures, e.g. Position, Colour, ...'''
+
 import typing
 from collections import namedtuple
 import matplotlib.pyplot as plt
@@ -59,6 +60,16 @@ class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
 
     @staticmethod
     def map(name: str, max_value: float, value: float):
+        '''
+        Map value to a colour based on given colourmap and max_value for scaling
+
+        :param name: colourmap name (needs to be supported by matplotlib, e.g. plasma)
+        :param max_value: maximum value, needed for scaling
+        :param value: value on scale
+        :return: Colour
+
+        '''
+
         return Colour(*plt.get_cmap(name=name, lut=max_value)(value))
 
 
@@ -121,12 +132,13 @@ class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
         '''checks whether speed lies between min and max (including)'''
         return self.min <= speed <= self.max
 
+
 @enum.unique
 class Distribution(enum.Enum):
     '''Enumerates distribution types for vehicle starting times'''
     LINEAR = enum.auto()
     POISSON = enum.auto()
-    _prng = numpy.random.RandomState()
+    _prng = numpy.random.RandomState()  # pylint: disable=no-member
 
     def next_timestep(self, lamb, prev_start_time):
         r'''
@@ -156,7 +168,7 @@ class InitialSorting(enum.Enum):
     BEST = enum.auto()
     RANDOM = enum.auto()
     WORST = enum.auto()
-    _prng = numpy.random.RandomState()
+    _prng = numpy.random.RandomState()  # pylint: disable=no-member
 
     def order(self, vehicles: list):
         '''*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)'''
@@ -208,6 +220,10 @@ class Metric(enum.Enum):
 
 @enum.unique
 class StatisticSeries(enum.Enum):
+    '''
+    Types of statistic series
+    '''
+
     GRID = 'grid_based_series'
     TIME = 'time_based_series'
 
