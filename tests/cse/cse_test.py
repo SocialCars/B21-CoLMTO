@@ -86,7 +86,7 @@ def test_sumo_cse():
         colmto.environment.vehicle.SUMOVehicle(
             environment={'gridlength': 200, 'gridcellwidth': 4},
             speed_max=random.randrange(0, 250)
-        ) for _ in range(10)
+        ) for _ in range(10**5)
     ]
 
     for i_vehicle in l_vehicles:

@@ -48,27 +48,33 @@ class Statistics(object):
             self._writer = colmto.common.io.Writer(None)
 
     def merge_vehicle_series(self, run: int, vehicles: typing.Dict[str, SUMOVehicle]) -> typing.Dict[str, dict]:
+        '''
+        merge vehicle data series into a dictionary structure suitable for writing to hdf5
+        :param run: current run number
+        :param vehicles: named dictionary of vehicles
+        :return: dictionary of metrics for current run
+        '''
 
         self._log.debug('Merging vehicle series of run %d', run)
 
         return {
-            i_series.value: {
+            StatisticSeries.GRID.value: {
                 'all': {
                     i_metric.value: {
                         'value': pandas.concat(
                             (
-                                i_series.of(vehicles[i_vehicle], interpolate=True)
+                                StatisticSeries.from_vehicle(vehicles[i_vehicle], interpolate=True)
                                 for i_vehicle in sorted(vehicles.keys())
                             ),
                             axis=1,
                             keys=sorted(vehicles.keys())
                         ).T[i_metric.value],
                         'attr': {
-                            'description': f'{i_series.value}-based data for all vehicle types',
+                            'description': f'{StatisticSeries.GRID.value}-based data for all vehicle types',
                             'metric': i_metric.value,
                         }
                     }
-                    for i_metric in i_series.metrics()
+                    for i_metric in StatisticSeries.metrics()
                     if len(vehicles) > 0
                 },
                 **{
@@ -76,25 +82,24 @@ class Statistics(object):
                         i_metric.value : {
                             'value' : pandas.concat(
                                 (
-                                    i_series.of(vehicles[i_vehicle], interpolate=True)
+                                    StatisticSeries.from_vehicle(vehicles[i_vehicle], interpolate=True)
                                     for i_vehicle in sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
                                 ),
                                 axis=1,
                                 keys=sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
                             ).T[i_metric.value],
                             'attr': {
-                                'description': f'{i_series.value}-based data of {i_vtype}s',
+                                'description': f'{StatisticSeries.GRID.value}-based data of {i_vtype}s',
                                 'metric': i_metric.value,
                                 'vtype': i_vtype.value,
                             }
                         }
-                        for i_metric in i_series.metrics()
+                        for i_metric in StatisticSeries.metrics()
                         if len(list(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))) > 0
                     }
                     for i_vtype in VehicleType
                 }
             }
-            for i_series in (StatisticSeries.GRID,)
         }
 
     def global_stats(self, merged_series: typing.Dict[str, dict]):
@@ -103,6 +108,8 @@ class Statistics(object):
         :param merged_series: data aquired by calling `merge_vehicle_series`
         :return: inplace updated `merged series data`
         '''
+
+        self._log.debug('Adding global stats to merged series')
 
         for i_series in merged_series:
             # for the individual vehicle types

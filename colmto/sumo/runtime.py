@@ -45,7 +45,6 @@ except ImportError:  # pragma: no cover
 
 class Runtime(object):
     '''Runtime class'''
-    # pylint: disable=too-few-public-methods
 
     def __init__(self, args, sumo_config, sumo_binary):
         '''C'tor.'''

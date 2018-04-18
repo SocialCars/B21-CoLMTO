@@ -23,12 +23,12 @@
 # @endcond
 '''Classes and functions to realise models regarding dissatisfaction, inefficiency and unfairness.'''
 
+import typing
 import numpy
 import pandas
-import typing
 
 
-# pylint: disable=no-member,len-as-condition
+# pylint: disable=no-member
 def unfairness(data: pandas.Series) -> numpy.float64:
     r'''
     Calculate the unfairness by means of the H-Spread of Hinges for given data points.
@@ -72,7 +72,7 @@ def unfairness(data: pandas.Series) -> numpy.float64:
 
     '''
 
-    return numpy.subtract(*data.quantile([.75, .25])) if len(data) else numpy.float64(0)
+    return numpy.subtract(*data.quantile([.75, .25])) if not data.empty else numpy.float64(0)
 
 
 def dissatisfaction(
@@ -107,11 +107,11 @@ def dissatisfaction(
     # pylint: disable=no-member
     return numpy.divide(
         1.,
-        1 + numpy.exp((-time_loss + time_loss_threshold * optimal_travel_time) * .05 )
+        1 + numpy.exp((-time_loss + time_loss_threshold * optimal_travel_time) * .05)
     )
     # pylint: enable=no-member
 
-def inefficiency(data: pandas.Series) -> typing.Union[numpy.int64, numpy.float64]:
+def inefficiency(data: pandas.Series) -> typing.Union[numpy.int64, numpy.float64]:  # pylint: disable=no-member
     '''
     Inefficiency model, i.e. sum of data
 

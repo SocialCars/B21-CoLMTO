@@ -23,15 +23,12 @@
 # @endcond
 '''Classes and functions to realise property structures, e.g. Position, Colour, ...'''
 
-import typing
 from collections import namedtuple
-import matplotlib.pyplot as plt
+import typing
 import enum
+import matplotlib.pyplot as plt
 import numpy
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from colmto.environment.vehicle import SUMOVehicle
+import pandas
 
 
 class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
@@ -135,12 +132,16 @@ class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
 
 @enum.unique
 class Distribution(enum.Enum):
-    '''Enumerates distribution types for vehicle starting times'''
+    '''
+    Enumerates distribution types for vehicle starting times
+
+    '''
+
     LINEAR = enum.auto()
     POISSON = enum.auto()
     _prng = numpy.random.RandomState()  # pylint: disable=no-member
 
-    def next_timestep(self, lamb, prev_start_time):
+    def next_timestep(self, lamb: float, prev_start_time: float) -> float:
         r'''
         Calculate next time step in Exponential or linear distribution.
         Exponential distribution with
@@ -154,7 +155,9 @@ class Distribution(enum.Enum):
         :param prev_start_time: start time
         :param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
         :return: next start time
+
         '''
+
         if self is Distribution.POISSON:
             return prev_start_time + self._prng.value.exponential(scale=lamb)
         elif self is Distribution.LINEAR:
@@ -164,14 +167,25 @@ class Distribution(enum.Enum):
 
 @enum.unique
 class InitialSorting(enum.Enum):
-    '''Initial sorting modes of vehicles'''
+    '''
+    Initial sorting modes of vehicles
+
+    '''
+
     BEST = enum.auto()
     RANDOM = enum.auto()
     WORST = enum.auto()
     _prng = numpy.random.RandomState()  # pylint: disable=no-member
 
-    def order(self, vehicles: list):
-        '''*in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)'''
+    def order(self, vehicles: typing.List['SUMOVehicle']):
+        '''
+        *in-place* brings list of vehicles into required order (BEST, RANDOM, WORST)
+
+        :param vehicles: list of vehicles
+        :return: None
+
+        '''
+
         if self is InitialSorting.BEST:
             vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
         elif self is InitialSorting.WORST:
@@ -180,8 +194,13 @@ class InitialSorting(enum.Enum):
             self.prng.shuffle(vehicles)
 
     @property
-    def prng(self):
-        '''returns numpy PRNG state'''
+    def prng(self) -> numpy.random.RandomState:  # pylint: disable=no-member
+        '''
+        returns numpy PRNG state
+        :return: numpy.random.RandomState instance
+
+        '''
+
         return self._prng.value
 
 
@@ -189,7 +208,9 @@ class InitialSorting(enum.Enum):
 class VehicleType(enum.Enum):
     '''
     Available vehicle types
+
     '''
+
     DELIVERY = 'delivery'
     HEAVYTRANSPORT = 'heavytransport'
     PASSENGER = 'passenger'
@@ -203,7 +224,9 @@ class VehicleType(enum.Enum):
 class Metric(enum.Enum):
     '''
     Statistical metrices
+
     '''
+
     DISSATISFACTION = 'dissatisfaction'
     GRID_POSITION_X = 'grid_position_x'
     GRID_POSITION_Y = 'grid_position_y'
@@ -222,33 +245,48 @@ class Metric(enum.Enum):
 class StatisticSeries(enum.Enum):
     '''
     Types of statistic series
+
     '''
 
     GRID = 'grid_based_series'
 
-    def of(self, vehicle: 'SUMOVehicle', interpolate=False):
-        if self is self.GRID:
-            return vehicle.statistic_series_grid(interpolate)
+    @staticmethod
+    def from_vehicle(vehicle: 'SUMOVehicle', interpolate=False) -> pandas.Series:
+        '''
+        return statistic series from given vehicle
+        :param vehicle: Vehicle
+        :param interpolate: interpolate values (True|False)
+        :return: pandas.Series
 
-    def metrics(self):
+        '''
+
+        return vehicle.statistic_series_grid(interpolate)
+
+    @staticmethod
+    def metrics():
         '''
         Returns a tuple of metrics for grid-based series
         :param seriestype: defines for which type of series the metrics shall be returned
         :return: tuple of metrics
+
         '''
-        if self is StatisticSeries.GRID:
-            return (Metric.TIME_STEP,
-                    Metric.POSITION_Y,
-                    Metric.GRID_POSITION_Y,
-                    Metric.DISSATISFACTION,
-                    Metric.TRAVEL_TIME,
-                    Metric.TIME_LOSS,
-                    Metric.RELATIVE_TIME_LOSS)
+
+        return (Metric.TIME_STEP,
+                Metric.POSITION_Y,
+                Metric.GRID_POSITION_Y,
+                Metric.DISSATISFACTION,
+                Metric.TRAVEL_TIME,
+                Metric.TIME_LOSS,
+                Metric.RELATIVE_TIME_LOSS)
 
 
 @enum.unique
 class Behaviour(enum.Enum):
-    '''Behaviour enum for enumerating allow/deny states and corresponding vehicle classes.'''
+    '''
+    Behaviour enum for enumerating allow/deny states and corresponding vehicle classes.
+
+    '''
+
     ALLOW = 'custom2'
     DENY = 'custom1'
 
@@ -283,12 +321,21 @@ class RuleOperator(enum.Enum):
 
     Denotes whether an iterable with boolean expressions is True,
     iff all elements are True (all()) or iff at least one element has to be True (any())
+
     '''
+
     ALL = all
     ANY = any
 
-    def evaluate(self, args: typing.Iterable):
-        '''evaluate iterable args'''
+    def evaluate(self, args: typing.Iterable) -> bool:
+        '''
+        evaluate iterable args
+
+        :param args: iterable
+        :return: True|False depending on RuleOperator
+
+        '''
+
         return self.value(args)  # pylint: disable=too-many-function-args
 
     @staticmethod

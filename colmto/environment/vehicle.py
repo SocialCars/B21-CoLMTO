@@ -24,8 +24,8 @@
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
 from types import MappingProxyType
-import pandas
 from collections import OrderedDict
+import pandas
 
 import colmto.cse.rule
 import colmto.common.model

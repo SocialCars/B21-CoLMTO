@@ -21,9 +21,9 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-# pylint: disable=too-few-public-methods
-# pylint: disable=no-self-use
+
 '''CSE classes'''
+
 import typing
 
 import colmto.common.log
@@ -69,7 +69,7 @@ class BaseCSE(object):
 
         '''
 
-        for i_vehicle in (iter(vehicles.values()) if isinstance(vehicles, dict) else vehicles):
+        for i_vehicle in vehicles.values() if isinstance(vehicles, dict) else vehicles:
             self.apply_one(i_vehicle)
 
         return self

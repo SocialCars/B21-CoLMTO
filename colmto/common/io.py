@@ -30,7 +30,6 @@ from pathlib import Path
 
 import json
 import numpy
-import pandas
 
 try:
     from yaml import CSafeLoader as SafeLoader, CSafeDumper as SafeDumper
@@ -115,7 +114,7 @@ class Writer(object):
             csv_writer.writerows(rowdict)
 
     def write_hdf5(self, object_dict: dict, hdf5_file: str, hdf5_base_path: str, **kwargs):
-        '''
+        r'''
         Write an object to a specific path into an open file, identified by fileid
 
         :param hdf5_file: The file name

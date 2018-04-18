@@ -23,10 +23,11 @@
 # @endcond
 # pylint: disable=too-few-public-methods
 '''Rule related classes'''
+
 import typing
 
 from abc import ABCMeta
-from abc import abstractclassmethod
+from abc import abstractmethod
 
 from colmto.common.helper import Position, VehicleType
 from colmto.common.helper import BoundingBox
@@ -45,6 +46,13 @@ class BaseRule(metaclass=ABCMeta):
         if rule_name:
             cls._valid_rules[rule_name] = cls
         super().__init_subclass__(**kwargs)
+
+    def __init__(self, **kwargs):
+        '''
+        C'tor
+        :param kwargs: configuration args
+        '''
+        pass
 
     @classmethod
     def rule_cls(cls, rule_name: str) -> 'BaseRule':
@@ -86,15 +94,20 @@ class BaseRule(metaclass=ABCMeta):
         >>>         'vehicle_type': 'truck'
         >>>     }
         >>> }
-        >>> extendable_position_rule = rule.ExtendableSUMOPositionRule.from_configuration(extendable_position_rule_config) # type: rule.ExtendableSUMOPositionRule
-        >>> vtype_rule = rule.SUMOVTypeRule.from_configuration(vtype_rule_config) # type: rule.SUMOVTypeRule
+        >>> extendable_position_rule = rule.ExtendableSUMOPositionRule.from_configuration(extendable_position_rule_config)
+        >>> vtype_rule = rule.SUMOVTypeRule.from_configuration(vtype_rule_config)
         >>> print(extendable_position_rule._valid_rules.keys())
-        dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule', 'ExtendableSUMOVTypeRule', 'SUMOMinimalSpeedRule', 'ExtendableSUMOMinimalSpeedRule', 'SUMOPositionRule', 'ExtendableSUMOPositionRule', 'SUMODissatisfactionRule', 'ExtendableSUMODissatisfactionRule'])
+        dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule',
+                   'ExtendableSUMOVTypeRule', 'SUMOMinimalSpeedRule', 'ExtendableSUMOMinimalSpeedRule',
+                   'SUMOPositionRule', 'ExtendableSUMOPositionRule', 'SUMODissatisfactionRule',
+                   'ExtendableSUMODissatisfactionRule'])
         >>> print(extendable_position_rule.add_subrule(vtype_rule))
-        <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: posbounding_boxBoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
+        <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: posbounding_boxBoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)),
+        subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
 
         :param rule_config: rule configuration
         :return: rule
+
         '''
 
         if not isinstance(rule_config, dict):
@@ -108,15 +121,6 @@ class BaseRule(metaclass=ABCMeta):
                              f'\"{cls.__name__}\" but config has type set to \"{rule_config.get("type")}\".')
 
         return cls(**rule_config.get('args'))
-
-
-    @abstractclassmethod
-    def __init__(self, **kwargs):
-        '''
-        C'tor
-        :param kwargs: configuration args
-        '''
-        pass
 
 
 class SUMORule(BaseRule, metaclass=ABCMeta):
@@ -135,17 +139,16 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         '''Get the SUMO class for disallowed vehicles'''
         return Behaviour.DENY.vclass
 
-    # pylint: disable=unused-argument,no-self-use
-    @abstractclassmethod
+    @abstractmethod
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
 
         :param vehicle: Vehicle
-        :return: boolean
+        :return: boolean (always False)
 
         '''
-        pass
+        return False
 
     def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
         '''
@@ -276,7 +279,7 @@ class ExtendableSUMORule(ExtendableRule, metaclass=ABCMeta):
 
         return self._subrule_operator.evaluate(
             (i_rule.applies_to(vehicle) for i_rule in self._subrules)
-        ) if len(self._subrules) > 0 else False  # always return False if subrules is empty
+        ) if self._subrules else False  # always return False if subrules is empty
 
 
 class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
@@ -284,13 +287,6 @@ class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
     Universal rule, i.e. always applies to any vehicle
     '''
 
-    def __init__(self):
-        '''
-        C'tor
-        '''
-        super().__init__()
-
-    # pylint: disable=unused-argument
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
@@ -323,25 +319,17 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
     Null rule, i.e. no restrictions: Applies to no vehicle
     '''
 
-    def __init__(self):
-        '''
-        C'tor
-        '''
-        super().__init__()
-
-    # pylint: disable=unused-argument
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
 
         :param vehicle: Vehicle
-        :return: boolean
+        :return: boolean (always False)
 
         '''
 
         return False
 
-    # pylint: disable=no-self-use
     def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
         '''
         Apply rule to vehicles.
@@ -360,7 +348,15 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
 
 class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
     '''Base class for vehicle attribute specific rules.'''
-    pass
+
+    @abstractmethod
+    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+        '''
+        applies to
+        :param vehicle: vehicles
+        :return: bool (always False)
+        '''
+        return False
 
 
 class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
@@ -394,7 +390,7 @@ class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
         return self._vehicle_type == vehicle.vehicle_type
 
 
-class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='ExtendableSUMOVTypeRule'):
+class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, metaclass=ABCMeta, rule_name='ExtendableSUMOVTypeRule'):
     '''
     Extendable vehicle-type based rule: Applies to vehicles with a given SUMO vehicle type.
     Can be extendend by sub-rules.
@@ -420,6 +416,7 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
+    @abstractmethod
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle.
@@ -430,6 +427,15 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
         '''
 
         return super().applies_to(vehicle) and self.subrules_apply_to(vehicle)
+
+    @abstractmethod
+    def applies_to_subrules(self, vehicle: 'SUMOVehicle'):
+        '''
+        applies to subrules
+        :param vehicle: vehicles
+        :return: bool (always False)
+        '''
+        return False
 
 
 class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
