@@ -185,10 +185,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_configfile = l_destinationdir / initial_sorting.name.lower() / str(run_number) \
                        / f'{l_scenarioname}.sumo.cfg'
 
-        l_output_measurements_dir = self.resultsdir / l_scenarioname \
-                                    / initial_sorting.name.lower() / str(run_number)
-
-        l_output_measurements_dir.mkdir(parents=True, exist_ok=True)
+        # create output dirs for fcd results if not running with cse enabled, i.e. stand alone
+        if not self.run_config.get('cse-enabled'):
+            (
+                    self.resultsdir / l_scenarioname / initial_sorting.name.lower() / str(run_number)
+            ).mkdir(parents=True, exist_ok=True)
 
         l_runcfgfiles = [l_tripfile, l_routefile, l_configfile]
 
@@ -228,7 +229,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
             'tripfile': l_tripfile,
             'routefile': l_routefile,
             'configfile': l_configfile,
-            'fcdfile': l_output_measurements_dir / f'{l_scenarioname}.fcd-output.xml',
+            'fcdfile': self.resultsdir /
+                       l_scenarioname /
+                       initial_sorting.name.lower() /
+                       str(run_number) /
+                       f'{l_scenarioname}.fcd-output.xml' if not self.run_config.get('cse-enabled') else None,
             'scenario_config': self.scenario_config.get(l_scenarioname)
         }
 
