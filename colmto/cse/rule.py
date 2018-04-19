@@ -47,6 +47,7 @@ class BaseRule(metaclass=ABCMeta):
             cls._valid_rules[rule_name] = cls
         super().__init_subclass__(**kwargs)
 
+    @abstractmethod
     def __init__(self, **kwargs):
         '''
         C'tor
@@ -287,6 +288,15 @@ class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
     Universal rule, i.e. always applies to any vehicle
     '''
 
+    def __init__(self, **kwargs):
+        '''
+        Dummy init
+        :param kwargs: passed args
+
+        '''
+
+        super().__init__(**kwargs)
+
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
@@ -318,6 +328,15 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
     '''
     Null rule, i.e. no restrictions: Applies to no vehicle
     '''
+
+    def __init__(self, **kwargs):
+        '''
+        Dummy init
+        :param kwargs: passed args
+
+        '''
+
+        super().__init__(**kwargs)
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -416,7 +435,6 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, metaclass=ABCMe
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
-    @abstractmethod
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle.
@@ -428,7 +446,6 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, metaclass=ABCMe
 
         return super().applies_to(vehicle) and self.subrules_apply_to(vehicle)
 
-    @abstractmethod
     def applies_to_subrules(self, vehicle: 'SUMOVehicle'):
         '''
         applies to subrules

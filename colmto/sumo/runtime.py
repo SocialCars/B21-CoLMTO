@@ -189,8 +189,7 @@ class Runtime(object):
                         i_vehicle_id,
                         l_vehicle.vehicle_class
                     )
-                    if l_vehicle.vehicle_class \
-                            == colmto.cse.rule.SUMORule.to_disallowed_class():
+                    if l_vehicle.vehicle_class == colmto.cse.rule.SUMORule.to_disallowed_class():
                         traci.vehicle.setColor(
                             i_vehicle_id,
                             (255, 0, 0, 255)
@@ -200,20 +199,6 @@ class Runtime(object):
                             i_vehicle_id,
                             tuple(l_vehicle.colour)
                         )
-
-                # record travel stats to vehicle
-                # l_vehicle.record_travel_stats(
-                #     l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
-                # )
-
-                # if i_vehicle_id == 'vehicle10':
-                #     self._log.debug(
-                #         'pos: %s, %s, act TT: %s, opt TT: %s',
-                #         l_vehicle.position,
-                #         l_vehicle.grid_position,
-                #         l_vehicle.travel_time,
-                #         round(l_vehicle.position.x / l_vehicle.speed_max, 2),
-                #     )
 
             traci.simulationStep()
 
