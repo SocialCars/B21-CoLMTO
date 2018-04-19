@@ -190,7 +190,7 @@ class InitialSorting(enum.Enum):
         elif self is InitialSorting.WORST:
             vehicles.sort(key=lambda i_v: i_v.speed_max)
         elif self is InitialSorting.RANDOM:
-            self._prng.shuffle(vehicles)
+            self._prng.value.shuffle(vehicles)
 
 
 @enum.unique
