@@ -48,7 +48,7 @@ class SumoSim(object):  # pylint: disable=too-many-instance-attributes
     '''Class for initialising/running SUMO scenarios.'''
 
     def __init__(self, args):
-        '''C'tor.'''
+        '''Initialisation.'''
 
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         self._args = args

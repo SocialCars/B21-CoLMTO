@@ -55,7 +55,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
     '''Create SUMO configuration files'''
 
     def __init__(self, args, netconvertbinary, duarouterbinary):
-        '''C'tor'''
+        '''Initialisation'''
         super().__init__(args)
 
         self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)

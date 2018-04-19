@@ -292,7 +292,7 @@ class Configuration(object):
 
     def __init__(self, args):
         '''
-        C'tor: Read scenario/run/vehicle_type configs and merge with command line arguments.
+        Initialisation: Read scenario/run/vehicle_type configs and merge with command line arguments.
         Command line args override cfgs.
         '''
 

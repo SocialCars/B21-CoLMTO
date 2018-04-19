@@ -39,7 +39,7 @@ class BaseVehicle(object):
     '''Base Vehicle.'''
 
     def __init__(self):
-        '''C'tor'''
+        '''Initialisation'''
 
         self._properties = {
             'position': Position(x=0.0, y=0.0),
@@ -105,7 +105,7 @@ class SUMOVehicle(BaseVehicle):
                  sigma=0.0,
                  speed_max=0.0):
         '''
-        C'tor.
+        Initialisation.
 
         :param vehicle_type:
         :param vtype_sumo_cfg:

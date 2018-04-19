@@ -37,7 +37,7 @@ class BaseCSE(object):
 
     def __init__(self, args=None):
         '''
-        C'tor
+        Initialisation
 
         :param args: argparse configuration
 

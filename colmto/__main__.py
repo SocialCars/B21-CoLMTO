@@ -37,7 +37,7 @@ class Colmto(object):
     '''Colmto main class'''
 
     def __init__(self):
-        '''C'tor.'''
+        '''Initialisation.'''
 
         # get config dir  ~/.colmto and create if not exist
         l_config_dir = Path('~/.colmto').expanduser()

@@ -42,7 +42,7 @@ class Namespace(object):
     '''Namespace similar to argparse'''
     # pylint: disable=too-few-public-methods
     def __init__(self, **kwargs):
-        '''C'tor.'''
+        '''Initialisation.'''
         self.__dict__.update(kwargs)
 
 

@@ -47,7 +47,7 @@ class Reader(object):  # pylint: disable=too-few-public-methods
     '''Read xml, json and yaml files.'''
 
     def __init__(self, args):
-        '''C'tor.'''
+        '''Initialisation.'''
         if args is not None:
             self._log = colmto.common.log.logger(__name__, args.loglevel, args.quiet, args.logfile)
         else:

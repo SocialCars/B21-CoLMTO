@@ -50,7 +50,7 @@ class BaseRule(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, **kwargs):
         '''
-        C'tor
+        Initialisation
         :param kwargs: configuration args
         '''
         pass
@@ -175,7 +175,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
 
     def __init__(self, subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
-        C'tor.
+        Initialisation.
 
         :param subrules: List of sub-rules
         :param subrule_operator: Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
@@ -383,7 +383,7 @@ class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
 
     def __init__(self, vehicle_type: typing.Union[VehicleType, str]):
         '''
-        C'tor.
+        Initialisation.
 
         :param vehicle_type: vehicle type
 
@@ -418,7 +418,7 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, metaclass=ABCMe
     def __init__(self, vehicle_type: typing.Union[VehicleType, str],
                  subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
-        C'tor
+        Initialisation
 
         :param vehicle_type: vehicle type
         :param subrules: List of sub-rules
@@ -460,7 +460,7 @@ class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
 
     def __init__(self, minimal_speed: float):
         '''
-        C'tor
+        Initialisation
         :param minimal_speed: minimal speed a vehicle has to undercut for this rule to apply
 
         '''
@@ -493,7 +493,7 @@ class ExtendableSUMOMinimalSpeedRule(SUMOMinimalSpeedRule, ExtendableSUMORule, r
     def __init__(self, minimal_speed: float,
                  subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
-        C'tor
+        Initialisation
 
         :param minimal_speed: minimal speed a vehicle has to undercut for this rule to apply
         :param subrules: List of sub-rules
@@ -530,7 +530,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
 
     def __init__(self, bounding_box=BoundingBox(Position(0.0, 0), Position(100.0, 1)), outside=False):
         '''
-        C'tor.
+        Initialisation.
         :param bounding_box: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
         :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
 
@@ -575,7 +575,7 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
     def __init__(self, bounding_box=BoundingBox(Position(0.0, 0), Position(100.0, 1)),
                  outside=False, subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
-        C'tor
+        Initialisation
 
         :param bounding_box: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
         :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
@@ -613,7 +613,7 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
 
     def __init__(self, threshold=0.5):
         '''
-        C'tor
+        Initialisation
         :param threshold: vehicle has to have reached for this rule to apply
 
         '''
@@ -655,7 +655,7 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
     def __init__(self, threshold=0.5,
                  subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
-        C'tor
+        Initialisation
 
         :param threshold: vehicle has to have reached for this rule to apply
         :param subrules: List of sub-rules

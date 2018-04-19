@@ -47,7 +47,7 @@ class Runtime(object):
     '''Runtime class'''
 
     def __init__(self, args, sumo_config, sumo_binary):
-        '''C'tor.'''
+        '''Initialisation.'''
         self._args = args
         self._sumo_config = sumo_config
         self._sumo_binary = sumo_binary
