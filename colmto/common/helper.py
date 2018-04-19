@@ -160,9 +160,8 @@ class Distribution(enum.Enum):
 
         if self is Distribution.POISSON:
             return prev_start_time + self._prng.value.exponential(scale=lamb)
-        elif self is Distribution.LINEAR:
-            return prev_start_time + 1 / lamb
-        return prev_start_time
+
+        return prev_start_time + 1 / lamb # i.e. Distribution.LINEAR
 
 
 @enum.unique
@@ -191,17 +190,7 @@ class InitialSorting(enum.Enum):
         elif self is InitialSorting.WORST:
             vehicles.sort(key=lambda i_v: i_v.speed_max)
         elif self is InitialSorting.RANDOM:
-            self.prng.shuffle(vehicles)
-
-    @property
-    def prng(self) -> numpy.random.RandomState:  # pylint: disable=no-member
-        '''
-        returns numpy PRNG state
-        :return: numpy.random.RandomState instance
-
-        '''
-
-        return self._prng.value
+            self._prng.shuffle(vehicles)
 
 
 @enum.unique
@@ -296,22 +285,21 @@ class Behaviour(enum.Enum):
         return self.value
 
     @staticmethod
-    def behaviour_from_string(behaviour: str, or_else: 'Behaviour') -> 'Behaviour':
+    def behaviour_from_string(behaviour: str) -> 'Behaviour':
         '''
         Transforms string argument of behaviour, i.e. 'allow', 'deny' case insensitive to
-        Behaviour enum value. Otherwise return passed or_else argument.
+        Behaviour enum value. Otherwise raises KeyError.
 
-        :param behaviour: string 'allow', 'deny'
-        :param or_else: otherwise returned argument
-        :type or_else: Behaviour
-        :return: Behaviour.ALLOW, Behaviour.DENY, or_else
+        :param behaviour: string 'allow', 'deny' (case insensitive)
+        :return: Behaviour.ALLOW, Behaviour.DENY,
+        :raises: KeyError
 
         '''
 
         try:
             return Behaviour[behaviour.upper()]
         except KeyError:
-            return or_else
+            raise KeyError(f'provided behaviour string \"{behaviour}\" is not valid! Available strings are {Behaviour.ALLOW.name}, {Behaviour.DENY.name}')
 
 
 @enum.unique
@@ -339,19 +327,17 @@ class RuleOperator(enum.Enum):
         return self.value(args)  # pylint: disable=too-many-function-args
 
     @staticmethod
-    def ruleoperator_from_string(rule_operator: str, or_else: 'RuleOperator') -> 'RuleOperator':
+    def ruleoperator_from_string(rule_operator: str) -> 'RuleOperator':
         '''
         Transforms string argument of rule operator, i.e. 'any', 'all' case insensitive to
-        RuleOperator enum value. Otherwise return passed or_else argument.
+        RuleOperator enum value. Otherwise raises KeyError.
 
         :param rule_operator: str ('any'|'all')
-        :param or_else: otherwise returned argument
-        :type or_else: RuleOperator
-        :return: RuleOperator.ANY, RuleOperator.ALL, or_else
-
+        :return: RuleOperator.ANY, RuleOperator.ALL
+        :raises: KeyError
         '''
 
         try:
             return RuleOperator[rule_operator.upper()]
         except KeyError:
-            return or_else
+            raise KeyError(f'provided rule operator string \"{rule_operator}\" is not valid! Available strings are \"{RuleOperator.ALL.name}\", \"{RuleOperator.ANY.name}')

@@ -69,23 +69,6 @@ def test_base_rule():
     '''
     colmto.cse.rule.BaseRule()
 
-
-def test_ruleoperatorfromstring():
-    '''Test colmto.cse.rule.BaseRule.ruleoperator_from_string.'''
-    assert_equal(
-        colmto.cse.rule.RuleOperator.ruleoperator_from_string('All', colmto.cse.rule.RuleOperator.ANY),
-        colmto.cse.rule.RuleOperator.ALL
-    )
-    assert_equal(
-        colmto.cse.rule.RuleOperator.ruleoperator_from_string('Any', colmto.cse.rule.RuleOperator.ALL),
-        colmto.cse.rule.RuleOperator.ANY
-    )
-    assert_equal(
-        colmto.cse.rule.RuleOperator.ruleoperator_from_string('Meh', colmto.cse.rule.RuleOperator.ALL),
-        colmto.cse.rule.RuleOperator.ALL
-    )
-
-
 def test_sumo_rule():
     '''
     Test SumoRule class
@@ -222,9 +205,14 @@ def test_sumo_extendable_rule():
             subrules=['foo'],
         )
 
-    assert_equal(
+    with assert_raises(KeyError):
         colmto.cse.rule.ExtendableSUMORule(
             subrule_operator='foo'
+        )
+
+    assert_equal(
+        colmto.cse.rule.ExtendableSUMORule(
+            subrule_operator='any'
         ).subrule_operator,
         colmto.cse.rule.RuleOperator.ANY
     )
@@ -232,7 +220,7 @@ def test_sumo_extendable_rule():
     assert_equal(
         colmto.cse.rule.ExtendableSUMORule(
             subrules=[colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)],
-            subrule_operator='foo'
+            subrule_operator='any'
         ).subrule_operator,
         colmto.cse.rule.RuleOperator.ANY
     )

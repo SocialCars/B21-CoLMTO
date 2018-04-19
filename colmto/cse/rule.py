@@ -188,7 +188,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
 
         # verify rule types
         for i_subrule in subrules:
-            if not isinstance(i_subrule, BaseRule) and not isinstance(i_subrule, dict):
+            if not (isinstance(i_subrule, BaseRule) or isinstance(i_subrule, dict)):
                 raise TypeError(f'{i_subrule} is not of colmto.cse.rule.BaseRule or dict.')
 
             self.add_subrule(
@@ -199,7 +199,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
 
         self._subrule_operator = subrule_operator \
             if isinstance(subrule_operator, RuleOperator) \
-            else RuleOperator.ruleoperator_from_string(subrule_operator, RuleOperator.ANY)
+            else RuleOperator.ruleoperator_from_string(subrule_operator)
 
         super().__init__()
 
