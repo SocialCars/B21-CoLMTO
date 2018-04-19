@@ -26,12 +26,9 @@ colmto: Test module for environment.vehicle.
 '''
 import numpy
 from nose.tools import assert_equal
-from nose.tools import assert_almost_equal
-from nose.tools import assert_list_equal
-
 
 import colmto.environment.vehicle
-from colmto.common.helper import Position, VehicleType
+from colmto.common.helper import VehicleType
 
 
 def test_basevehicle():
@@ -94,13 +91,13 @@ def test_sumovehicle():
     assert_equal(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
     assert_equal(l_sumovehicle.colour, (128, 64, 255, 255))
     assert_equal(l_sumovehicle.start_time, 13)
-    assert_equal(l_sumovehicle._grid_position, (0, 0))
+    assert_equal(l_sumovehicle._grid_position, (0, 0))  # pylint: disable=protected-access
 
-    l_sumovehicle._grid_position = (1, 2)
+    l_sumovehicle._grid_position = (1, 2)  # pylint: disable=protected-access
 
-    assert_equal(l_sumovehicle._grid_position, (1, 2))
+    assert_equal(l_sumovehicle._grid_position, (1, 2))  # pylint: disable=protected-access
     assert_equal(l_sumovehicle.properties.get('grid_position'), (1, 2))
-    assert_equal(l_sumovehicle._travel_time, 0.0)
+    assert_equal(l_sumovehicle._travel_time, 0.0)  # pylint: disable=protected-access
 
 
 def test_update():
@@ -125,6 +122,6 @@ def test_update():
         12.1
     )
     assert_equal(
-        l_sumovehicle._grid_position,
+        l_sumovehicle._grid_position,  # pylint: disable=protected-access
         (round(20/4)-1, -1)
     )

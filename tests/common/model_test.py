@@ -27,7 +27,6 @@ colmto: Test module for common.model.
 
 import pandas
 import numpy
-import matplotlib.pyplot as plt
 
 from nose.tools import assert_equal
 from nose.tools import assert_almost_equal
@@ -81,7 +80,7 @@ def test_unfairness():
     assert_true(
         isinstance(
             colmto.common.model.unfairness(pandas.Series()),
-            numpy.float64
+            numpy.float64                                       # pylint: disable=no-member
         )
     )
 
@@ -118,7 +117,7 @@ def test_inefficiency():
     assert_true(
         isinstance(
             colmto.common.model.inefficiency(pandas.Series((1.1, 2, 3, 4))),
-            numpy.float64
+            numpy.float64                                                   # pylint: disable=no-member
         )
     )
 
@@ -131,4 +130,3 @@ def test_inefficiency():
         colmto.common.model.inefficiency(pandas.Series((11, -2, 43.5, 114))),
         166.5
     )
-

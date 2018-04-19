@@ -26,16 +26,15 @@ colmto: Test module for environment.rule.
 '''
 import random
 
-import colmto.cse.rule
-import colmto.environment.vehicle
-import colmto.cse.rule
-
 from nose.tools import assert_equal
 from nose.tools import assert_false
 from nose.tools import assert_is_instance
 from nose.tools import assert_raises
 from nose.tools import assert_true
 from nose.tools import assert_tuple_equal
+
+import colmto.cse.rule
+import colmto.environment.vehicle
 
 
 def test_behaviour():
@@ -68,8 +67,7 @@ def test_base_rule():
     '''
     Test BaseRule class
     '''
-    with assert_raises(TypeError):
-        colmto.cse.rule.BaseRule()
+    colmto.cse.rule.BaseRule()
 
 
 def test_ruleoperatorfromstring():
@@ -93,7 +91,7 @@ def test_sumo_rule():
     Test SumoRule class
     '''
     with assert_raises(TypeError):
-        colmto.cse.rule.SUMORule()
+        colmto.cse.rule.SUMORule()  # pylint: disable=abstract-class-instantiated
 
     assert_equal(colmto.cse.rule.SUMORule.to_disallowed_class(), 'custom1')
     assert_equal(colmto.cse.rule.SUMORule.to_allowed_class(), 'custom2')

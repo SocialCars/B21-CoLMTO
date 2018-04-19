@@ -150,5 +150,3 @@ def test_sumo_cse():
     )
 
     assert_in(l_rule_speed, l_sumo_cse.rules)
-
-

@@ -83,10 +83,10 @@ class Statistics(object):
                             'value' : pandas.concat(
                                 (
                                     StatisticSeries.from_vehicle(vehicles[i_vehicle], interpolate=True)
-                                    for i_vehicle in sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
+                                    for i_vehicle in sorted(filter(lambda v, vtype=i_vtype: vehicles[v].vehicle_type == vtype, vehicles.keys()))
                                 ),
                                 axis=1,
-                                keys=sorted(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))
+                                keys=sorted(filter(lambda v, vtype=i_vtype: vehicles[v].vehicle_type == vtype, vehicles.keys()))
                             ).T[i_metric.value],
                             'attr': {
                                 'description': f'{StatisticSeries.GRID.value}-based data of {i_vtype}s',
@@ -95,7 +95,7 @@ class Statistics(object):
                             }
                         }
                         for i_metric in StatisticSeries.metrics()
-                        if len(list(filter(lambda v: vehicles[v].vehicle_type == i_vtype, vehicles.keys()))) > 0
+                        if len(list(filter(lambda v, vtype=i_vtype: vehicles[v].vehicle_type == vtype, vehicles.keys()))) > 0
                     }
                     for i_vtype in VehicleType
                 }

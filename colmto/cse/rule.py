@@ -21,7 +21,6 @@
 # # along with this program. If not, see http://www.gnu.org/licenses/         #
 # #############################################################################
 # @endcond
-# pylint: disable=too-few-public-methods
 '''Rule related classes'''
 
 import typing
@@ -47,7 +46,6 @@ class BaseRule(metaclass=ABCMeta):
             cls._valid_rules[rule_name] = cls
         super().__init_subclass__(**kwargs)
 
-    @abstractmethod
     def __init__(self, **kwargs):
         '''
         Initialisation
@@ -288,15 +286,6 @@ class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
     Universal rule, i.e. always applies to any vehicle
     '''
 
-    def __init__(self, **kwargs):
-        '''
-        Dummy init
-        :param kwargs: passed args
-
-        '''
-
-        super().__init__(**kwargs)
-
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
         Test whether this rule applies to given vehicle
@@ -308,35 +297,11 @@ class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
 
         return True
 
-    def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
-        '''
-        Apply rule to vehicles.
-
-        :param vehicles: iterable object containing BaseVehicles, or inherited objects
-        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
-
-        '''
-
-        return (
-            i_vehicle.change_vehicle_class(
-                self.to_disallowed_class()
-            ) if self.applies_to(i_vehicle) else i_vehicle for i_vehicle in vehicles
-        )
-
 
 class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
     '''
     Null rule, i.e. no restrictions: Applies to no vehicle
     '''
-
-    def __init__(self, **kwargs):
-        '''
-        Dummy init
-        :param kwargs: passed args
-
-        '''
-
-        super().__init__(**kwargs)
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -348,21 +313,6 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
         '''
 
         return False
-
-    def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
-        '''
-        Apply rule to vehicles.
-
-        :param vehicles: iterable object containing BaseVehicles, or inherited objects
-        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
-
-        '''
-
-        return (
-            i_vehicle.change_vehicle_class(
-                self.to_disallowed_class()
-            ) if self.applies_to(i_vehicle) else i_vehicle for i_vehicle in vehicles
-        )
 
 
 class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
@@ -409,7 +359,7 @@ class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
         return self._vehicle_type == vehicle.vehicle_type
 
 
-class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, metaclass=ABCMeta, rule_name='ExtendableSUMOVTypeRule'):
+class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='ExtendableSUMOVTypeRule'):
     '''
     Extendable vehicle-type based rule: Applies to vehicles with a given SUMO vehicle type.
     Can be extendend by sub-rules.
@@ -444,15 +394,7 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, metaclass=ABCMe
 
         '''
 
-        return super().applies_to(vehicle) and self.subrules_apply_to(vehicle)
-
-    def applies_to_subrules(self, vehicle: 'SUMOVehicle'):
-        '''
-        applies to subrules
-        :param vehicle: vehicles
-        :return: bool (always False)
-        '''
-        return False
+        return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)
 
 
 class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
@@ -568,8 +510,8 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
 class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name='ExtendableSUMOPositionRule'):
     '''
     Extendable position-based rule: Applies to vehicles which are located inside a given bounding box, i.e.
-    [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)].
-    Can be extendend by sub-rules.
+    [(left_lane_0, right_lane_0) -> (left_lane_1, right_lane_1)], AND match at least one sub-rule.
+    Should be extendend by sub-rules, as an empty sub-rule set defaults to False (i.e. applies-not).
     '''
 
     def __init__(self, bounding_box=BoundingBox(Position(0.0, 0), Position(100.0, 1)),

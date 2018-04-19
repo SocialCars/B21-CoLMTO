@@ -32,18 +32,16 @@ import typing
 from collections import OrderedDict
 
 import numpy
-
-from colmto.common.helper import Colour
-from colmto.common.helper import Distribution
-from colmto.common.helper import InitialSorting
+import defusedxml.lxml
 
 try:
     import lxml.etree as etree
 except ImportError:
     import xml.etree.ElementTree as etree
 
-import defusedxml.lxml
-
+from colmto.common.helper import Colour
+from colmto.common.helper import Distribution
+from colmto.common.helper import InitialSorting
 import colmto.common.configuration
 import colmto.common.io
 import colmto.common.log
@@ -137,7 +135,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             scenarioname, l_scenarioconfig, l_edgefile, self._args.forcerebuildscenarios
         )
         self._generate_settings_xml(
-            l_scenarioconfig, self.run_config, l_settingsfile, self._args.forcerebuildscenarios
+            self.run_config, l_settingsfile, self._args.forcerebuildscenarios
         )
         self._generate_net_xml(
             l_nodefile, l_edgefile, l_netfile, self._args.forcerebuildscenarios
@@ -188,7 +186,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         # create output dirs for fcd results if not running with cse enabled, i.e. stand alone
         if not self.run_config.get('cse-enabled'):
             (
-                    self.resultsdir / l_scenarioname / initial_sorting.name.lower() / str(run_number)
+                self.resultsdir / l_scenarioname / initial_sorting.name.lower() / str(run_number)
             ).mkdir(parents=True, exist_ok=True)
 
         l_runcfgfiles = [l_tripfile, l_routefile, l_configfile]
@@ -501,12 +499,11 @@ class SumoConfig(colmto.common.configuration.Configuration):
             )
 
     @staticmethod
-    def _generate_settings_xml(scenarioconfig: dict, runcfg: MappingProxyType,
+    def _generate_settings_xml(runcfg: MappingProxyType,
                                settingsfile: Path, forcerebuildscenarios=False):
         '''
         Generate SUMO's settings configuration file.
 
-        :param scenarioconfig: Scenario configuration
         :param runcfg: Run configuration
         :param settingsfile: Destination to write settings file
         :param forcerebuildscenarios: Rebuild scenarios,
@@ -558,10 +555,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
             'Create vehicle distribution with %s', self._run_config.get('vtypedistribution')
         )
 
-        l_vehps = aadt / (24 * 60 * 60) \
-            if not self._run_config.get('vehiclespersecond').get('enabled') \
-            else self._run_config.get('vehiclespersecond').get('value')
-
         l_vehicle_list = [
             colmto.environment.vehicle.SUMOVehicle(
                 vehicle_type=vtype,
@@ -580,14 +573,12 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 ),
                 environment={
                     'length': (1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length')
-                        if not self._run_config.get('onlyoneotlsegment')
-                        else (1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length')
-                             / (self.scenario_config.get(scenario_name).get('parameters').get('switches') + 1),
+                              if not self._run_config.get('onlyoneotlsegment')
+                              else (1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length') / (self.scenario_config.get(scenario_name).get('parameters').get('switches') + 1),
                     'gridcellwidth': self._run_config.get('gridcellwidth'),
                     'gridlength': int(round((1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length') / self._run_config.get('gridcellwidth')))
-                        if not self._run_config.get('onlyoneotlsegment')
-                        else int(round((1 + self._run_config.get('entrylanepercent') / 100.) * (self.scenario_config.get(scenario_name).get('parameters').get('length')
-                             / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
+                                  if not self._run_config.get('onlyoneotlsegment')
+                                  else int(round((1 + self._run_config.get('entrylanepercent') / 100.) * (self.scenario_config.get(scenario_name).get('parameters').get('length') / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
                 }
             ) for vtype in vtype_list
         ]  # type: typing.List[colmto.environment.vehicle.SUMOVehicle]
@@ -609,7 +600,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
             i_vehicle.start_time = Distribution[
                 self.run_config.get('starttimedistribution').upper()
             ].next_timestep(
-                l_vehps,
+                aadt / (24 * 60 * 60)
+                if not self._run_config.get('vehiclespersecond').get('enabled')
+                else self._run_config.get('vehiclespersecond').get('value'),
                 l_vehicle_list[i - 1].start_time if i > 0 else 0
             )
             l_vehicles[f'vehicle_{i:0>4}'] = i_vehicle
@@ -674,32 +667,20 @@ class SumoConfig(colmto.common.configuration.Configuration):
             l_vattr.update({
                 'id': str(i_vid),
                 'colour': f'{i_vehicle.colour.red/255.},'
-                         f'{i_vehicle.colour.green/255.},'
-                         f'{i_vehicle.colour.blue/255.},'
-                         f'{i_vehicle.colour.alpha/255.}'
+                          f'{i_vehicle.colour.green/255.},'
+                          f'{i_vehicle.colour.blue/255.},'
+                          f'{i_vehicle.colour.alpha/255.}'
             })
 
             # override parameters speedDev, desiredSpeed, and length if defined in run config
-            l_runcfgspeeddev = self.run_config \
-                .get('vtypedistribution') \
-                .get(l_vattr.get('vType')) \
-                .get('speedDev')
-            if l_runcfgspeeddev is not None:
-                l_vattr['speedDev'] = str(l_runcfgspeeddev)
+            if self.run_config.get('vtypedistribution').get(l_vattr.get('vType')).get('speedDev') is not None:
+                l_vattr['speedDev'] = str(self.run_config.get('vtypedistribution').get(l_vattr.get('vType')).get('speedDev'))
 
-            l_runcfgsigma = self.run_config \
-                .get('vtypedistribution') \
-                .get(l_vattr.get('vType')) \
-                .get('sigma')
-            if l_runcfgsigma is not None:
-                l_vattr['sigma'] = str(l_runcfgsigma)
+            if self.run_config.get('vtypedistribution').get(l_vattr.get('vType')).get('sigma') is not None:
+                l_vattr['sigma'] = str(self.run_config.get('vtypedistribution').get(l_vattr.get('vType')).get('sigma'))
 
-            l_runcfglength = self.run_config \
-                .get('vtypedistribution') \
-                .get(l_vattr.get('vType')) \
-                .get('length')
-            if l_runcfglength is not None:
-                l_vattr['length'] = str(l_runcfglength)
+            if self.run_config.get('vtypedistribution').get(l_vattr.get('vType')).get('length') is not None:
+                l_vattr['length'] = str(self.run_config.get('vtypedistribution').get(l_vattr.get('vType')).get('length'))
 
             l_vattr['speedlimit'] = str(i_vehicle.speed_max)
             l_vattr['maxSpeed'] = str(i_vehicle.speed_max)

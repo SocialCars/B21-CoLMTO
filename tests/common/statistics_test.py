@@ -25,17 +25,16 @@
 colmto: Test module for common.statistics.
 '''
 
+from nose.tools import assert_is_instance
+from nose.tools import assert_raises
+
 import colmto.common.statistics
 import colmto.common.io
+
 try:
     import colmto.environment
 except ImportError:
     print('Error importing colmto.environment, tests probably still run')
-
-from nose.tools import assert_equal
-from nose.tools import assert_is_instance
-from nose.tools import assert_not_is_instance
-from nose.tools import assert_raises
 
 
 class Namespace(object):
@@ -118,6 +117,10 @@ def test_aggregate_hdf5():
             ) for i_vid in range(4, 6)
         }
     )
+
+    l_statistics.merge_vehicle_series(1, l_vehicles)
+
+    l_statistics.global_stats(l_statistics.merge_vehicle_series(2, l_vehicles))
 
 #     for i_vehicle in l_vehicles.values():
 #         i_vehicle.dsat_threshold = 0.0
