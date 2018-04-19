@@ -35,32 +35,7 @@ from nose.tools import assert_tuple_equal
 
 import colmto.cse.rule
 import colmto.environment.vehicle
-
-
-def test_behaviour():
-    '''
-    Test Behaviour enum
-    '''
-    assert_equal(colmto.cse.rule.Behaviour.ALLOW.vclass, colmto.cse.rule.Behaviour.ALLOW.value)
-    assert_equal(colmto.cse.rule.Behaviour.DENY.vclass, colmto.cse.rule.Behaviour.DENY.value)
-    assert_equal(colmto.cse.rule.Behaviour.ALLOW.value, 'custom2')
-    assert_equal(colmto.cse.rule.Behaviour.DENY.value, 'custom1')
-
-
-def test_ruleoperator():
-    '''
-    Test RuleOperator enum
-    '''
-    assert_equal(colmto.cse.rule.RuleOperator.ANY.value, any)
-    assert_equal(colmto.cse.rule.RuleOperator.ALL.value, all)
-    assert_equal(colmto.cse.rule.RuleOperator.ANY.evaluate([True, True]), True)
-    assert_equal(colmto.cse.rule.RuleOperator.ANY.evaluate([False, True]), True)
-    assert_equal(colmto.cse.rule.RuleOperator.ANY.evaluate([True, False]), True)
-    assert_equal(colmto.cse.rule.RuleOperator.ANY.evaluate([False, False]), False)
-    assert_equal(colmto.cse.rule.RuleOperator.ALL.evaluate([True, True]), True)
-    assert_equal(colmto.cse.rule.RuleOperator.ALL.evaluate([False, True]), False)
-    assert_equal(colmto.cse.rule.RuleOperator.ALL.evaluate([True, False]), False)
-    assert_equal(colmto.cse.rule.RuleOperator.ALL.evaluate([False, False]), False)
+import colmto.common.helper
 
 
 def test_base_rule():
@@ -162,7 +137,7 @@ def test_sumo_vtype_rule():
                 )
             )
         ).vehicle_class,
-        colmto.cse.rule.Behaviour.DENY.value
+        colmto.common.helper.Behaviour.DENY.value
     )
 
     assert_equal(
@@ -178,7 +153,7 @@ def test_sumo_vtype_rule():
                 )
             )
         ).vehicle_class,
-        colmto.cse.rule.Behaviour.DENY.value
+        colmto.common.helper.Behaviour.DENY.value
     )
 
     assert_equal(
@@ -194,7 +169,7 @@ def test_sumo_vtype_rule():
                 )
             )
         ).vehicle_class,
-        colmto.cse.rule.Behaviour.ALLOW.value
+        colmto.common.helper.Behaviour.ALLOW.value
     )
 
 
@@ -214,7 +189,7 @@ def test_sumo_extendable_rule():
         colmto.cse.rule.ExtendableSUMORule(
             subrule_operator='any'
         ).subrule_operator,
-        colmto.cse.rule.RuleOperator.ANY
+        colmto.common.helper.RuleOperator.ANY
     )
 
     assert_equal(
@@ -222,17 +197,17 @@ def test_sumo_extendable_rule():
             subrules=[colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)],
             subrule_operator='any'
         ).subrule_operator,
-        colmto.cse.rule.RuleOperator.ANY
+        colmto.common.helper.RuleOperator.ANY
     )
 
     l_sumo_rule = colmto.cse.rule.ExtendableSUMORule(
         subrules=[colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)],
-        subrule_operator=colmto.cse.rule.RuleOperator.ANY
+        subrule_operator=colmto.common.helper.RuleOperator.ANY
     )
 
-    assert_equal(l_sumo_rule.subrule_operator, colmto.cse.rule.RuleOperator.ANY)
-    l_sumo_rule.subrule_operator = colmto.cse.rule.RuleOperator.ALL
-    assert_equal(l_sumo_rule.subrule_operator, colmto.cse.rule.RuleOperator.ALL)
+    assert_equal(l_sumo_rule.subrule_operator, colmto.common.helper.RuleOperator.ANY)
+    l_sumo_rule.subrule_operator = colmto.common.helper.RuleOperator.ALL
+    assert_equal(l_sumo_rule.subrule_operator, colmto.common.helper.RuleOperator.ALL)
 
     with assert_raises(ValueError):
         l_sumo_rule.subrule_operator = 'foo'
@@ -268,7 +243,7 @@ def test_sumo_extendable_rule():
 
     l_sumo_rule = colmto.cse.rule.ExtendableSUMORule(
         subrules=[],
-        subrule_operator=colmto.cse.rule.RuleOperator.ALL
+        subrule_operator=colmto.common.helper.RuleOperator.ALL
     )
     l_sumo_rule.add_subrule(l_sumo_sub_rule)
 

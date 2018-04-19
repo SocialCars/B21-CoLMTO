@@ -115,3 +115,31 @@ def test_ruleoperatorfromstring():
     )
     with assert_raises(KeyError):
         helper.RuleOperator.ruleoperator_from_string('Meh')
+
+
+def test_behaviour():
+    '''
+    Test Behaviour enum
+    '''
+    assert_equal(helper.Behaviour.ALLOW.vclass, helper.Behaviour.ALLOW.value)
+    assert_equal(helper.Behaviour.DENY.vclass, helper.Behaviour.DENY.value)
+    assert_equal(helper.Behaviour.ALLOW.value, 'custom2')
+    assert_equal(helper.Behaviour.DENY.value, 'custom1')
+    with assert_raises(KeyError):
+        helper.Behaviour.behaviour_from_string('Meh')
+
+
+def test_ruleoperator():
+    '''
+    Test RuleOperator enum
+    '''
+    assert_equal(helper.RuleOperator.ANY.value, any)
+    assert_equal(helper.RuleOperator.ALL.value, all)
+    assert_equal(helper.RuleOperator.ANY.evaluate([True, True]), True)
+    assert_equal(helper.RuleOperator.ANY.evaluate([False, True]), True)
+    assert_equal(helper.RuleOperator.ANY.evaluate([True, False]), True)
+    assert_equal(helper.RuleOperator.ANY.evaluate([False, False]), False)
+    assert_equal(helper.RuleOperator.ALL.evaluate([True, True]), True)
+    assert_equal(helper.RuleOperator.ALL.evaluate([False, True]), False)
+    assert_equal(helper.RuleOperator.ALL.evaluate([True, False]), False)
+    assert_equal(helper.RuleOperator.ALL.evaluate([False, False]), False)
