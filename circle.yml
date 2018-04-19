@@ -49,24 +49,24 @@ jobs:
             - run:
                   name: Remove sphinx source and build files
                   command: rm -r docs/source && rm -r docs/build && rm docs/Makefile
-#            - run:
-#                  name: Run Tests
-#                  command: python3 setup.py test
+            - run:
+                  name: Run Tests
+                  command: python3 setup.py test
             - run:
                   name: Run Simulation for Scenario NI-B210 (1/2)
                   command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1 --debug
             - run:
                  name: Run Simulation for Scenario NI-B210 with CSE (2/2)
                  command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1 --only-one-otl-segment --debug
-#            - run:
-#                  name: Run Nosetests for Codecov
-#                  command: nosetests -w tests --with-coverage
-#            - run:
-#                  name: Upload Codecov Results (1/2)
-#                  command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
-#            - run:
-#                  name: Upload Codecov Results (2/2)
-#                  command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
+            - run:
+                  name: Run Nosetests for Codecov
+                  command: nosetests -w tests --with-coverage
+            - run:
+                  name: Upload Codecov Results (1/2)
+                  command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
+            - run:
+                  name: Upload Codecov Results (2/2)
+                  command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
             - run:
                   name: Backup documentation files to /tmp
                   command: mv -f colmto tests docs readme.md license.md architecture.png executionmodel.png /tmp
