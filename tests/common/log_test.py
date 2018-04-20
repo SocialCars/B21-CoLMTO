@@ -29,74 +29,76 @@ import logging
 import os
 import tempfile
 
-from nose.tools import assert_equal
-from nose.tools import assert_true
-from nose.tools import assert_raises
+import unittest
 
 import colmto.common.log
 
+class TestLogger(unittest.TestCase):
+    '''
+    Test cases for logger module
+    '''
 
-def test_logger():
-    '''Test logger'''
-
-    f_temp_log = tempfile.NamedTemporaryFile()
-
-    l_logs = [
-        colmto.common.log.logger(
-            name='foo',
-            logfile=f_temp_log.name,
-            quiet=True,
-            loglevel=logging.INFO
-        ),
-        colmto.common.log.logger(
-            name='foo',
-            logfile=f_temp_log.name,
-            quiet=False,
-            loglevel=logging.INFO
-        )
-    ]
-
-    for i_logger in l_logs:
-        i_logger.info('foo')
-
-    for i_level in ('NOTSET', 'INFO', 'DEBUG', 'WARNING', 'ERROR', 'CRITICAL'):
-        l_log = colmto.common.log.logger(
-            name='foo{}'.format(i_level),
-            logfile=f_temp_log.name,
-            quiet=True,
-            loglevel=i_level
-        )
-        assert_true(
-            os.path.exists(os.path.dirname(f_temp_log.name))
-        )
-        assert_true(
-            l_log.name,
-            'foo{}'.format(i_level)
-        )
-        assert_equal(
-            logging.getLevelName(l_log.level),
-            i_level
-        )
-    with assert_raises(ValueError):
-        colmto.common.log.logger(
-            name='bar',
-            logfile=f_temp_log.name,
-            quiet=True,
-            loglevel='this should raise value error: Unknown level'
-        )
-
-    with assert_raises(TypeError):
-        colmto.common.log.logger(
-            name='bar',
-            logfile=f_temp_log.name,
-            quiet=True,
-            loglevel=['this should fail']
-        )
-
-    with assert_raises(TypeError):
-        colmto.common.log.logger(
-            name='barz',
-            logfile=f_temp_log.name,
-            quiet='foo',
-            loglevel='info'
-        )
+    def test_logger(self):
+        '''Test logger'''
+    
+        f_temp_log = tempfile.NamedTemporaryFile()
+    
+        l_logs = [
+            colmto.common.log.logger(
+                name='foo',
+                logfile=f_temp_log.name,
+                quiet=True,
+                loglevel=logging.INFO
+            ),
+            colmto.common.log.logger(
+                name='foo',
+                logfile=f_temp_log.name,
+                quiet=False,
+                loglevel=logging.INFO
+            )
+        ]
+    
+        for i_logger in l_logs:
+            i_logger.info('foo')
+    
+        for i_level in ('NOTSET', 'INFO', 'DEBUG', 'WARNING', 'ERROR', 'CRITICAL'):
+            l_log = colmto.common.log.logger(
+                name='foo{}'.format(i_level),
+                logfile=f_temp_log.name,
+                quiet=True,
+                loglevel=i_level
+            )
+            self.assertTrue(
+                os.path.exists(os.path.dirname(f_temp_log.name))
+            )
+            self.assertTrue(
+                l_log.name,
+                'foo{}'.format(i_level)
+            )
+            self.assertEqual(
+                logging.getLevelName(l_log.level),
+                i_level
+            )
+        with self.assertRaises(ValueError):
+            colmto.common.log.logger(
+                name='bar',
+                logfile=f_temp_log.name,
+                quiet=True,
+                loglevel='this should raise value error: Unknown level'
+            )
+    
+        with self.assertRaises(TypeError):
+            colmto.common.log.logger(
+                name='bar',
+                logfile=f_temp_log.name,
+                quiet=True,
+                loglevel=['this should fail']
+            )
+    
+        with self.assertRaises(TypeError):
+            colmto.common.log.logger(
+                name='barz',
+                logfile=f_temp_log.name,
+                quiet='foo',
+                loglevel='info'
+            )

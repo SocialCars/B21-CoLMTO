@@ -25,121 +25,147 @@
 colmto: Test module for common.helper.
 '''
 
-from nose.tools import assert_equal
-from nose.tools import assert_tuple_equal
-from nose.tools import assert_false
-from nose.tools import assert_almost_equal
-from nose.tools import assert_true
-from nose.tools import assert_greater
-from nose.tools import assert_raises
-
 import random
 import typing
+import unittest
 
 import colmto.common.helper as helper
 from colmto.environment.vehicle import SUMOVehicle
 
-def test_colour():
+class HelperTests(unittest.TestCase):
     '''
-    Test Colour
+    Testing the helper module
     '''
-    l_colour_tuple = (23, 42, 12, 255)
-    l_colour = helper.Colour(*l_colour_tuple)
 
-    assert_tuple_equal(l_colour, l_colour_tuple)
-    assert_equal(l_colour.red, l_colour_tuple[0])
-    assert_equal(l_colour.green, l_colour_tuple[1])
-    assert_equal(l_colour.blue, l_colour_tuple[2])
-    assert_equal(l_colour.alpha, l_colour_tuple[3])
-    l_3colour = l_colour * 3
-    assert_true(isinstance(l_3colour, helper.Colour))
-    assert_tuple_equal((69, 126, 36, 765), l_3colour)
-    assert_tuple_equal(
-        helper.Colour.map('plasma', 255, 127),
-        helper.Colour(red=0.798216, green=0.280197, blue=0.469538, alpha=1.0)
-    )
+    def setUp(self):
+        '''
+        Set up vars with test data
+        '''
+        self.vehicles = [SUMOVehicle(speed_max=random.randrange(0, 120), environment={}) for _ in range(500)]  # type: typing.List[SUMOVehicle]
+        self.colour_tuple = (23, 42, 12, 255)
+
+    def tearDown(self):
+        '''
+        Clean up vars with test data
+        '''
+        del self.vehicles
+        del self.colour_tuple
+
+    def test_colour(self):
+        '''
+        Test Colour
+        '''
+
+        l_colour = helper.Colour(*self.colour_tuple)
+
+        self.assertTupleEqual(l_colour, self.colour_tuple)
+        self.assertEqual(l_colour.red, self.colour_tuple[0])
+        self.assertEqual(l_colour.green, self.colour_tuple[1])
+        self.assertEqual(l_colour.blue, self.colour_tuple[2])
+        self.assertEqual(l_colour.alpha, self.colour_tuple[3])
+        l_3colour = l_colour * 3
+        self.assertTrue(isinstance(l_3colour, helper.Colour))
+        self.assertTupleEqual((69, 126, 36, 765), l_3colour)
+        self.assertTupleEqual(
+            helper.Colour.map('plasma', 255, 127),
+            helper.Colour(red=0.798216, green=0.280197, blue=0.469538, alpha=1.0)
+        )
+
+    def test_speedrange(self):
+        '''
+        Test SpeedRange
+        '''
+
+        l_speedrange = helper.SpeedRange(12,120)
+
+        for i_speed in range(12, 121):
+            with self.subTest(pattern=i_speed):
+                self.assertTrue(l_speedrange.contains(i_speed))
+        for i_speed in range(-10, 12):
+            with self.subTest(pattern=i_speed):
+                self.assertFalse(l_speedrange.contains(i_speed))
+        for i_speed in range(121, 150):
+            with self.subTest(pattern=i_speed):
+                self.assertFalse(l_speedrange.contains(i_speed))
+
+    def test_distribution(self):
+        '''
+        Test Distribution
+        '''
+        self.assertGreater(
+            helper.Distribution.POISSON.next_timestep(10.5, 1),
+            1
+        )
+        self.assertAlmostEqual(
+            helper.Distribution.LINEAR.next_timestep(10.5, 1),
+            1 + 1/10.5
+        )
+
+    def test_initialsorting_best(self):
+        '''
+        Test InitialSorting BEST case
+        '''
+
+        helper.InitialSorting.WORST.order(self.vehicles)
+        for i in range(len(self.vehicles)-1):
+            with self.subTest(pattern=i):
+                self.assertTrue(self.vehicles[i].speed_max <= self.vehicles[i+1].speed_max)
+
+    def test_initialsorting_worst(self):
+        '''
+        Test InitialSorting BEST case
+        '''
+
+        helper.InitialSorting.BEST.order(self.vehicles)
+        for i in range(len(self.vehicles)-1):
+            with self.subTest(pattern=i):
+                self.assertTrue(self.vehicles[i].speed_max >= self.vehicles[i+1].speed_max)
+
+    def test_initialsorting_random(self):
+        '''
+        Test InitialSorting RANDOM case
+        '''
+
+        helper.InitialSorting.RANDOM.order(self.vehicles)
+
+    def test_ruleoperatorfromstring(self):
+        '''Test colmto.cse.rule.BaseRule.ruleoperator_from_string.'''
+
+        self.assertEqual(
+            helper.RuleOperator.ruleoperator_from_string('All'),
+            helper.RuleOperator.ALL
+        )
+        self.assertEqual(
+            helper.RuleOperator.ruleoperator_from_string('Any'),
+            helper.RuleOperator.ANY
+        )
+        with self.assertRaises(KeyError):
+            helper.RuleOperator.ruleoperator_from_string('Meh')
 
 
-def speedrange_test():
-    '''
-    Test SpeedRange
-    '''
-    l_speedrange = helper.SpeedRange(12,120)
-    for i_speed in range(12, 121):
-        assert_true(l_speedrange.contains(i_speed))
-    for i_speed in range(-10, 12):
-        assert_false(l_speedrange.contains(i_speed))
-    for i_speed in range(121, 150):
-        assert_false(l_speedrange.contains(i_speed))
-
-def distribution_test():
-    '''
-    Test Distribution
-    '''
-    assert_greater(
-        helper.Distribution.POISSON.next_timestep(10.5, 1),
-        1
-    )
-    assert_almost_equal(
-        helper.Distribution.LINEAR.next_timestep(10.5, 1),
-        1 + 1/10.5
-    )
-
-def initialsorting_test():
-    '''
-    Test InitialSorting
-    '''
-    l_vehicles = [SUMOVehicle(speed_max=random.randrange(0, 120), environment={}) for _ in range(30)]  # type: typing.List[SUMOVehicle]
-
-    helper.InitialSorting.BEST.order(l_vehicles)
-    for i in range(len(l_vehicles)-1):
-        assert_true(l_vehicles[i].speed_max >= l_vehicles[i+1].speed_max)
-
-    helper.InitialSorting.WORST.order(l_vehicles)
-    for i in range(len(l_vehicles)-1):
-        assert_true(l_vehicles[i].speed_max <= l_vehicles[i+1].speed_max)
-
-    helper.InitialSorting.RANDOM.order(l_vehicles)
+    def test_behaviour(self):
+        '''
+        Test Behaviour enum
+        '''
+        self.assertEqual(helper.Behaviour.ALLOW.vclass, helper.Behaviour.ALLOW.value)
+        self.assertEqual(helper.Behaviour.DENY.vclass, helper.Behaviour.DENY.value)
+        self.assertEqual(helper.Behaviour.ALLOW.value, 'custom2')
+        self.assertEqual(helper.Behaviour.DENY.value, 'custom1')
+        with self.assertRaises(KeyError):
+            helper.Behaviour.behaviour_from_string('Meh')
 
 
-def test_ruleoperatorfromstring():
-    '''Test colmto.cse.rule.BaseRule.ruleoperator_from_string.'''
-
-    assert_equal(
-        helper.RuleOperator.ruleoperator_from_string('All'),
-        helper.RuleOperator.ALL
-    )
-    assert_equal(
-        helper.RuleOperator.ruleoperator_from_string('Any'),
-        helper.RuleOperator.ANY
-    )
-    with assert_raises(KeyError):
-        helper.RuleOperator.ruleoperator_from_string('Meh')
-
-
-def test_behaviour():
-    '''
-    Test Behaviour enum
-    '''
-    assert_equal(helper.Behaviour.ALLOW.vclass, helper.Behaviour.ALLOW.value)
-    assert_equal(helper.Behaviour.DENY.vclass, helper.Behaviour.DENY.value)
-    assert_equal(helper.Behaviour.ALLOW.value, 'custom2')
-    assert_equal(helper.Behaviour.DENY.value, 'custom1')
-    with assert_raises(KeyError):
-        helper.Behaviour.behaviour_from_string('Meh')
-
-
-def test_ruleoperator():
-    '''
-    Test RuleOperator enum
-    '''
-    assert_equal(helper.RuleOperator.ANY.value, any)
-    assert_equal(helper.RuleOperator.ALL.value, all)
-    assert_equal(helper.RuleOperator.ANY.evaluate([True, True]), True)
-    assert_equal(helper.RuleOperator.ANY.evaluate([False, True]), True)
-    assert_equal(helper.RuleOperator.ANY.evaluate([True, False]), True)
-    assert_equal(helper.RuleOperator.ANY.evaluate([False, False]), False)
-    assert_equal(helper.RuleOperator.ALL.evaluate([True, True]), True)
-    assert_equal(helper.RuleOperator.ALL.evaluate([False, True]), False)
-    assert_equal(helper.RuleOperator.ALL.evaluate([True, False]), False)
-    assert_equal(helper.RuleOperator.ALL.evaluate([False, False]), False)
+    def test_ruleoperator(self):
+        '''
+        Test RuleOperator enum
+        '''
+        self.assertEqual(helper.RuleOperator.ANY.value, any)
+        self.assertEqual(helper.RuleOperator.ALL.value, all)
+        self.assertEqual(helper.RuleOperator.ANY.evaluate([True, True]), True)
+        self.assertEqual(helper.RuleOperator.ANY.evaluate([False, True]), True)
+        self.assertEqual(helper.RuleOperator.ANY.evaluate([True, False]), True)
+        self.assertEqual(helper.RuleOperator.ANY.evaluate([False, False]), False)
+        self.assertEqual(helper.RuleOperator.ALL.evaluate([True, True]), True)
+        self.assertEqual(helper.RuleOperator.ALL.evaluate([False, True]), False)
+        self.assertEqual(helper.RuleOperator.ALL.evaluate([True, False]), False)
+        self.assertEqual(helper.RuleOperator.ALL.evaluate([False, False]), False)

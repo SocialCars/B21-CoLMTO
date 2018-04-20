@@ -25,8 +25,7 @@
 colmto: Test module for common.statistics.
 '''
 
-from nose.tools import assert_is_instance
-from nose.tools import assert_raises
+import unittest
 
 import colmto.common.statistics
 import colmto.common.io
@@ -44,53 +43,42 @@ class Namespace(object):
         '''Initialisation.'''
         self.__dict__.update(kwargs)
 
-
-def test_statistics():
-    '''Test statistics class.'''
-    assert_is_instance(
-        colmto.common.statistics.Statistics(None),
-        colmto.common.statistics.Statistics
-    )
-    assert_is_instance(
-        colmto.common.statistics.Statistics(
-            Namespace(
-                loglevel='debug', quiet=False, logfile='foo.log'
-            )
-        ),
-        colmto.common.statistics.Statistics
-    )
-
-    with assert_raises(AttributeError):
-        colmto.common.statistics.Statistics('foo')
-
-
-def test_aggregate_hdf5():
+class TestStatistics(unittest.TestCase):
     '''
-    Test aggregate_vehicle_grid_stats -> stats_to_hdf5_structure -> aggregate_run_stats_to_hdf5
-    chain
+    Test cases for statistics module
     '''
-    l_statistics = colmto.common.statistics.Statistics()
 
-    l_vehicles = {
-        i_vid: colmto.environment.vehicle.SUMOVehicle(
-            environment={'gridlength': 200, 'gridcellwidth': 4},
-            vtype_sumo_cfg={'dsat_threshold': 0.2},
-            vehicle_type='passenger',
-            speed_deviation=0.0,
-            speed_max=100.,
-        ).update(
-            position=(1, 1),
-            lane_index=0,
-            speed=10.,
-            time_step=2
-        ) for i_vid in range(2)
-    }
-    l_vehicles.update(
-        {
+    def test_statistics(self):
+        '''Test statistics class.'''
+        self.assertIsInstance(
+            colmto.common.statistics.Statistics(None),
+            colmto.common.statistics.Statistics
+        )
+        self.assertIsInstance(
+            colmto.common.statistics.Statistics(
+                Namespace(
+                    loglevel='debug', quiet=False, logfile='foo.log'
+                )
+            ),
+            colmto.common.statistics.Statistics
+        )
+
+        with self.assertRaises(AttributeError):
+            colmto.common.statistics.Statistics('foo')
+
+
+    def test_aggregate_hdf5(self):
+        '''
+        Test aggregate_vehicle_grid_stats -> stats_to_hdf5_structure -> aggregate_run_stats_to_hdf5
+        chain
+        '''
+        l_statistics = colmto.common.statistics.Statistics()
+
+        l_vehicles = {
             i_vid: colmto.environment.vehicle.SUMOVehicle(
                 environment={'gridlength': 200, 'gridcellwidth': 4},
                 vtype_sumo_cfg={'dsat_threshold': 0.2},
-                vehicle_type='truck',
+                vehicle_type='passenger',
                 speed_deviation=0.0,
                 speed_max=100.,
             ).update(
@@ -98,65 +86,80 @@ def test_aggregate_hdf5():
                 lane_index=0,
                 speed=10.,
                 time_step=2
-            ) for i_vid in range(2, 4)
+            ) for i_vid in range(2)
         }
-    )
-    l_vehicles.update(
-        {
-            i_vid: colmto.environment.vehicle.SUMOVehicle(
-                environment={'gridlength': 200, 'gridcellwidth': 4},
-                vtype_sumo_cfg={'dsat_threshold': 0.2},
-                vehicle_type='tractor',
-                speed_deviation=0.0,
-                speed_max=100.,
-            ).update(
-                position=(1, 1),
-                lane_index=0,
-                speed=10.,
-                time_step=2
-            ) for i_vid in range(4, 6)
-        }
-    )
+        l_vehicles.update(
+            {
+                i_vid: colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vtype_sumo_cfg={'dsat_threshold': 0.2},
+                    vehicle_type='truck',
+                    speed_deviation=0.0,
+                    speed_max=100.,
+                ).update(
+                    position=(1, 1),
+                    lane_index=0,
+                    speed=10.,
+                    time_step=2
+                ) for i_vid in range(2, 4)
+            }
+        )
+        l_vehicles.update(
+            {
+                i_vid: colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vtype_sumo_cfg={'dsat_threshold': 0.2},
+                    vehicle_type='tractor',
+                    speed_deviation=0.0,
+                    speed_max=100.,
+                ).update(
+                    position=(1, 1),
+                    lane_index=0,
+                    speed=10.,
+                    time_step=2
+                ) for i_vid in range(4, 6)
+            }
+        )
 
-    l_statistics.merge_vehicle_series(1, l_vehicles)
+        l_statistics.merge_vehicle_series(1, l_vehicles)
 
-    l_statistics.global_stats(l_statistics.merge_vehicle_series(2, l_vehicles))
+        l_statistics.global_stats(l_statistics.merge_vehicle_series(2, l_vehicles))
 
-#     for i_vehicle in l_vehicles.values():
-#         i_vehicle.dsat_threshold = 0.0
-#
-#     for i_step in range(1, 3):
-#         for i_vehicle in l_vehicles.values():
-#             i_vehicle.record_travel_stats(i_step)
-#             i_vehicle.update(
-#                 position=(i_vehicle.position[0]+10., 0),
-#                 lane_index=0,
-#                 speed=10.
-#             )
-#
-#     l_statistics.aggregate_vehicle_grid_stats(l_vehicles)
-#
-#     for i_vehicle in l_vehicles.values():
-#         for i_element in i_vehicle.travel_stats.get('grid').get('pos_x'):
-#             assert_not_is_instance(i_element, list)
-#         for i_element in i_vehicle.travel_stats.get('grid').get('pos_y'):
-#             assert_not_is_instance(i_element, list)
-#         for i_element in i_vehicle.travel_stats.get('grid').get('speed'):
-#             assert_not_is_instance(i_element, list)
-#         for i_element in i_vehicle.travel_stats.get('grid').get('time_loss'):
-#             assert_not_is_instance(i_element, list)
-#         for i_element in i_vehicle.travel_stats.get('grid').get('relative_time_loss'):
-#             assert_not_is_instance(i_element, list)
-#         for i_element in i_vehicle.travel_stats.get('grid').get('dissatisfaction'):
-#             assert_not_is_instance(i_element, list)
-#
-#     l_statistics.aggregate_run_stats_to_hdf5(
-#         {
-#             0: l_statistics.stats_to_hdf5_structure(
-#                 l_vehicles,
-#                 0,
-#                 [0, 4, 6]
-#             )
-#         },
-#         [0, 4, 6]
-#     )
+    #     for i_vehicle in l_vehicles.values():
+    #         i_vehicle.dsat_threshold = 0.0
+    #
+    #     for i_step in range(1, 3):
+    #         for i_vehicle in l_vehicles.values():
+    #             i_vehicle.record_travel_stats(i_step)
+    #             i_vehicle.update(
+    #                 position=(i_vehicle.position[0]+10., 0),
+    #                 lane_index=0,
+    #                 speed=10.
+    #             )
+    #
+    #     l_statistics.aggregate_vehicle_grid_stats(l_vehicles)
+    #
+    #     for i_vehicle in l_vehicles.values():
+    #         for i_element in i_vehicle.travel_stats.get('grid').get('pos_x'):
+    #             assert_not_is_instance(i_element, list)
+    #         for i_element in i_vehicle.travel_stats.get('grid').get('pos_y'):
+    #             assert_not_is_instance(i_element, list)
+    #         for i_element in i_vehicle.travel_stats.get('grid').get('speed'):
+    #             assert_not_is_instance(i_element, list)
+    #         for i_element in i_vehicle.travel_stats.get('grid').get('time_loss'):
+    #             assert_not_is_instance(i_element, list)
+    #         for i_element in i_vehicle.travel_stats.get('grid').get('relative_time_loss'):
+    #             assert_not_is_instance(i_element, list)
+    #         for i_element in i_vehicle.travel_stats.get('grid').get('dissatisfaction'):
+    #             assert_not_is_instance(i_element, list)
+    #
+    #     l_statistics.aggregate_run_stats_to_hdf5(
+    #         {
+    #             0: l_statistics.stats_to_hdf5_structure(
+    #                 l_vehicles,
+    #                 0,
+    #                 [0, 4, 6]
+    #             )
+    #         },
+    #         [0, 4, 6]
+    #     )
