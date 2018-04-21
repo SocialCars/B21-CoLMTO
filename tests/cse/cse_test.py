@@ -152,3 +152,7 @@ class TestCSE(unittest.TestCase):
         )
     
         self.assertIn(l_rule_speed, l_sumo_cse.rules)
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -169,3 +169,7 @@ class HelperTests(unittest.TestCase):
         self.assertEqual(helper.RuleOperator.ALL.evaluate([False, True]), False)
         self.assertEqual(helper.RuleOperator.ALL.evaluate([True, False]), False)
         self.assertEqual(helper.RuleOperator.ALL.evaluate([False, False]), False)
+
+
+if __name__=='__main__':
+    unittest.main()

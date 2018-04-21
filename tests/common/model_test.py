@@ -129,3 +129,7 @@ class ModelTest(unittest.TestCase):
             colmto.common.model.inefficiency(pandas.Series((11, -2, 43.5, 114))),
             166.5
         )
+
+
+if __name__ == '__main__':
+    unittest.main()

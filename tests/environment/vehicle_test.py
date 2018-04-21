@@ -129,3 +129,7 @@ class TestVehicle(unittest.TestCase):
             l_sumovehicle._grid_position,  # pylint: disable=protected-access
             (round(20/4)-1, -1)
         )
+
+
+if __name__ == '__main__':
+    unittest.main()

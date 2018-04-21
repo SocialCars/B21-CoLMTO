@@ -102,3 +102,7 @@ class TestLogger(unittest.TestCase):
                 quiet='foo',
                 loglevel='info'
             )
+
+
+if __name__=='__main__':
+    unittest.main()

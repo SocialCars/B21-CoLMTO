@@ -482,3 +482,7 @@ class TestIO(unittest.TestCase):
                 hdf5_file=f_temp_test.name,
                 hdf5_base_path='root'
             )
+
+
+if __name__=='__main__':
+    unittest.main()

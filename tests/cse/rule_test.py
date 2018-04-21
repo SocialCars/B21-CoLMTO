@@ -401,3 +401,7 @@ class TestRule(unittest.TestCase):
             ),
             "<class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: bounding_box = BoundingBox(p1=Position(x=0.0, y=-1.0), p2=Position(x=100.0, y=1.0)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
         )
+
+
+if __name__ == '__main__':
+    unittest.main()

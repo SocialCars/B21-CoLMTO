@@ -152,3 +152,7 @@ class TestVisualisation(unittest.TestCase):
         ]
 
         self.assertListEqual(sorted(l_colors), sorted(l_results))
+
+
+if __name__ == '__main__':
+    unittest.main()
