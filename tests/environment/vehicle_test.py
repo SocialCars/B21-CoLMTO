@@ -25,103 +25,107 @@
 colmto: Test module for environment.vehicle.
 '''
 import numpy
-from nose.tools import assert_equal
-
+import unittest
 import colmto.environment.vehicle
 from colmto.common.helper import VehicleType
 
 
-def test_basevehicle():
+class TestVehicle(unittest.TestCase):
     '''
-    Test BaseVehicle class
-    '''
-
-    # test default values
-    l_basevehicle = colmto.environment.vehicle.BaseVehicle()
-
-    assert_equal(l_basevehicle.speed, 0.0)
-    assert_equal(l_basevehicle.position, (0.0, 0))
-
-    # test custom values
-    l_basevehicle = colmto.environment.vehicle.BaseVehicle()
-    l_basevehicle.position = numpy.array([23.0, 0])
-    l_basevehicle.speed = 12.1
-
-    assert_equal(l_basevehicle.speed, 12.1)
-    assert_equal(l_basevehicle.position, (23.0, 0))
-    assert_equal(l_basevehicle.properties.get('position'), (23.0, 0))
-    assert_equal(l_basevehicle.properties.get('speed'), 12.1)
-
-
-def test_sumovehicle():
-    '''
-    Test SUMOVehicle class.
+    Test cases for Vehicle
     '''
 
-    # test default values
-    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
-        environment={'gridlength': 200, 'gridcellwidth': 4}
-    )
+    def test_basevehicle(self):
+        '''
+        Test BaseVehicle class
+        '''
 
-    assert_equal(l_sumovehicle.speed_max, 0.0)
-    assert_equal(l_sumovehicle.speed, 0.0)
-    assert_equal(l_sumovehicle.position, (0.0, 0))
-    assert_equal(l_sumovehicle.vehicle_type, VehicleType.UNDEFINED)
-    assert_equal(l_sumovehicle.colour, (255, 255, 0, 255))
+        # test default values
+        l_basevehicle = colmto.environment.vehicle.BaseVehicle()
 
-    # test custom values
-    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
-        speed_max=27.777,
-        speed_deviation=1.2,
-        environment={'gridlength': 200, 'gridcellwidth': 4},
-        vehicle_type='passenger',
-        vtype_sumo_cfg={
-            'length': 3.00,
-            'minGap': 2.50
-        }
-    )
-    l_sumovehicle.position = numpy.array([42.0, 0])
-    l_sumovehicle.colour = (128, 64, 255, 255)
-    l_sumovehicle.speed_current = 12.1
-    l_sumovehicle.start_time = 13
+        self.assertEqual(l_basevehicle.speed, 0.0)
+        self.assertEqual(l_basevehicle.position, (0.0, 0))
 
-    assert_equal(l_sumovehicle.speed_max, 27.777)
-    assert_equal(l_sumovehicle.speed_current, 12.1)
-    assert_equal(l_sumovehicle.position, (42.0, 0))
-    assert_equal(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
-    assert_equal(l_sumovehicle.colour, (128, 64, 255, 255))
-    assert_equal(l_sumovehicle.start_time, 13)
-    assert_equal(l_sumovehicle._grid_position, (0, 0))  # pylint: disable=protected-access
+        # test custom values
+        l_basevehicle = colmto.environment.vehicle.BaseVehicle()
+        l_basevehicle.position = numpy.array([23.0, 0])
+        l_basevehicle.speed = 12.1
 
-    l_sumovehicle._grid_position = (1, 2)  # pylint: disable=protected-access
-
-    assert_equal(l_sumovehicle._grid_position, (1, 2))  # pylint: disable=protected-access
-    assert_equal(l_sumovehicle.properties.get('grid_position'), (1, 2))
-    assert_equal(l_sumovehicle._travel_time, 0.0)  # pylint: disable=protected-access
+        self.assertEqual(l_basevehicle.speed, 12.1)
+        self.assertEqual(l_basevehicle.position, (23.0, 0))
+        self.assertEqual(l_basevehicle.properties.get('position'), (23.0, 0))
+        self.assertEqual(l_basevehicle.properties.get('speed'), 12.1)
 
 
-def test_update():
-    '''Test update'''
-    l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
-        environment={'gridlength': 200, 'gridcellwidth': 4},
-        speed_max=10,
-        vtype_sumo_cfg={'dsat_threshold': 0.2}
-    )
-    l_sumovehicle.update(
-        position=colmto.environment.vehicle.Position(20, 2),
-        lane_index=1,
-        speed=12.1,
-        time_step=2
-    )
-    assert_equal(
-        l_sumovehicle.position,
-        (20, 2)
-    )
-    assert_equal(
-        l_sumovehicle.speed,
-        12.1
-    )
-    assert_equal(
-        l_sumovehicle._grid_position,  # pylint: disable=protected-access
-        (round(20/4)-1, -1)
-    )
+    def test_sumovehicle(self):
+        '''
+        Test SUMOVehicle class.
+        '''
+
+        # test default values
+        l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200, 'gridcellwidth': 4}
+        )
+
+        self.assertEqual(l_sumovehicle.speed_max, 0.0)
+        self.assertEqual(l_sumovehicle.speed, 0.0)
+        self.assertEqual(l_sumovehicle.position, (0.0, 0))
+        self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.UNDEFINED)
+        self.assertEqual(l_sumovehicle.colour, (255, 255, 0, 255))
+
+        # test custom values
+        l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
+            speed_max=27.777,
+            speed_deviation=1.2,
+            environment={'gridlength': 200, 'gridcellwidth': 4},
+            vehicle_type='passenger',
+            vtype_sumo_cfg={
+                'length': 3.00,
+                'minGap': 2.50
+            }
+        )
+        l_sumovehicle.position = numpy.array([42.0, 0])
+        l_sumovehicle.colour = (128, 64, 255, 255)
+        l_sumovehicle.speed_current = 12.1
+        l_sumovehicle.start_time = 13
+
+        self.assertEqual(l_sumovehicle.speed_max, 27.777)
+        self.assertEqual(l_sumovehicle.speed_current, 12.1)
+        self.assertEqual(l_sumovehicle.position, (42.0, 0))
+        self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
+        self.assertEqual(l_sumovehicle.colour, (128, 64, 255, 255))
+        self.assertEqual(l_sumovehicle.start_time, 13)
+        self.assertEqual(l_sumovehicle._grid_position, (0, 0))  # pylint: disable=protected-access
+
+        l_sumovehicle._grid_position = (1, 2)  # pylint: disable=protected-access
+
+        self.assertEqual(l_sumovehicle._grid_position, (1, 2))  # pylint: disable=protected-access
+        self.assertEqual(l_sumovehicle.properties.get('grid_position'), (1, 2))
+        self.assertEqual(l_sumovehicle._travel_time, 0.0)  # pylint: disable=protected-access
+
+
+    def test_update(self):
+        '''Test update'''
+        l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200, 'gridcellwidth': 4},
+            speed_max=10,
+            vtype_sumo_cfg={'dsat_threshold': 0.2}
+        )
+        l_sumovehicle.update(
+            position=colmto.environment.vehicle.Position(20, 2),
+            lane_index=1,
+            speed=12.1,
+            time_step=2
+        )
+        self.assertEqual(
+            l_sumovehicle.position,
+            (20, 2)
+        )
+        self.assertEqual(
+            l_sumovehicle.speed,
+            12.1
+        )
+        self.assertEqual(
+            l_sumovehicle._grid_position,  # pylint: disable=protected-access
+            (round(20/4)-1, -1)
+        )
