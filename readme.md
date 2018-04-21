@@ -107,7 +107,7 @@ make -j $(getconf NPROCESSORS_CONF)
 #### FreeBSD
 
 ```sh
-sudo portmaster -d devel/py-pip@py36 math/py-numpy@py36 science/py-h5py@py36 math/py-matplotlib@py36 textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2 
+sudo portmaster devel/py-pip@py36 math/py-numpy@py36 science/py-h5py@py36 math/py-matplotlib@py36 textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2 
 ```
 
 #### MacOS
@@ -132,7 +132,7 @@ export CPPFLAGS="-I/usr/local/include"
 
 Install dependencies via pip3 (append `--prefix=` on MacOS)
 ```sh
-pip3 install -r requirements.txt --user
+pip3.6 install -r requirements.txt --user
 ```
 
 Build package

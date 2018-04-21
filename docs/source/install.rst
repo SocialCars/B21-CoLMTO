@@ -47,7 +47,7 @@ FreeBSD
 
 .. code-block:: bash
 
-    sudo portmaster devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
+    sudo portmaster devel/git lang/python36 devel/autoconf textproc/xerces-c3 graphics/proj graphics/gdal x11-toolkits/fox16
 
     cd colmto/sumo/sumo
     make -f Makefile.cvs
@@ -88,7 +88,7 @@ FreeBSD
 
 .. code-block:: bash
 
-    sudo portmaster textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2
+    sudo portmaster devel/py-pip@py36 math/py-numpy@py36 science/py-h5py@py36 math/py-matplotlib@py36 textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2
 
 MacOS
 ^^^^^
@@ -121,23 +121,23 @@ Install dependencies via ``pip3`` (append ``--prefix=`` on MacOS)
 
 .. code-block:: bash
 
-    pip3 install -r requirements.txt --user
+    pip3.6 install -r requirements.txt --user
 
 Build package
 
 .. code-block:: bash
 
-    python3 setup.py build
+    python3.6 setup.py build
 
 Run unit tests
 
 .. code-block:: bash
 
-    python3 setup.py test
+    python3.6 setup.py test
 
 
 Install (local)
 
 .. code-block:: bash
 
-    python3 setup.py install --user
+    python3.6 setup.py install --user
