@@ -28,5 +28,6 @@ colmto: Test module starter
 import unittest
 
 if __name__=='__main__':
-    runner = unittest.TextTestRunner()
-    runner.run(unittest.TestLoader().discover('tests', pattern='*_test.py')) # todo: fix filenames to test_*.py
+    unittest.TextTestRunner().run(
+        unittest.TestLoader().discover('tests', pattern='*_test.py') # todo: fix filenames to test_*.py
+    )
