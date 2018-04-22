@@ -29,5 +29,5 @@ import unittest
 
 if __name__=='__main__':
     unittest.TextTestRunner().run(
-        unittest.TestLoader().discover('tests', pattern='*_test.py') # todo: fix filenames to test_*.py
+        unittest.TestLoader().discover('tests')
     )
