@@ -394,35 +394,59 @@ class TestRule(unittest.TestCase):
                 environment={'gridlength': 200, 'gridcellwidth': 4},
                 speed_max=random.randrange(0, 120)
             ) for _ in range(4711)
-            ]
+        ]
 
         l_results = l_sumo_rule.apply(l_vehicles)
 
         for i, i_results in enumerate(l_results):
-            if l_vehicles[i].speed_max < 60.0:
-                self.assertEqual(
-                    i_results.vehicle_class,
-                    colmto.cse.rule.SUMORule.to_disallowed_class()
-                )
-            else:
-                self.assertEqual(
-                    i_results.vehicle_class,
-                    colmto.cse.rule.SUMORule.to_allowed_class()
-                )
+            with self.subTest(pattern=(i, i_results)):
+                if l_vehicles[i].speed_max < 60.0:
+                    self.assertEqual(
+                        i_results.vehicle_class,
+                        colmto.cse.rule.SUMORule.to_disallowed_class()
+                    )
+                else:
+                    self.assertEqual(
+                        i_results.vehicle_class,
+                        colmto.cse.rule.SUMORule.to_allowed_class()
+                    )
+
+    def test_extendable_sumo_speed_rule(self):
+        '''
+        Test ExtendableSUMOMinimalSpeedRule class
+        '''
+
+        l_esmsr = colmto.cse.rule.ExtendableSUMOMinimalSpeedRule(
+            minimal_speed=60.,
+        ).add_subrule(
+            colmto.cse.rule.SUMOPositionRule(
+                bounding_box=((0., -1.), (100., 1.))
+            )
+        )
 
         self.assertEqual(
-            str(
-                colmto.cse.rule.ExtendableSUMOMinimalSpeedRule(
-                    minimal_speed=60.,
-                ).add_subrule(
-                    colmto.cse.rule.SUMOPositionRule(
-                        bounding_box=((0., -1.), (100., 1.))
-                    )
-                )
-            ),
+            str(l_esmsr),
             "<class 'colmto.cse.rule.ExtendableSUMOMinimalSpeedRule'>: minimal_speed = 60.0, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
         )
 
+        l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200, 'gridcellwidth': 4},
+            vehicle_type='passenger'
+        )
+
+        for i_pos in ((0, -1), (100, 1)):
+            with self.subTest(pattern=i_pos):
+                l_vehicle._position = i_pos
+                self.assertTrue(
+                    l_esmsr.applies_to(l_vehicle)
+                )
+
+        for i_pos in ((0, -2), (101, 1)):
+            with self.subTest(pattern=i_pos):
+                l_vehicle._position = i_pos
+                self.assertFalse(
+                    l_esmsr.applies_to(l_vehicle)
+                )
 
     def test_sumo_position_rule(self):
         '''
@@ -430,10 +454,11 @@ class TestRule(unittest.TestCase):
         '''
         l_sumo_rule = colmto.cse.rule.SUMOPositionRule(bounding_box=((0., -1.), (100., 1.)))
         self.assertIsInstance(l_sumo_rule, colmto.cse.rule.SUMOPositionRule)
+        self.assertEqual(str(l_sumo_rule), '<class \'colmto.cse.rule.SUMOPositionRule\'>: bounding_box = BoundingBox(p1=Position(x=0.0, y=-1.0), p2=Position(x=100.0, y=1.0))')
 
         l_vehicles = [
             colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4})
-            for _ in range(4711)
+            for _ in range(10**4)
         ]
 
         for i_vehicle in l_vehicles:
@@ -467,18 +492,53 @@ class TestRule(unittest.TestCase):
             ((0., -1.), (100., 1.))
         )
 
-        self.assertEqual(
-            str(
-                colmto.cse.rule.ExtendableSUMOPositionRule(
-                    bounding_box=((0., -1.), (100., 1.)),
-                ).add_subrule(
-                    colmto.cse.rule.SUMOMinimalSpeedRule(
-                        minimal_speed=60.
-                    )
+    def test_extendable_sumo_position_rule(self):
+        '''
+        Test ExtendableSUMOPositionRule class
+        '''
+
+        l_espr = colmto.cse.rule.ExtendableSUMOPositionRule(
+            bounding_box=((0., -1.), (100., 1.)),
+        )
+        # without a sub-rule, an extended rule should always evaluate False
+        for i_pos in ((0, -1), (100, 1), (50, -1.5)):
+            with self.subTest(pattern=colmto.common.helper.Position(*i_pos)):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
                 )
-            ),
+                l_vehicle._position = i_pos
+                self.assertFalse(l_espr.applies_to(l_vehicle))
+
+        l_espr.add_subrule(
+            colmto.cse.rule.SUMOMinimalSpeedRule(
+                minimal_speed=60.
+            )
+        )
+        self.assertEqual(
+            str(l_espr),
             "<class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: bounding_box = BoundingBox(p1=Position(x=0.0, y=-1.0), p2=Position(x=100.0, y=1.0)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
         )
+
+        for i_pos, i_speed in zip(((0, -1), (100, 1)), (59, 20)):
+            with self.subTest(pattern=(colmto.common.helper.Position(*i_pos), i_speed)):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
+                    speed_max=i_speed
+                )
+                l_vehicle._position = i_pos
+                self.assertTrue(l_espr.applies_to(l_vehicle))
+
+        for i_pos, i_speed in zip(((0, -2), (101, 1), (0, -1), (100, 1)), (60, 120, 60, 120)):
+            with self.subTest(pattern=(colmto.common.helper.Position(*i_pos), i_speed)):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
+                    speed_max=i_speed
+                )
+                l_vehicle._position = i_pos
+                self.assertFalse(l_espr.applies_to(l_vehicle))
 
 
 if __name__ == '__main__':
