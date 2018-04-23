@@ -30,8 +30,11 @@ import warnings
 import functools
 
 
-def logger(name: str, loglevel=logging.NOTSET, quiet=False,
-           logfile=Path('~/.colmto/colmto.log').expanduser()) -> logging.Logger:
+def logger(
+        name: str,
+        loglevel=logging.NOTSET,
+        quiet=False,
+        logfile=Path('~/.colmto/colmto.log').expanduser()) -> logging.Logger:
     '''
     Create a logger instance.
 
@@ -61,7 +64,7 @@ def logger(name: str, loglevel=logging.NOTSET, quiet=False,
     for i_handler in l_log.handlers:
         if isinstance(i_handler, logging.handlers.RotatingFileHandler):
             l_add_fhandler = False
-        elif isinstance(i_handler, logging.StreamHandler):
+        if i_handler.__class__ is logging.StreamHandler:
             l_add_qhandler = False
 
     if l_add_fhandler:
@@ -87,7 +90,8 @@ def logger(name: str, loglevel=logging.NOTSET, quiet=False,
 
     return l_log
 
-def deprecated(func):
+
+def deprecated(func: 'function'):
     '''
     This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
@@ -102,8 +106,8 @@ def deprecated(func):
         warnings.warn_explicit(
             'Call to deprecated function {}.'.format(func.__name__),
             category=DeprecationWarning,
-            filename=func.func_code.co_filename,
-            lineno=func.func_code.co_firstlineno + 1
+            filename=func.__code__.co_filename,
+            lineno=func.__code__.co_firstlineno + 1
         )
         return func(*args, **kwargs)
     return new_func

@@ -25,13 +25,13 @@
 colmto: Test module for colmto.common.log.
 '''
 import logging
-
 import os
 import tempfile
-
 import unittest
+import warnings
 
 import colmto.common.log
+
 
 class TestLogger(unittest.TestCase):
     '''
@@ -47,7 +47,7 @@ class TestLogger(unittest.TestCase):
             colmto.common.log.logger(
                 name='foo',
                 logfile=f_temp_log.name,
-                quiet=True,
+                quiet=False,
                 loglevel=logging.INFO
             ),
             colmto.common.log.logger(
@@ -55,30 +55,45 @@ class TestLogger(unittest.TestCase):
                 logfile=f_temp_log.name,
                 quiet=False,
                 loglevel=logging.INFO
+            ),
+            colmto.common.log.logger(
+                name='foo',
+                logfile=f_temp_log.name,
+                quiet=False,
+                loglevel=logging.INFO
+            ),
+            colmto.common.log.logger(
+                name='foo',
+                logfile=f_temp_log.name,
+                quiet=False,
+                loglevel=logging.DEBUG
             )
         ]
     
         for i_logger in l_logs:
-            i_logger.info('foo')
+            with self.subTest(pattern=i_logger):
+                i_logger.info('foo')
     
         for i_level in ('NOTSET', 'INFO', 'DEBUG', 'WARNING', 'ERROR', 'CRITICAL'):
-            l_log = colmto.common.log.logger(
-                name='foo{}'.format(i_level),
-                logfile=f_temp_log.name,
-                quiet=True,
-                loglevel=i_level
-            )
-            self.assertTrue(
-                os.path.exists(os.path.dirname(f_temp_log.name))
-            )
-            self.assertTrue(
-                l_log.name,
-                'foo{}'.format(i_level)
-            )
-            self.assertEqual(
-                logging.getLevelName(l_log.level),
-                i_level
-            )
+            with self.subTest(pattern=i_level):
+                l_log = colmto.common.log.logger(
+                    name='foo{}'.format(i_level),
+                    logfile=f_temp_log.name,
+                    quiet=True,
+                    loglevel=i_level
+                )
+                self.assertTrue(
+                    os.path.exists(os.path.dirname(f_temp_log.name))
+                )
+                self.assertTrue(
+                    l_log.name,
+                    'foo{}'.format(i_level)
+                )
+                self.assertEqual(
+                    logging.getLevelName(l_log.level),
+                    i_level
+                )
+
         with self.assertRaises(ValueError):
             colmto.common.log.logger(
                 name='bar',
@@ -101,6 +116,21 @@ class TestLogger(unittest.TestCase):
                 logfile=f_temp_log.name,
                 quiet='foo',
                 loglevel='info'
+            )
+
+    def test_deprecated(self):
+        '''
+        Test deprecated decorator
+        '''
+
+        @colmto.common.log.deprecated
+        def deprecated_function(arg):
+            return arg
+
+        with warnings.catch_warnings():
+            self.assertEqual(
+                deprecated_function('foo'),
+                'foo'
             )
 
 
