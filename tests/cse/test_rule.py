@@ -540,6 +540,28 @@ class TestRule(unittest.TestCase):
                 l_vehicle._position = i_pos
                 self.assertFalse(l_espr.applies_to(l_vehicle))
 
+    def test_sumo_dissatisfaction_rule(self):
+        '''
+        Test SUMODissatisfactionRule
+        '''
+
+        self.assertEqual(colmto.cse.rule.SUMODissatisfactionRule().threshold, 0.5)
+        self.assertEqual(colmto.cse.rule.SUMODissatisfactionRule(threshold=0.25).threshold, 0.25)
+        self.assertEqual(
+            str(colmto.cse.rule.SUMODissatisfactionRule()),
+            '<class \'colmto.cse.rule.SUMODissatisfactionRule\'>: threshold = 0.5'
+        )
+
+        l_dsat_rule = colmto.cse.rule.SUMODissatisfactionRule()
+
+        for i_relative_time_loss in range(100):
+            with self.subTest(pattern=i_relative_time_loss):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
+                )
+                # self.assertFalse(l_espr.applies_to(l_vehicle))
+                # todo: assertion
 
 if __name__ == '__main__':
     unittest.main()

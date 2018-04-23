@@ -33,6 +33,7 @@ from colmto.common.helper import BoundingBox
 
 from colmto.common.helper import Behaviour
 from colmto.common.helper import RuleOperator
+from colmto.common.model import dissatisfaction
 
 
 class BaseRule(metaclass=ABCMeta):
@@ -548,7 +549,7 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
 class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRule'):
     '''
     Dissatisfaction based rule:
-    Applies to vehicles which have reached a given dissatisfaction threshold (default: >=0.5).
+    Applies to vehicles which have reached a given dissatisfaction value (default: >=0.5).
     '''
 
     def __init__(self, threshold=0.5):
@@ -583,7 +584,7 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
 
         '''
 
-        return vehicle.dsat_threshold >= self._threshold
+        return vehicle.dsat_threshold >= self._threshold # todo: fixme: use dissatisfaction() for calculating actual dsat of vehicle
 
 
 class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMORule, rule_name='ExtendableSUMODissatisfactionRule'):
