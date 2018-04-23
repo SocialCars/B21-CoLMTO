@@ -144,10 +144,8 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         Test whether this rule applies to given vehicle
 
         :param vehicle: Vehicle
-        :return: boolean (always False)
-
         '''
-        return False
+        pass
 
     def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
         '''

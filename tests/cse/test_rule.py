@@ -43,6 +43,19 @@ class TestRule(unittest.TestCase):
         Test BaseRule class
         '''
         colmto.cse.rule.BaseRule()
+        l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(
+            {
+                'type': 'SUMOMinimalSpeedRule',
+                'args': {
+                    'minimal_speed': 30/3.6
+                }
+            }
+        )
+
+        for i_error, i_arg in zip((TypeError, KeyError, ValueError), (None, {}, {'args': 'foo', 'type': None})):
+            with self.subTest(pattern=(i_error, i_arg)):
+                with self.assertRaises(i_error):
+                    colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(i_arg)
 
     def test_sumo_rule(self):
         '''
@@ -91,16 +104,8 @@ class TestRule(unittest.TestCase):
         self.assertIsInstance(colmto.cse.rule.SUMOVTypeRule('passenger'), colmto.cse.rule.SUMOVTypeRule)
 
         self.assertEqual(
-            str(
-                colmto.cse.rule.ExtendableSUMOVTypeRule(
-                    vehicle_type='passenger'
-                ).add_subrule(
-                    colmto.cse.rule.SUMOPositionRule(
-                        bounding_box=((0., -1.), (100., 1.))
-                    )
-                )
-            ),
-            "<class 'colmto.cse.rule.ExtendableSUMOVTypeRule'>: vehicle_type = VehicleType.PASSENGER, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
+            str(colmto.cse.rule.SUMOVTypeRule('passenger')),
+            '<class \'colmto.cse.rule.SUMOVTypeRule\'>: vehicle_type = VehicleType.PASSENGER'
         )
 
         self.assertTrue(
@@ -174,11 +179,63 @@ class TestRule(unittest.TestCase):
         )
 
 
+    def test_sumo_extendable_vtype_rule(self):
+        '''Test ExtendableSUMOVTypeRule'''
+
+        l_evtrule = colmto.cse.rule.ExtendableSUMOVTypeRule(
+            vehicle_type='passenger'
+        ).add_subrule(
+            colmto.cse.rule.SUMOPositionRule(
+                bounding_box=((0., -1.), (100., 1.))
+            )
+        )
+
+        self.assertEqual(
+            str(l_evtrule),
+            "<class 'colmto.cse.rule.ExtendableSUMOVTypeRule'>: vehicle_type = VehicleType.PASSENGER, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOPositionRule'>"
+        )
+
+        l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200, 'gridcellwidth': 4},
+            vehicle_type='passenger'
+        )
+
+        l_vehicle._position = (0, -2)
+        self.assertFalse(
+            l_evtrule.applies_to(
+                l_vehicle
+            )
+        )
+
+        l_vehicle._position = (0, -1)
+        self.assertTrue(
+            l_evtrule.applies_to(
+                l_vehicle
+            )
+        )
+
+        l_vehicle._position = (100, 1)
+        self.assertTrue(
+            l_evtrule.applies_to(
+                l_vehicle
+            )
+        )
+
+        l_vehicle._position = (101, 1)
+        self.assertFalse(
+            l_evtrule.applies_to(
+                l_vehicle
+            )
+        )
+
     def test_sumo_extendable_rule(self):
         '''Test SUMOExtendableRule class'''
         with self.assertRaises(TypeError):
             colmto.cse.rule.ExtendableSUMORule(
                 subrules=['foo'],
+            )
+            colmto.cse.rule.ExtendableSUMORule(
+                subrules=123,
             )
 
         with self.assertRaises(KeyError):
@@ -193,12 +250,33 @@ class TestRule(unittest.TestCase):
             colmto.common.helper.RuleOperator.ANY
         )
 
+        self.assertIsInstance(
+            colmto.cse.rule.ExtendableSUMORule(
+                subrule_operator='any'
+            ).subrules,
+            frozenset
+        )
+
         self.assertEqual(
             colmto.cse.rule.ExtendableSUMORule(
                 subrules=[colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)],
                 subrule_operator='any'
             ).subrule_operator,
             colmto.common.helper.RuleOperator.ANY
+        )
+
+        self.assertEqual(
+            str(colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=60.)),
+            '<class \'colmto.cse.rule.SUMOMinimalSpeedRule\'>: minimal_speed = 60.0'
+        )
+
+        l_subrule = colmto.cse.rule.SUMOMinimalSpeedRule(minimal_speed=120.)
+        self.assertSetEqual(
+            colmto.cse.rule.ExtendableSUMORule(
+                subrules=(l_subrule, l_subrule),
+                subrule_operator='any'
+            ).subrules,
+            {l_subrule}
         )
 
         l_sumo_rule = colmto.cse.rule.ExtendableSUMORule(
