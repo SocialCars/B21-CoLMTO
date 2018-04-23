@@ -474,7 +474,7 @@ class TestIO(unittest.TestCase):
         with self.assertRaises(TypeError):
             colmto.common.io.Writer(None).write_hdf5(
                 object_dict={
-                    'foo/baz': {
+                    'foo/baz/raise/object/error': {
                         'value': lambda x: x,
                         'attr': {'info': 'meh'}
                     }
