@@ -33,7 +33,7 @@ from colmto.common.helper import BoundingBox
 
 from colmto.common.helper import Behaviour
 from colmto.common.helper import RuleOperator
-from colmto.common.model import dissatisfaction
+# from colmto.common.model import dissatisfaction # todo: use dsat()
 
 
 class BaseRule(metaclass=ABCMeta):
@@ -187,7 +187,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
 
         # verify rule types
         for i_subrule in subrules:
-            if not (isinstance(i_subrule, BaseRule) or isinstance(i_subrule, dict)):
+            if not isinstance(i_subrule, (BaseRule, dict)):
                 raise TypeError(f'{i_subrule} is not of colmto.cse.rule.BaseRule or dict.')
 
             self.add_subrule(

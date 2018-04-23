@@ -27,7 +27,5 @@ colmto: Test module starter
 
 import unittest
 
-if __name__=='__main__':
-    unittest.TextTestRunner().run(
-        unittest.TestLoader().discover('.')
-    )
+if __name__ == '__main__':
+    unittest.TextTestRunner().run(unittest.TestLoader().discover('.'))

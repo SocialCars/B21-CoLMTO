@@ -52,8 +52,7 @@ class TestCSE(unittest.TestCase):
             ),
             colmto.cse.cse.BaseCSE
         )
-    
-    
+
     def test_sumo_cse(self):
         '''
         Test SumoCSE class
@@ -66,36 +65,36 @@ class TestCSE(unittest.TestCase):
             ),
             colmto.cse.cse.SumoCSE
         )
-    
+
         l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule(80.)
-    
+
         l_rule_outside_position = colmto.cse.rule.SUMOPositionRule(
             bounding_box=((0., 0), (64.0, 1)),
             outside=True
         )
-    
+
         l_sumo_cse = colmto.cse.cse.SumoCSE().add_rule(l_rule_outside_position).add_rule(l_rule_speed)
-    
+
         self.assertIsInstance(l_sumo_cse, colmto.cse.cse.SumoCSE)
         self.assertIsInstance(l_sumo_cse.rules, frozenset)
         self.assertIn(l_rule_speed, l_sumo_cse.rules)
         self.assertIn(l_rule_outside_position, l_sumo_cse.rules)
-    
+
         with self.assertRaises(TypeError):
             l_sumo_cse.add_rule('foo')
-    
+
         l_vehicles = [
             colmto.environment.vehicle.SUMOVehicle(
                 environment={'gridlength': 200, 'gridcellwidth': 4},
                 speed_max=random.randrange(0, 250)
             ) for _ in range(1000)
         ]
-    
+
         for i_vehicle in l_vehicles:
             i_vehicle.position = (random.randrange(0, 120), random.randint(0, 1))
-    
+
         l_sumo_cse.apply(l_vehicles)
-    
+
         for i_vehicle in l_vehicles:
             if 0 <= i_vehicle.position.x <= 64.0 and 0 <= i_vehicle.position.y <= 1 and \
                     i_vehicle.speed_max >= 80.0:
@@ -108,12 +107,12 @@ class TestCSE(unittest.TestCase):
                     i_vehicle.vehicle_class,
                     colmto.cse.rule.SUMORule.to_disallowed_class()
                 )
-    
+
         self.assertEqual(
             len(colmto.cse.cse.SumoCSE().add_rules_from_cfg({}).rules),
             0
         )
-    
+
         l_sumo_cse = colmto.cse.cse.SumoCSE().add_rules_from_cfg(
             [
                 {
@@ -133,11 +132,11 @@ class TestCSE(unittest.TestCase):
                 }
             ]
         )
-    
+
         self.assertIsInstance(tuple(l_sumo_cse.rules)[0], colmto.cse.rule.ExtendableSUMOPositionRule)
-    
+
         # self.assertIsInstance(tuple(tuple(l_sumo_cse.rules)[0].subrules)[0], colmto.cse.rule.SUMOMinimalSpeedRule)
-    
+
         l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(
             {
                 'type': 'SUMOMinimalSpeedRule',
@@ -146,11 +145,11 @@ class TestCSE(unittest.TestCase):
                 }
             }
         )
-    
+
         l_sumo_cse.add_rule(
             l_rule_speed
         )
-    
+
         self.assertIn(l_rule_speed, l_sumo_cse.rules)
 
 

@@ -25,14 +25,17 @@
 colmto: Test module for common.model.
 '''
 
+import unittest
 import pandas
 import numpy
-import unittest
 
 import colmto.common.model
 
 
 class ModelTest(unittest.TestCase):
+    '''
+    Test Model class
+    '''
 
     def test_unfairness(self):
         '''

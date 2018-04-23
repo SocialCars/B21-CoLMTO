@@ -29,17 +29,13 @@ import json
 import tempfile
 import logging
 import gzip
-
+import unittest
 import h5py
-
 import yaml
 try:
     from yaml import CSafeDumper as SafeDumper
 except ImportError:  # pragma: no cover
     from yaml import SafeDumper
-
-import unittest
-
 import colmto.common.io
 
 
@@ -492,5 +488,5 @@ class TestIO(unittest.TestCase):
             )
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

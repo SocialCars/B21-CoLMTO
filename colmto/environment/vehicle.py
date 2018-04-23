@@ -354,5 +354,6 @@ class SUMOVehicle(BaseVehicle):
         self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, self._grid_position.x)] = self._travel_time
         self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] = time_step - self.start_time - self._position.x / self.speed_max
         self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
+        # todo: add lane_index data series and Metric.LANE_INDEX
 
         return self

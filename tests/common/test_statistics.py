@@ -66,7 +66,6 @@ class TestStatistics(unittest.TestCase):
         with self.assertRaises(AttributeError):
             colmto.common.statistics.Statistics('foo')
 
-
     def test_aggregate_hdf5(self):
         '''
         Test aggregate_vehicle_grid_stats -> stats_to_hdf5_structure -> aggregate_run_stats_to_hdf5

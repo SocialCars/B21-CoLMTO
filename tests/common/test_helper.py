@@ -26,7 +26,6 @@ colmto: Test module for common.helper.
 '''
 
 import random
-import typing
 import unittest
 
 import colmto.common.helper as helper
@@ -41,7 +40,7 @@ class HelperTests(unittest.TestCase):
         '''
         Set up vars with test data
         '''
-        self.vehicles = [SUMOVehicle(speed_max=random.randrange(0, 120), environment={}) for _ in range(500)]  # type: typing.List[SUMOVehicle]
+        self.vehicles = [SUMOVehicle(speed_max=random.randrange(0, 120), environment={}) for _ in range(500)]
         self.colour_tuple = (23, 42, 12, 255)
 
     def tearDown(self):
@@ -76,7 +75,7 @@ class HelperTests(unittest.TestCase):
         Test SpeedRange
         '''
 
-        l_speedrange = helper.SpeedRange(12,120)
+        l_speedrange = helper.SpeedRange(12, 120)
 
         for i_speed in range(12, 121):
             with self.subTest(pattern=i_speed):
@@ -134,7 +133,7 @@ class HelperTests(unittest.TestCase):
         '''
 
         with self.assertRaises(KeyError):
-            helper.InitialSorting._prng.order(self.vehicles)
+            helper.InitialSorting._prng.order(self.vehicles)    # pylint: disable=protected-access
 
     def test_ruleoperatorfromstring(self):
         '''Test colmto.cse.rule.BaseRule.ruleoperator_from_string.'''
@@ -198,5 +197,5 @@ class HelperTests(unittest.TestCase):
                 self.assertEqual(str(i_metric), i_value)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

@@ -40,9 +40,9 @@ class TestLogger(unittest.TestCase):
 
     def test_logger(self):
         '''Test logger'''
-    
+
         f_temp_log = tempfile.NamedTemporaryFile()
-    
+
         l_logs = [
             colmto.common.log.logger(
                 name='foo',
@@ -69,11 +69,11 @@ class TestLogger(unittest.TestCase):
                 loglevel=logging.DEBUG
             )
         ]
-    
+
         for i_logger in l_logs:
             with self.subTest(pattern=i_logger):
                 i_logger.info('foo')
-    
+
         for i_level in ('NOTSET', 'INFO', 'DEBUG', 'WARNING', 'ERROR', 'CRITICAL'):
             with self.subTest(pattern=i_level):
                 l_log = colmto.common.log.logger(
@@ -101,7 +101,7 @@ class TestLogger(unittest.TestCase):
                 quiet=True,
                 loglevel='this should raise value error: Unknown level'
             )
-    
+
         with self.assertRaises(TypeError):
             colmto.common.log.logger(
                 name='bar',
@@ -109,7 +109,7 @@ class TestLogger(unittest.TestCase):
                 quiet=True,
                 loglevel=['this should fail']
             )
-    
+
         with self.assertRaises(TypeError):
             colmto.common.log.logger(
                 name='barz',
@@ -125,6 +125,7 @@ class TestLogger(unittest.TestCase):
 
         @colmto.common.log.deprecated
         def deprecated_function(arg):
+            '''Deprecated dummy function'''
             return arg
 
         with warnings.catch_warnings():
@@ -134,5 +135,5 @@ class TestLogger(unittest.TestCase):
             )
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

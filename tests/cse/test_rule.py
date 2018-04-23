@@ -43,11 +43,11 @@ class TestRule(unittest.TestCase):
         Test BaseRule class
         '''
         colmto.cse.rule.BaseRule()
-        l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(
+        colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(
             {
                 'type': 'SUMOMinimalSpeedRule',
                 'args': {
-                    'minimal_speed': 30/3.6
+                    'minimal_speed': 40/3.6
                 }
             }
         )
@@ -200,28 +200,28 @@ class TestRule(unittest.TestCase):
             vehicle_type='passenger'
         )
 
-        l_vehicle._position = (0, -2)
+        l_vehicle._position = (0, -2)       # pylint: disable=protected-access
         self.assertFalse(
             l_evtrule.applies_to(
                 l_vehicle
             )
         )
 
-        l_vehicle._position = (0, -1)
+        l_vehicle._position = (0, -1)       # pylint: disable=protected-access
         self.assertTrue(
             l_evtrule.applies_to(
                 l_vehicle
             )
         )
 
-        l_vehicle._position = (100, 1)
+        l_vehicle._position = (100, 1)      # pylint: disable=protected-access
         self.assertTrue(
             l_evtrule.applies_to(
                 l_vehicle
             )
         )
 
-        l_vehicle._position = (101, 1)
+        l_vehicle._position = (101, 1)      # pylint: disable=protected-access
         self.assertFalse(
             l_evtrule.applies_to(
                 l_vehicle
@@ -411,7 +411,7 @@ class TestRule(unittest.TestCase):
                         colmto.cse.rule.SUMORule.to_allowed_class()
                     )
 
-    def test_extendable_sumo_speed_rule(self):
+    def test_extendable_speed_rule(self):
         '''
         Test ExtendableSUMOMinimalSpeedRule class
         '''
@@ -436,14 +436,14 @@ class TestRule(unittest.TestCase):
 
         for i_pos in ((0, -1), (100, 1)):
             with self.subTest(pattern=i_pos):
-                l_vehicle._position = i_pos
+                l_vehicle._position = i_pos         # pylint: disable=protected-access
                 self.assertTrue(
                     l_esmsr.applies_to(l_vehicle)
                 )
 
         for i_pos in ((0, -2), (101, 1)):
             with self.subTest(pattern=i_pos):
-                l_vehicle._position = i_pos
+                l_vehicle._position = i_pos         # pylint: disable=protected-access
                 self.assertFalse(
                     l_esmsr.applies_to(l_vehicle)
                 )
@@ -492,7 +492,7 @@ class TestRule(unittest.TestCase):
             ((0., -1.), (100., 1.))
         )
 
-    def test_extendable_sumo_position_rule(self):
+    def test_extendable_position_rule(self):
         '''
         Test ExtendableSUMOPositionRule class
         '''
@@ -507,7 +507,7 @@ class TestRule(unittest.TestCase):
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                 )
-                l_vehicle._position = i_pos
+                l_vehicle._position = i_pos                     # pylint: disable=protected-access
                 self.assertFalse(l_espr.applies_to(l_vehicle))
 
         l_espr.add_subrule(
@@ -527,7 +527,7 @@ class TestRule(unittest.TestCase):
                     vehicle_type='passenger',
                     speed_max=i_speed
                 )
-                l_vehicle._position = i_pos
+                l_vehicle._position = i_pos                     # pylint: disable=protected-access
                 self.assertTrue(l_espr.applies_to(l_vehicle))
 
         for i_pos, i_speed in zip(((0, -2), (101, 1), (0, -1), (100, 1)), (60, 120, 60, 120)):
@@ -537,7 +537,7 @@ class TestRule(unittest.TestCase):
                     vehicle_type='passenger',
                     speed_max=i_speed
                 )
-                l_vehicle._position = i_pos
+                l_vehicle._position = i_pos                     # pylint: disable=protected-access
                 self.assertFalse(l_espr.applies_to(l_vehicle))
 
     def test_sumo_dissatisfaction_rule(self):
@@ -552,16 +552,18 @@ class TestRule(unittest.TestCase):
             '<class \'colmto.cse.rule.SUMODissatisfactionRule\'>: threshold = 0.5'
         )
 
-        l_dsat_rule = colmto.cse.rule.SUMODissatisfactionRule()
+        # l_dsat_rule = colmto.cse.rule.SUMODissatisfactionRule()
 
         for i_relative_time_loss in range(100):
             with self.subTest(pattern=i_relative_time_loss):
-                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                # l_vehicle =
+                colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                 )
                 # self.assertFalse(l_espr.applies_to(l_vehicle))
                 # todo: assertion
+
 
 if __name__ == '__main__':
     unittest.main()
