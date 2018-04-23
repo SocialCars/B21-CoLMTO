@@ -187,10 +187,12 @@ class InitialSorting(enum.Enum):
 
         if self is InitialSorting.BEST:
             vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
-        elif self is InitialSorting.WORST:
-            vehicles.sort(key=lambda i_v: i_v.speed_max)
         elif self is InitialSorting.RANDOM:
             self._prng.value.shuffle(vehicles)
+        elif self is InitialSorting.WORST:
+            vehicles.sort(key=lambda i_v: i_v.speed_max)
+        else:
+            raise KeyError('Valid orderings are BEST|RANDOM|WORST')
 
 
 @enum.unique

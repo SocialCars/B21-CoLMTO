@@ -54,14 +54,14 @@ class BaseVehicle(object):
         return MappingProxyType(self._properties)
 
     @property
-    def speed(self) -> float:
+    def _speed(self) -> float:
         '''
         :return: current speed at time step
         '''
         return self._properties.get('speed')
 
-    @speed.setter
-    def speed(self, speed: float):
+    @_speed.setter
+    def _speed(self, speed: float):
         '''
         Set vehicle speed
         :param speed: current position
@@ -249,22 +249,6 @@ class SUMOVehicle(BaseVehicle):
         :return: SUMO vehicle class
         '''
         return str(self._properties.get('vClass'))
-
-    @property
-    def _speed(self) -> float:
-        '''
-        :return: self._properties.get('speed')
-        '''
-        return float(self._properties.get('speed'))
-
-    @_speed.setter
-    def _speed(self, speed: float):
-        '''
-        Updates current speed.
-
-        :return: travel time
-        '''
-        self._properties['speed'] = float(speed)
 
     @property
     def speed_max(self) -> float:

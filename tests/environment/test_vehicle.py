@@ -43,15 +43,15 @@ class TestVehicle(unittest.TestCase):
         # test default values
         l_basevehicle = colmto.environment.vehicle.BaseVehicle()
 
-        self.assertEqual(l_basevehicle.speed, 0.0)
+        self.assertEqual(l_basevehicle._speed, 0.0)
         self.assertEqual(l_basevehicle.position, (0.0, 0))
 
         # test custom values
         l_basevehicle = colmto.environment.vehicle.BaseVehicle()
         l_basevehicle.position = numpy.array([23.0, 0])
-        l_basevehicle.speed = 12.1
+        l_basevehicle._speed = 12.1
 
-        self.assertEqual(l_basevehicle.speed, 12.1)
+        self.assertEqual(l_basevehicle._speed, 12.1)
         self.assertEqual(l_basevehicle.position, (23.0, 0))
         self.assertEqual(l_basevehicle.properties.get('position'), (23.0, 0))
         self.assertEqual(l_basevehicle.properties.get('speed'), 12.1)
@@ -68,11 +68,13 @@ class TestVehicle(unittest.TestCase):
         )
 
         self.assertEqual(l_sumovehicle.speed_max, 0.0)
-        self.assertEqual(l_sumovehicle.speed, 0.0)
+        self.assertEqual(l_sumovehicle._speed, 0.0)
         self.assertEqual(l_sumovehicle.position, (0.0, 0))
         self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.UNDEFINED)
         self.assertEqual(l_sumovehicle.colour, (255, 255, 0, 255))
-
+        self.assertEqual(l_sumovehicle._time_step, 0.0)
+        l_sumovehicle._time_step = 42.1
+        self.assertEqual(l_sumovehicle._time_step, 42.1)
         # test custom values
         l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
             speed_max=27.777,
@@ -86,11 +88,9 @@ class TestVehicle(unittest.TestCase):
         )
         l_sumovehicle.position = numpy.array([42.0, 0])
         l_sumovehicle.colour = (128, 64, 255, 255)
-        l_sumovehicle.speed_current = 12.1
         l_sumovehicle.start_time = 13
 
         self.assertEqual(l_sumovehicle.speed_max, 27.777)
-        self.assertEqual(l_sumovehicle.speed_current, 12.1)
         self.assertEqual(l_sumovehicle.position, (42.0, 0))
         self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
         self.assertEqual(l_sumovehicle.colour, (128, 64, 255, 255))
@@ -122,12 +122,16 @@ class TestVehicle(unittest.TestCase):
             (20, 2)
         )
         self.assertEqual(
-            l_sumovehicle.speed,
+            l_sumovehicle._speed,
             12.1
         )
         self.assertEqual(
             l_sumovehicle._grid_position,  # pylint: disable=protected-access
             (round(20/4)-1, -1)
+        )
+        self.assertEqual(
+            l_sumovehicle._time_step,
+            2
         )
 
 

@@ -128,6 +128,14 @@ class HelperTests(unittest.TestCase):
 
         helper.InitialSorting.RANDOM.order(self.vehicles)
 
+    def test_initialsorting_prng(self):
+        '''
+        Test InitialSorting prng error case
+        '''
+
+        with self.assertRaises(KeyError):
+            helper.InitialSorting._prng.order(self.vehicles)
+
     def test_ruleoperatorfromstring(self):
         '''Test colmto.cse.rule.BaseRule.ruleoperator_from_string.'''
 
@@ -169,6 +177,25 @@ class HelperTests(unittest.TestCase):
         self.assertEqual(helper.RuleOperator.ALL.evaluate([False, True]), False)
         self.assertEqual(helper.RuleOperator.ALL.evaluate([True, False]), False)
         self.assertEqual(helper.RuleOperator.ALL.evaluate([False, False]), False)
+
+    def test_metric(self):
+        '''
+        Test Metric
+        '''
+
+        for i_metric, i_value in (
+                (helper.Metric.DISSATISFACTION, 'dissatisfaction'),
+                (helper.Metric.GRID_POSITION_X, 'grid_position_x'),
+                (helper.Metric.GRID_POSITION_Y, 'grid_position_y'),
+                (helper.Metric.POSITION_X, 'position_x'),
+                (helper.Metric.POSITION_Y, 'position_y'),
+                (helper.Metric.RELATIVE_TIME_LOSS, 'relative_time_loss'),
+                (helper.Metric.TIME_LOSS, 'time_loss'),
+                (helper.Metric.TIME_STEP, 'time_step'),
+                (helper.Metric.TRAVEL_TIME, 'travel_time')):
+            with self.subTest(pattern=(i_metric, i_value)):
+                self.assertEqual(i_metric.value, i_value)
+                self.assertEqual(str(i_metric), i_value)
 
 
 if __name__=='__main__':

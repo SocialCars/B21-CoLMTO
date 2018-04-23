@@ -55,6 +55,14 @@ class TestIO(unittest.TestCase):
     Test cases for IO module
     '''
 
+    def test_reader(self):
+        '''
+        Test Reader
+        '''
+
+        with tempfile.NamedTemporaryFile() as f_tmp:
+            colmto.common.io.Reader(Namespace(loglevel='debug', quiet=True, logfile=f_tmp.name))
+
     def test_reader_read_yaml(self):
         '''Test read_yaml method from Reader class.'''
 
