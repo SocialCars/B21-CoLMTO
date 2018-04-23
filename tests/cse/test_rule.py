@@ -393,7 +393,7 @@ class TestRule(unittest.TestCase):
             colmto.environment.vehicle.SUMOVehicle(
                 environment={'gridlength': 200, 'gridcellwidth': 4},
                 speed_max=random.randrange(0, 120)
-            ) for _ in range(4711)
+            ) for _ in range(1000)
         ]
 
         l_results = l_sumo_rule.apply(l_vehicles)
@@ -458,7 +458,7 @@ class TestRule(unittest.TestCase):
 
         l_vehicles = [
             colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4})
-            for _ in range(10**4)
+            for _ in range(1000)
         ]
 
         for i_vehicle in l_vehicles:
