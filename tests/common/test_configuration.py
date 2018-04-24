@@ -103,7 +103,7 @@ class TestConfiguration(unittest.TestCase):
                 )
             )
 
-    def test_configuration_base_exceptions(self):
+    def test_configuration_baseexceptions(self):
         '''
         Test for BaseExceptions
         '''
@@ -174,12 +174,12 @@ class TestConfiguration(unittest.TestCase):
             self.assertIsInstance(l_config.run_config, MappingProxyType)
             l_runconfig = dict(l_config.run_config)
             del l_runconfig['colmto_version']
-            self.assertDictEqual(l_runconfig, colmto.common.configuration._DEFAULT_CONFIG_RUN)
+            self.assertDictEqual(l_runconfig, colmto.common.configuration._DEFAULT_CONFIG_RUN)  # pylint: disable=protected-access
             self.assertIsInstance(l_config.scenario_config, MappingProxyType)
-            self.assertDictEqual(dict(l_config.scenario_config), colmto.common.configuration._DEFAULT_CONFIG_SCENARIO)
+            self.assertDictEqual(dict(l_config.scenario_config), colmto.common.configuration._DEFAULT_CONFIG_SCENARIO) # pylint: disable=protected-access
             self.assertEqual(l_config.scenario_dir, Path(f_tmp.name))
             self.assertIsInstance(l_config.vtypes_config, MappingProxyType)
-            self.assertDictEqual(dict(l_config.vtypes_config), colmto.common.configuration._DEFAULT_CONFIG_VTYPES)
+            self.assertDictEqual(dict(l_config.vtypes_config), colmto.common.configuration._DEFAULT_CONFIG_VTYPES) # pylint: disable=protected-access
             self.assertEqual(l_config.output_dir, Path(f_tmp.name))
             self.assertEqual(l_config.run_prefix, 'foo')
 

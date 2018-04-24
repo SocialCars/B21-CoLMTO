@@ -628,8 +628,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
                            scenario_runs: dict,
                            initialsorting: InitialSorting,
                            vtype_list: list,
-                           tripfile: Path, forcerebuildscenarios=False
-                          ) -> typing.Dict[int, colmto.environment.vehicle.SUMOVehicle]:
+                           tripfile: Path,
+                           forcerebuildscenarios=False) -> typing.Dict[int, colmto.environment.vehicle.SUMOVehicle]:
         '''
         Generate SUMO's trip file.
 

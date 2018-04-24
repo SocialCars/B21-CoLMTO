@@ -136,11 +136,11 @@ class SpeedRange(Range):
 
     __slots__ = ()
 
-    def __new__(cls, min, max):
-        if min > max:
+    def __new__(cls, rmin, rmax):
+        if rmin > rmax:
             raise ValueError(f'SpeedRange minumium is larger than maximum.')
         # noinspection PyArgumentList
-        return super(cls, SpeedRange).__new__(cls, min, max)
+        return super(cls, SpeedRange).__new__(cls, rmin, rmax)
 
 
 class DissatisfactionRange(Range):
@@ -150,11 +150,11 @@ class DissatisfactionRange(Range):
 
     __slots__ = ()
 
-    def __new__(cls, min, max):
-        if min > max:
+    def __new__(cls, rmin, rmax):
+        if rmin > rmax:
             raise ValueError(f'DissatisfactionRange minumium is larger than maximum.')
         # noinspection PyArgumentList
-        return super(cls, DissatisfactionRange).__new__(cls, min, max)
+        return super(cls, DissatisfactionRange).__new__(cls, rmin, rmax)
 
 
 @enum.unique

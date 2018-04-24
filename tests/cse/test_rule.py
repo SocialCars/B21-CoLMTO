@@ -25,7 +25,7 @@
 colmto: Test module for environment.rule.
 '''
 import random
-import typing
+import typing   # pylint: disable=unused-import
 import unittest
 
 import colmto.cse.rule
@@ -568,7 +568,7 @@ class TestRule(unittest.TestCase):
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                 )
-                l_vehicle._properties['dissatisfaction'] = i_dsat
+                l_vehicle._properties['dissatisfaction'] = i_dsat           # pylint: disable=protected-access
                 if i_dsat <= 50:
                     self.assertTrue(l_dsat_rule.applies_to(l_vehicle))
                 else:

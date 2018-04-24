@@ -34,8 +34,6 @@ from colmto.common.helper import BoundingBox
 from colmto.common.helper import Behaviour
 from colmto.common.helper import RuleOperator
 from colmto.common.helper import DissatisfactionRange
-if typing.TYPE_CHECKING:
-    from colmto.environment.vehicle import SUMOVehicle
 
 
 class BaseRule(metaclass=ABCMeta):
