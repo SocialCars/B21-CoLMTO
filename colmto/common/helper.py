@@ -120,7 +120,6 @@ class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
 class Range(namedtuple('Range', ('min', 'max'))):
     '''
     Named tuple to represent a range.
-
     '''
 
     __slots__ = ()
@@ -133,10 +132,15 @@ class Range(namedtuple('Range', ('min', 'max'))):
 class SpeedRange(Range):
     '''
     Named tuple to represent allowed speed range.
-
     '''
 
     __slots__ = ()
+
+    def __new__(cls, min, max):
+        if min > max:
+            raise ValueError(f'SpeedRange minumium is larger than maximum.')
+        # noinspection PyArgumentList
+        return super(cls, SpeedRange).__new__(cls, min, max)
 
 
 class DissatisfactionRange(Range):
@@ -145,6 +149,12 @@ class DissatisfactionRange(Range):
     '''
 
     __slots__ = ()
+
+    def __new__(cls, min, max):
+        if min > max:
+            raise ValueError(f'DissatisfactionRange minumium is larger than maximum.')
+        # noinspection PyArgumentList
+        return super(cls, DissatisfactionRange).__new__(cls, min, max)
 
 
 @enum.unique

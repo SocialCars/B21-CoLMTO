@@ -544,25 +544,81 @@ class TestRule(unittest.TestCase):
         '''
         Test SUMODissatisfactionRule
         '''
+        for i_thr in ((0.1, 0.5), (0.25, 0.75)):
+            with self.subTest(pattern=colmto.common.helper.DissatisfactionRange(*i_thr)):
+                self.assertTupleEqual(
+                    colmto.cse.rule.SUMODissatisfactionRule(dissatisfaction_range=i_thr).threshold_range,
+                    i_thr
+                )
 
-        self.assertEqual(colmto.cse.rule.SUMODissatisfactionRule().threshold, 0.5)
-        self.assertEqual(colmto.cse.rule.SUMODissatisfactionRule(threshold=0.25).threshold, 0.25)
         self.assertEqual(
             str(colmto.cse.rule.SUMODissatisfactionRule()),
-            '<class \'colmto.cse.rule.SUMODissatisfactionRule\'>: threshold = 0.5'
+            '<class \'colmto.cse.rule.SUMODissatisfactionRule\'>: dissatisfaction_range = DissatisfactionRange(min=0.0, max=0.5), outside = False'
+        )
+        self.assertEqual(
+            str(colmto.cse.rule.SUMODissatisfactionRule(dissatisfaction_range=(1.0, 2.0), outside=True)),
+            '<class \'colmto.cse.rule.SUMODissatisfactionRule\'>: dissatisfaction_range = DissatisfactionRange(min=1.0, max=2.0), outside = True'
         )
 
-        # l_dsat_rule = colmto.cse.rule.SUMODissatisfactionRule()
+        l_dsat_rule = colmto.cse.rule.SUMODissatisfactionRule(dissatisfaction_range=(0, 50))
 
-        for i_relative_time_loss in range(100):
-            with self.subTest(pattern=i_relative_time_loss):
-                # l_vehicle =
-                colmto.environment.vehicle.SUMOVehicle(
+        for i_dsat in range(100):
+            with self.subTest(pattern=(l_dsat_rule.threshold_range, i_dsat)):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                 )
-                # self.assertFalse(l_espr.applies_to(l_vehicle))
-                # todo: assertion
+                l_vehicle._properties['dissatisfaction'] = i_dsat
+                if i_dsat <= 50:
+                    self.assertTrue(l_dsat_rule.applies_to(l_vehicle))
+                else:
+                    self.assertFalse(l_dsat_rule.applies_to(l_vehicle))
+
+
+    def test_extendable_sumodissatisfactionrule(self):
+        '''
+        Test ExtendableSUMODissatisfactionRule
+        '''
+        l_esdr = colmto.cse.rule.ExtendableSUMODissatisfactionRule(dissatisfaction_range=(0, 50))
+
+        for i_dsat in range(100):
+            with self.subTest(pattern=i_dsat):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
+                )
+                l_vehicle._properties['dissatisfaction'] = i_dsat   # pylint: disable=protected-access
+                self.assertFalse(l_esdr.applies_to(l_vehicle))
+
+        l_esdr.add_subrule(
+            colmto.cse.rule.SUMOMinimalSpeedRule(
+                minimal_speed=60.
+            )
+        )
+        self.assertEqual(
+            str(l_esdr),
+            "<class 'colmto.cse.rule.ExtendableSUMODissatisfactionRule'>: threshold = DissatisfactionRange(min=0, max=50), outside = False, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
+        )
+
+        for i_dsat, i_speed in zip((0, 50), (59, 20)):
+            with self.subTest(pattern=(i_dsat, i_speed)):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
+                    speed_max=i_speed
+                )
+                l_vehicle._properties['dissatisfaction'] = i_dsat   # pylint: disable=protected-access
+                self.assertTrue(l_esdr.applies_to(l_vehicle))
+
+        for i_dsat, i_speed in zip((0, 50), (66, 60)):
+            with self.subTest(pattern=(i_dsat, i_speed)):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
+                    speed_max=i_speed
+                )
+                l_vehicle._properties['dissatisfaction'] = i_dsat   # pylint: disable=protected-access
+                self.assertFalse(l_esdr.applies_to(l_vehicle))
 
 
 if __name__ == '__main__':

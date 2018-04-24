@@ -481,7 +481,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
 
         super().__init__()
         self._bounding_box = BoundingBox(*bounding_box)
-        self._outside = outside
+        self._outside = bool(outside)
 
     def __str__(self):
         return f'{self.__class__}: ' \

@@ -70,6 +70,23 @@ class HelperTests(unittest.TestCase):
             helper.Colour(red=0.798216, green=0.280197, blue=0.469538, alpha=1.0)
         )
 
+    def test_range(self):
+        '''
+        Test Range
+        '''
+
+        l_range = helper.Range(12, 120)
+
+        for i_range in range(12, 121):
+            with self.subTest(pattern=i_range):
+                self.assertTrue(l_range.contains(i_range))
+        for i_range in range(-10, 12):
+            with self.subTest(pattern=i_range):
+                self.assertFalse(l_range.contains(i_range))
+        for i_range in range(121, 150):
+            with self.subTest(pattern=i_range):
+                self.assertFalse(l_range.contains(i_range))
+
     def test_speedrange(self):
         '''
         Test SpeedRange
@@ -86,6 +103,27 @@ class HelperTests(unittest.TestCase):
         for i_speed in range(121, 150):
             with self.subTest(pattern=i_speed):
                 self.assertFalse(l_speedrange.contains(i_speed))
+        with self.assertRaises(ValueError):
+            helper.SpeedRange(12, -120)
+
+    def test_dissatisfactionrange(self):
+        '''
+        Test DissatisfactionRange
+        '''
+
+        l_dsatrange = helper.DissatisfactionRange(12, 120)
+
+        for i_drange in range(12, 121):
+            with self.subTest(pattern=i_drange):
+                self.assertTrue(l_dsatrange.contains(i_drange))
+        for i_drange in range(-10, 12):
+            with self.subTest(pattern=i_drange):
+                self.assertFalse(l_dsatrange.contains(i_drange))
+        for i_drange in range(121, 150):
+            with self.subTest(pattern=i_drange):
+                self.assertFalse(l_dsatrange.contains(i_drange))
+        with self.assertRaises(ValueError):
+            helper.DissatisfactionRange(12, -120)
 
     def test_distribution(self):
         '''
