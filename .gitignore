@@ -15,6 +15,7 @@
 docs/build/**/*
 !docs/Makefile
 !docs/pylint.sh
+!docs/pylint.rc
 !docs/radon.sh
 !docs/source/**/*.png
 !docs/source/**/*.py
