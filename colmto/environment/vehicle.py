@@ -132,7 +132,8 @@ class SUMOVehicle(BaseVehicle):
                 'vClass': colmto.cse.rule.SUMORule.to_allowed_class(),
                 'grid_position': Position(x=0, y=0),
                 'time_step': 0.0,
-                'travel_time': 0.0
+                'travel_time': 0.0,
+                'dissatisfaction': 0.0
             }
         )
 
@@ -181,7 +182,6 @@ class SUMOVehicle(BaseVehicle):
         '''
         return VehicleType[str(self._properties.get('vType')).upper()] \
             if self._properties.get('vType') else VehicleType.UNDEFINED
-
 
     @property
     def start_time(self) -> float:
@@ -256,6 +256,15 @@ class SUMOVehicle(BaseVehicle):
         :return: self._properties.get('maxSpeed')
         '''
         return float(self._properties.get('maxSpeed'))
+
+    @property
+    def dissatisfaction(self) -> float:
+        '''
+        Current dissatisfaction (updated via update() function)
+        :return: Dissatisfaction, float of range [0, 1]
+
+        '''
+        return float(self._properties.get('dissatisfaction'))
 
     @property
     def dsat_threshold(self) -> float:
@@ -341,7 +350,7 @@ class SUMOVehicle(BaseVehicle):
         self._travel_time = float(time_step) - self.start_time
 
         # update data series based on grid cell
-        l_dissatisfaction = colmto.common.model.dissatisfaction(
+        self._properties['dissatisfaction'] = colmto.common.model.dissatisfaction(
             time_step - self.start_time - self._position.x / self.speed_max,
             self._position.x / self.speed_max,
             self.dsat_threshold
@@ -350,10 +359,10 @@ class SUMOVehicle(BaseVehicle):
         self._grid_based_series_dict.get(Metric.TIME_STEP.value)[(Metric.TIME_STEP.value, self._grid_position.x)] = float(time_step)
         self._grid_based_series_dict.get(Metric.POSITION_Y.value)[(Metric.POSITION_Y.value, self._grid_position.x)] = self._position.y
         self._grid_based_series_dict.get(Metric.GRID_POSITION_Y.value)[(Metric.GRID_POSITION_Y.value, self._grid_position.x)] = self._grid_position.y
-        self._grid_based_series_dict.get(Metric.DISSATISFACTION.value)[(Metric.DISSATISFACTION.value, self._grid_position.x)] = l_dissatisfaction
+        self._grid_based_series_dict.get(Metric.DISSATISFACTION.value)[(Metric.DISSATISFACTION.value, self._grid_position.x)] = self.dissatisfaction
         self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, self._grid_position.x)] = self._travel_time
         self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] = time_step - self.start_time - self._position.x / self.speed_max
         self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
-        # todo: add lane_index data series and Metric.LANE_INDEX
+        self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[(Metric.LANE_INDEX.value, self._grid_position.x)] = lane_index
 
         return self

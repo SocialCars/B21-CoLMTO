@@ -227,6 +227,7 @@ class Metric(enum.Enum):
     TIME_LOSS = 'time_loss'
     TIME_STEP = 'time_step'
     TRAVEL_TIME = 'travel_time'
+    LANE_INDEX = 'lane_index'
 
     def __str__(self):
         return self.value
@@ -268,7 +269,8 @@ class StatisticSeries(enum.Enum):
                 Metric.DISSATISFACTION,
                 Metric.TRAVEL_TIME,
                 Metric.TIME_LOSS,
-                Metric.RELATIVE_TIME_LOSS)
+                Metric.RELATIVE_TIME_LOSS,
+                Metric.LANE_INDEX)
 
 
 @enum.unique
