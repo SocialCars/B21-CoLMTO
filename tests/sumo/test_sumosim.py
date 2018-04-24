@@ -107,6 +107,30 @@ class TestSumoSim(unittest.TestCase):
         '''
         Test SumoSim.runscenarios() with CSE
         '''
+        with self.assertRaises(Exception):
+            with tempfile.NamedTemporaryFile() as f_tmp, tempfile.NamedTemporaryFile() as f_tmp_hdf5:
+                colmto.sumo.sumosim.SumoSim(
+                    Namespace(
+                        loglevel='DEBUG',
+                        quiet=False,
+                        logfile=f_tmp.name,
+                        output_dir=Path(f_tmp.name).parent,
+                        runconfigfile=Path(f_tmp.name),
+                        scenarioconfigfile=Path(f_tmp.name),
+                        vtypesconfigfile=Path(f_tmp.name),
+                        freshconfigs=True,
+                        headless=True,
+                        gui=False,
+                        onlyoneotlsegment=True,
+                        cse_enabled=True,
+                        runs=1,
+                        scenarios=['NI-B210'],
+                        run_prefix='foo',
+                        forcerebuildscenarios=True,
+                        results_hdf5_file=Path(f_tmp_hdf5.name)
+                    )
+                ).run_scenario(None)
+
         with tempfile.NamedTemporaryFile() as f_tmp, tempfile.NamedTemporaryFile() as f_tmp_hdf5:
             colmto.sumo.sumosim.SumoSim(
                 Namespace(
