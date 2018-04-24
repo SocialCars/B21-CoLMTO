@@ -108,31 +108,50 @@ class TestVehicle(unittest.TestCase):
         '''Test update'''
         l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
             environment={'gridlength': 200, 'gridcellwidth': 4},
-            speed_max=10,
+            speed_max=15,
             vtype_sumo_cfg={'dsat_threshold': 0.2}
         )
+
+        self.assertEqual(l_sumovehicle.dsat_threshold, 0.2)
+        self.assertEqual(l_sumovehicle.speed_max, 15)
+        self.assertEqual(l_sumovehicle.dissatisfaction, 0.0)
+        l_sumovehicle.position = (0, 0)
+        l_sumovehicle.start_time = 0
+
         l_sumovehicle.update(
-            position=colmto.environment.vehicle.Position(20, 2),
+            position=colmto.environment.vehicle.Position(15000, 0),
             lane_index=1,
-            speed=12.1,
-            time_step=2
+            speed=15,
+            time_step=1000
         )
+
+        self.assertAlmostEqual(l_sumovehicle.dissatisfaction, 0.0, places=4)
+
         self.assertEqual(
             l_sumovehicle.position,
-            (20, 2)
+            (15000, 0)
         )
         self.assertEqual(
             l_sumovehicle._speed,           # pylint: disable=protected-access
-            12.1
+            15
         )
         self.assertEqual(
             l_sumovehicle._grid_position,   # pylint: disable=protected-access
-            (round(20/4)-1, -1)
+            (round(15000/4)-1, -1)
         )
         self.assertEqual(
             l_sumovehicle._time_step,       # pylint: disable=protected-access
-            2
+            1000
         )
+
+        l_sumovehicle.update(
+            position=colmto.environment.vehicle.Position(12500, 0),
+            lane_index=0,
+            speed=12,
+            time_step=1000
+        )
+
+        self.assertAlmostEqual(l_sumovehicle.dissatisfaction, .5)
 
 
 if __name__ == '__main__':
