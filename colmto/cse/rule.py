@@ -28,12 +28,14 @@ import typing
 from abc import ABCMeta
 from abc import abstractmethod
 
-from colmto.common.helper import Position, VehicleType
+from colmto.common.helper import Position
+from colmto.common.helper import VehicleType
 from colmto.common.helper import BoundingBox
-
 from colmto.common.helper import Behaviour
 from colmto.common.helper import RuleOperator
-# from colmto.common.model import dissatisfaction # todo: use dsat()
+from colmto.common.helper import DissatisfactionRange
+if typing.TYPE_CHECKING:
+    from colmto.environment.vehicle import SUMOVehicle
 
 
 class BaseRule(metaclass=ABCMeta):
@@ -549,31 +551,34 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
 class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRule'):
     '''
     Dissatisfaction based rule:
-    Applies to vehicles which have reached a given dissatisfaction value (default: >=0.5).
+    Applies to vehicles which are in- or outside a given dissatisfaction range (default: inside [0, 0.5]).
     '''
 
-    def __init__(self, threshold=0.5):
+    def __init__(self, dissatisfaction_range=DissatisfactionRange(0.0, 0.5), outside=False):
         '''
         Initialisation
-        :param threshold: vehicle has to have reached for this rule to apply
+        :param dissatisfaction_range: vehicle have to be in- or outside for this rule to apply
+        :param outside: controls whether this rules applies to vehicles inside (default) or outside of range
 
         '''
 
         super().__init__()
-        self._threshold = threshold
+        self._dissatisfaction_range = DissatisfactionRange(*dissatisfaction_range)
+        self._outside = bool(outside)
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'threshold = {self._threshold}'
+               f'dissatisfaction_range = {self._dissatisfaction_range}, ' \
+               f'outside = {self._outside}'
 
     @property
-    def threshold(self) -> float:
+    def threshold_range(self) -> float:
         '''
-        :return: dissatisfaction threshold
+        :return: dissatisfaction threshold range
 
         '''
 
-        return self._threshold
+        return self._dissatisfaction_range
 
     def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
         '''
@@ -584,7 +589,7 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
 
         '''
 
-        return vehicle.dsat_threshold >= self._threshold # todo: fixme: use dissatisfaction() for calculating actual dsat of vehicle
+        return self._outside ^ self._dissatisfaction_range.contains(vehicle.dissatisfaction)
 
 
 class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMORule, rule_name='ExtendableSUMODissatisfactionRule'):
@@ -593,7 +598,7 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
     Applies to vehicles which have reached a given dissatisfaction threshold (default: >=0.5).
     '''
 
-    def __init__(self, threshold=0.5,
+    def __init__(self, dissatisfaction_range=DissatisfactionRange(0.0, 0.5), outside=False,
                  subrules=tuple(), subrule_operator=RuleOperator.ANY):
         '''
         Initialisation
@@ -604,12 +609,13 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
 
         '''
 
-        SUMODissatisfactionRule.__init__(self, threshold=threshold)
+        SUMODissatisfactionRule.__init__(self, dissatisfaction_range=dissatisfaction_range, outside=outside)
         ExtendableSUMORule.__init__(self, subrules=subrules, subrule_operator=subrule_operator)
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'threshold = {self._threshold}, ' \
+               f'threshold = {self._dissatisfaction_range}, ' \
+               f'outside = {self._outside}, ' \
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 

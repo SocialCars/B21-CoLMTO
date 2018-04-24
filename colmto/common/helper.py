@@ -117,7 +117,20 @@ class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
         return self.p1.x <= position.x <= self.p2.x and self.p1.y <= position.y <= self.p2.y
 
 
-class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
+class Range(namedtuple('Range', ('min', 'max'))):
+    '''
+    Named tuple to represent a range.
+
+    '''
+
+    __slots__ = ()
+
+    def contains(self, value: float):
+        '''checks whether value lies between min and max (including)'''
+        return self.min <= value <= self.max
+
+
+class SpeedRange(Range):
     '''
     Named tuple to represent allowed speed range.
 
@@ -125,9 +138,13 @@ class SpeedRange(namedtuple('SpeedRange', ('min', 'max'))):
 
     __slots__ = ()
 
-    def contains(self, speed: float):
-        '''checks whether speed lies between min and max (including)'''
-        return self.min <= speed <= self.max
+
+class DissatisfactionRange(Range):
+    '''
+    Named tuple to represent allowed speed range.
+    '''
+
+    __slots__ = ()
 
 
 @enum.unique
