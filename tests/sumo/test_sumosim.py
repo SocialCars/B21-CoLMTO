@@ -111,7 +111,7 @@ class TestSumoSim(unittest.TestCase):
             ).run_scenarios()
 
     @unittest.skipUnless(
-        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_file(),
+        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
         f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
     def test_sumosim_runscenarios_cse(self):
         '''
