@@ -82,8 +82,8 @@ class TestSumoSim(unittest.TestCase):
             )
 
     @unittest.skipUnless(
-        Path(f"{os.environ.get('SUMO_HOME','sumo')}/bin/sumo").is_file(),
-        f"can't find sumo binary at {os.environ.get('SUMO_HOME','sumo')}/bin/sumo")
+        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
+        f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
     def test_sumosim_runscenarios(self):
         '''
         Test SumoSim.runscenarios()
@@ -111,8 +111,8 @@ class TestSumoSim(unittest.TestCase):
             ).run_scenarios()
 
     @unittest.skipUnless(
-        Path(f"{os.environ.get('SUMO_HOME','sumo')}/bin/sumo").is_file(),
-        f"can't find sumo binary at {os.environ.get('SUMO_HOME','sumo')}/bin/sumo")
+        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_file(),
+        f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
     def test_sumosim_runscenarios_cse(self):
         '''
         Test SumoSim.runscenarios() with CSE
@@ -163,3 +163,7 @@ class TestSumoSim(unittest.TestCase):
                     results_hdf5_file=Path(f_tmp_hdf5.name)
                 )
             ).run_scenarios()
+
+
+if __name__ == '__main__':
+    unittest.main()
