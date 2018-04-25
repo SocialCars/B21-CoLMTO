@@ -28,7 +28,6 @@ from setuptools import setup
 from setuptools.command.test import test as TestCommand
 from sphinx.setup_command import BuildDoc
 
-os.environ['SUMO_HOME'] = os.path.abspath('../sumo')
 
 class PyTest(TestCommand):
     '''pytest class'''
