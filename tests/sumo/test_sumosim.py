@@ -78,7 +78,7 @@ class TestSumoSim(unittest.TestCase):
                 forcerebuildscenarios=True,
                 initialsortings=['random']
             )
-            self.assertEqual(colmto.sumo.sumosim.SumoSim(l_args)._args, l_args)
+            self.assertEqual(colmto.sumo.sumosim.SumoSim(l_args)._args, l_args)  # pylint: disable=protected-access
 
     @staticmethod
     @unittest.skipUnless(

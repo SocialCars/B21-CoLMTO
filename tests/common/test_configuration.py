@@ -51,24 +51,24 @@ class TestConfiguration(unittest.TestCase):
         Test Configuration class
         '''
         with tempfile.NamedTemporaryFile() as f_tmp:
-            colmto.common.configuration.Configuration(
-                Namespace(
-                    loglevel='DEBUG',
-                    quiet=False,
-                    logfile=f_tmp.name,
-                    runconfigfile=Path(f_tmp.name),
-                    scenarioconfigfile=Path(f_tmp.name),
-                    vtypesconfigfile=Path(f_tmp.name),
-                    freshconfigs=True,
-                    headless=True,
-                    gui=False,
-                    onlyoneotlsegment=True,
-                    cse_enabled=True,
-                    runs=1,
-                    scenarios=None,
-                    initialsortings=['random']
-                )
+            l_args = Namespace(
+                loglevel='DEBUG',
+                quiet=False,
+                logfile=f_tmp.name,
+                runconfigfile=Path(f_tmp.name),
+                scenarioconfigfile=Path(f_tmp.name),
+                vtypesconfigfile=Path(f_tmp.name),
+                freshconfigs=True,
+                headless=True,
+                gui=False,
+                onlyoneotlsegment=True,
+                cse_enabled=True,
+                runs=1,
+                scenarios=None,
+                initialsortings=['random']
             )
+            self.assertEqual(colmto.common.configuration.Configuration(l_args)._args, l_args)  # pylint: disable=protected-access
+
             colmto.common.configuration.Configuration(
                 Namespace(
                     loglevel='DEBUG',
@@ -190,4 +190,3 @@ class TestConfiguration(unittest.TestCase):
             self.assertDictEqual(dict(l_config.vtypes_config), colmto.common.configuration._DEFAULT_CONFIG_VTYPES) # pylint: disable=protected-access
             self.assertEqual(l_config.output_dir, Path(f_tmp.name))
             self.assertEqual(l_config.run_prefix, 'foo')
-

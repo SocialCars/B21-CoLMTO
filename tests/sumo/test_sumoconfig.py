@@ -152,7 +152,8 @@ class TestSUMOConfiguration(unittest.TestCase):
             )
             self.assertEqual(l_sumo_config.aadt({'scenarioname': 'NI-B210'}), 13000.0)
 
-    def test_sumo_configuration_settingsxml(self):
+    @staticmethod
+    def test_sumo_configuration_settingsxml():
         '''
         Test SUMOConfig _generate_settings_xml
         '''
@@ -183,7 +184,8 @@ class TestSUMOConfiguration(unittest.TestCase):
             l_sumo_config._generate_settings_xml(l_sumo_config.run_config, f_tmp.name, forcerebuildscenarios=True)  # pylint: disable=protected-access
             l_sumo_config._generate_settings_xml(l_sumo_config.run_config, f_tmp.name, forcerebuildscenarios=False) # pylint: disable=protected-access
 
-    def test_sumo_configuration_nodexml(self):
+    @staticmethod
+    def test_sumo_configuration_nodexml():
         '''
         Test SUMOConfig _generate_node_xml
         '''
@@ -238,7 +240,8 @@ class TestSUMOConfiguration(unittest.TestCase):
             )
             l_sumo_config._generate_node_xml(l_sumo_config.scenario_config.get('NI-B210'), f_tmp.name, forcerebuildscenarios=True)  # pylint: disable=protected-access
 
-    def test_sumo_configuration_edge_xml(self):
+    @staticmethod
+    def test_sumo_configuration_edge_xml():
         '''
         Test SUMOConfig _generate_edge_xml
         '''

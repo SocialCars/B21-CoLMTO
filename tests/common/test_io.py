@@ -51,7 +51,8 @@ class TestIO(unittest.TestCase):
     Test cases for IO module
     '''
 
-    def test_reader(self):
+    @staticmethod
+    def test_reader():
         '''
         Test Reader
         '''
