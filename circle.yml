@@ -42,10 +42,10 @@ jobs:
                   command: python3 setup.py install --user
             - run:
                   name: Create documentation (html)
-                  command: cd docs && make html && mv build/html sources && cd ..
+                  command: cd docs && make html && mv build/html sources; cd ..
             - run:
                   name: Create documentation (pdf)
-                  command: cd docs && make latexpdf && cp build/latex/CoLMTO-doc.pdf . && cd ..
+                  command: cd docs && make latexpdf && cp build/latex/CoLMTO-doc.pdf .; cd ..
             - run:
                   name: Remove sphinx source and build files
                   command: rm -r docs/source && rm -r docs/build && rm docs/Makefile
