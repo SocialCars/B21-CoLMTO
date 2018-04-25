@@ -14,7 +14,6 @@ Prerequisites
   * `h5py <https://pypi.python.org/pypi/h5py>`_
   * `lxml <https://pypi.python.org/pypi/lxml>`_
   * `matplotlib <https://pypi.python.org/pypi/matplotlib>`_
-  * `nose <https://pypi.python.org/pypi/nose>`_
   * `PyYAML <https://pypi.python.org/pypi/PyYAML>`_
   * `sh <https://pypi.python.org/pypi/sh>`_
   * `sphinx_rtd_theme <https://github.com/rtfd/sphinx_rtd_theme.git>`_ (for building this documentation)
