@@ -29,6 +29,15 @@ import unittest
 import tempfile
 from pathlib import Path
 import os
+import sys
+
+try:
+    sys.path.append(os.path.join('sumo', 'tools'))
+    sys.path.append(os.path.join(os.environ.get('SUMO_HOME', os.path.join('..', '..')), 'tools'))
+    import sumolib
+except ImportError:  # pragma: no cover
+    raise ImportError('please declare environment variable \'SUMO_HOME\' as the root')
+
 import colmto.sumo.sumosim
 
 
@@ -49,6 +58,7 @@ class TestSumoSim(unittest.TestCase):
         '''
         Test SumoSim class
         '''
+        print(sumolib)
         with tempfile.NamedTemporaryFile() as f_tmp:
             colmto.sumo.sumosim.SumoSim(
                 Namespace(
