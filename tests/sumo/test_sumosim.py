@@ -77,7 +77,8 @@ class TestSumoSim(unittest.TestCase):
                     runs=1,
                     scenarios=None,
                     run_prefix='foo',
-                    forcerebuildscenarios=True
+                    forcerebuildscenarios=True,
+                    initialsortings=['random']
                 )
             )
 
@@ -106,16 +107,14 @@ class TestSumoSim(unittest.TestCase):
                     runs=1,
                     scenarios=['NI-B210'],
                     run_prefix='foo',
-                    forcerebuildscenarios=True
+                    forcerebuildscenarios=True,
+                    initialsortings=['random']
                 )
             ).run_scenarios()
 
-    @unittest.skipUnless(
-        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
-        f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
-    def test_sumosim_runscenarios_cse(self):
+    def test_sumosim_runscenarios_cse_exception(self):
         '''
-        Test SumoSim.runscenarios() with CSE
+        Test SumoSim.runscenarios() with CSE passing None as a scenario name
         '''
         with self.assertRaises(Exception):
             with tempfile.NamedTemporaryFile() as f_tmp, tempfile.NamedTemporaryFile() as f_tmp_hdf5:
@@ -137,10 +136,18 @@ class TestSumoSim(unittest.TestCase):
                         scenarios=['NI-B210'],
                         run_prefix='foo',
                         forcerebuildscenarios=True,
-                        results_hdf5_file=Path(f_tmp_hdf5.name)
+                        results_hdf5_file=Path(f_tmp_hdf5.name),
+                        initialsortings=['random']
                     )
                 ).run_scenario(None)
 
+    @unittest.skipUnless(
+        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
+        f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
+    def test_sumosim_runscenarios_cse(self):
+        '''
+        Test SumoSim.runscenarios() with CSE
+        '''
         with tempfile.NamedTemporaryFile() as f_tmp, tempfile.NamedTemporaryFile() as f_tmp_hdf5:
             colmto.sumo.sumosim.SumoSim(
                 Namespace(
@@ -160,7 +167,8 @@ class TestSumoSim(unittest.TestCase):
                     scenarios=['NI-B210'],
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    results_hdf5_file=Path(f_tmp_hdf5.name)
+                    results_hdf5_file=Path(f_tmp_hdf5.name),
+                    initialsortings=['random']
                 )
             ).run_scenarios()
 

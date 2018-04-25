@@ -88,6 +88,12 @@ class Colmto(object):
             '--scenarios', dest='scenarios', type=str, nargs='*',
             default=None
         )
+
+        l_parser.add_argument(
+            '--initialsortings', dest='initialsortings', type=str, nargs='*',
+            default=None
+        )
+
         l_parser.add_argument(
             '--runs', dest='runs', type=int,
             default=None

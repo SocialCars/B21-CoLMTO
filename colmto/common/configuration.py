@@ -374,6 +374,8 @@ class Configuration(object):
                 self._run_config['scenarios'] = self._args.scenarios
             else:
                 self._run_config['scenarios'] = list(self._scenario_config.keys())
+        if self._args.initialsortings is not None:
+            self._run_config['initialsortings'] = self._args.initialsortings
 
     @property
     def run_config(self) -> MappingProxyType:

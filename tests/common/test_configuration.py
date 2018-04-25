@@ -65,7 +65,8 @@ class TestConfiguration(unittest.TestCase):
                     onlyoneotlsegment=True,
                     cse_enabled=True,
                     runs=1,
-                    scenarios=None
+                    scenarios=None,
+                    initialsortings=['random']
                 )
             )
             colmto.common.configuration.Configuration(
@@ -82,7 +83,8 @@ class TestConfiguration(unittest.TestCase):
                     onlyoneotlsegment=False,
                     cse_enabled=False,
                     runs=None,
-                    scenarios=['all']
+                    scenarios=['all'],
+                    initialsortings=['random']
                 )
             )
             colmto.common.configuration.Configuration(
@@ -99,7 +101,8 @@ class TestConfiguration(unittest.TestCase):
                     onlyoneotlsegment=False,
                     cse_enabled=False,
                     runs=None,
-                    scenarios='foo'
+                    scenarios='foo',
+                    initialsortings=['random']
                 )
             )
 
@@ -123,7 +126,8 @@ class TestConfiguration(unittest.TestCase):
                         onlyoneotlsegment=True,
                         cse_enabled=True,
                         runs=1,
-                        scenarios=None
+                        scenarios=None,
+                        initialsortings=['random']
                     )
                 )
             with self.assertRaises(BaseException):
@@ -141,7 +145,8 @@ class TestConfiguration(unittest.TestCase):
                         onlyoneotlsegment=True,
                         cse_enabled=True,
                         runs=1,
-                        scenarios=None
+                        scenarios=None,
+                        initialsortings=['random']
                     )
                 )
 
@@ -168,12 +173,15 @@ class TestConfiguration(unittest.TestCase):
                     scenarios=['NI-B210'],
                     scenario_dir=Path(f_tmp.name),
                     output_dir=Path(f_tmp.name),
-                    run_prefix='foo'
+                    run_prefix='foo',
+                    initialsortings=['random']
                 )
             )
             self.assertIsInstance(l_config.run_config, MappingProxyType)
             l_runconfig = dict(l_config.run_config)
             del l_runconfig['colmto_version']
+            self.assertListEqual(l_runconfig.get('initialsortings'), ['random'])
+            l_runconfig['initialsortings'] = ['best', 'random', 'worst']
             self.assertDictEqual(l_runconfig, colmto.common.configuration._DEFAULT_CONFIG_RUN)  # pylint: disable=protected-access
             self.assertIsInstance(l_config.scenario_config, MappingProxyType)
             self.assertDictEqual(dict(l_config.scenario_config), colmto.common.configuration._DEFAULT_CONFIG_SCENARIO) # pylint: disable=protected-access
