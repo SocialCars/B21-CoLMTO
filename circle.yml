@@ -59,14 +59,20 @@ jobs:
                  name: Run Simulation for Scenario NI-B210 with CSE (2/2)
                  command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1 --only-one-otl-segment --debug
             - run:
-                  name: Run Tests for Codecov Coverage
-                  command: py.test tests --cov=colmto
+                  name: Run Tests for Codecov/Codacy Coverage
+                  command: py.test tests --cov=colmto --cov-report=xml:coverage.xml
             - run:
-                  name: Upload Codecov Results (1/2)
-                  command: bash <(curl -s https://codecov.io/bash) -t 910321f1-7584-4bc8-b264-bce881241d83
+                  name: Upload Results to Codecov for masc (1/4)
+                  command: bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
             - run:
-                  name: Upload Codecov Results (2/2)
-                  command: bash <(curl -s https://codecov.io/bash) -t 06655147-fb7f-41be-9b5f-45c85c4f591f
+                  name: Upload Results to Codecov for socialcars (2/4)
+                  command: bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN_2
+            - run:
+                  name: Upload Results to Codacy for masc (3/4)
+                  command: python-codacy-coverage -r coverage.xml -t $CODACY_PROJECT_TOKEN_2
+            - run:
+                  name: Upload Results to Codacy for socialcars (3/4)
+                  command: python-codacy-coverage -r coverage.xml -t $CODACY_PROJECT_TOKEN
             - run:
                   name: Backup documentation files to /tmp
                   command: mv -f colmto tests docs readme.md license.md architecture.png executionmodel.png /tmp
