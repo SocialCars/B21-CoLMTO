@@ -58,34 +58,33 @@ class TestSumoSim(unittest.TestCase):
         '''
         Test SumoSim class
         '''
-        print(sumolib)
         with tempfile.NamedTemporaryFile() as f_tmp:
-            colmto.sumo.sumosim.SumoSim(
-                Namespace(
-                    loglevel='DEBUG',
-                    quiet=False,
-                    logfile=f_tmp.name,
-                    output_dir=Path(f_tmp.name).parent,
-                    runconfigfile=Path(f_tmp.name),
-                    scenarioconfigfile=Path(f_tmp.name),
-                    vtypesconfigfile=Path(f_tmp.name),
-                    freshconfigs=True,
-                    headless=True,
-                    gui=False,
-                    onlyoneotlsegment=True,
-                    cse_enabled=True,
-                    runs=1,
-                    scenarios=None,
-                    run_prefix='foo',
-                    forcerebuildscenarios=True,
-                    initialsortings=['random']
-                )
+            l_args = Namespace(
+                loglevel='DEBUG',
+                quiet=False,
+                logfile=f_tmp.name,
+                output_dir=Path(f_tmp.name).parent,
+                runconfigfile=Path(f_tmp.name),
+                scenarioconfigfile=Path(f_tmp.name),
+                vtypesconfigfile=Path(f_tmp.name),
+                freshconfigs=True,
+                headless=True,
+                gui=False,
+                onlyoneotlsegment=True,
+                cse_enabled=True,
+                runs=1,
+                scenarios=None,
+                run_prefix='foo',
+                forcerebuildscenarios=True,
+                initialsortings=['random']
             )
+            self.assertEqual(colmto.sumo.sumosim.SumoSim(l_args)._args, l_args)
 
+    @staticmethod
     @unittest.skipUnless(
         Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
         f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
-    def test_sumosim_runscenarios(self):
+    def test_sumosim_runscenarios():
         '''
         Test SumoSim.runscenarios()
         '''
@@ -141,10 +140,11 @@ class TestSumoSim(unittest.TestCase):
                     )
                 ).run_scenario(None)
 
+    @staticmethod
     @unittest.skipUnless(
         Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
         f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
-    def test_sumosim_runscenarios_cse(self):
+    def test_sumosim_runscenarios_cse():
         '''
         Test SumoSim.runscenarios() with CSE
         '''
