@@ -77,16 +77,23 @@ setup(
         }
     },
     install_requires=[
-        'doxypypy',
-        'defusedxml',
-        'h5py',
-        'lxml',
-        'matplotlib',
-        'nose',
-        'pytest',
-        'PyYAML',
-        'sh',
-        'pygments-style-solarized',
+        'defusedxml==0.5.0',
+        'codacy-coverage==1.3.11',
+        'codecov==2.0.15',
+        'pytest==3.5.0',
+        'pytest-cov==2.5.1',
+        'h5py==2.7.1',
+        'lxml==4.2.1',
+        'matplotlib==2.2.2',
+        'numexpr==2.6.4',
+        'numpy==1.14.2',
+        'bottleneck==1.2.1',
+        'pandas==0.22.0',
+        'pytest==3.5.0',
+        'PyYAML==3.12',
+        'pygments-style-solarized==0.1.1',
+        'sh==1.12.14',
+        'Sphinx==1.7.2'
     ],
 
     entry_points={
