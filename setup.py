@@ -80,7 +80,7 @@ setup(
         'defusedxml==0.5.0',
         'codacy-coverage==1.3.11',
         'codecov==2.0.15',
-        'pytest==3.5.0',
+        'pytest==3.5.1',
         'pytest-cov==2.5.1',
         'h5py==2.7.1',
         'lxml==4.2.1',
@@ -89,11 +89,10 @@ setup(
         'numpy==1.14.2',
         'bottleneck==1.2.1',
         'pandas==0.22.0',
-        'pytest==3.5.0',
         'PyYAML==3.12',
         'pygments-style-solarized==0.1.1',
         'sh==1.12.14',
-        'Sphinx==1.7.2'
+        'Sphinx==1.7.4'
     ],
 
     entry_points={
