@@ -145,10 +145,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
     def generate_run(
             self,
-            scenario_run_config,
+            scenario_run_config: dict,
             initial_sorting: InitialSorting,
-            run_number,
-            vtype_list):
+            run_number: int,
+            vtype_list: list):
         '''generate run configurations
 
         :param scenario_run_config: run configuration of scenario
@@ -160,7 +160,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         self._log.debug(
             'Generating run %s for %s sorting', run_number, initial_sorting.name.lower()
         )
-        l_scenarioname = scenario_run_config.get('scenarioname')
+        l_scenarioname: str = scenario_run_config.get('scenarioname')
 
         l_destinationdir = self.runsdir / l_scenarioname
 
@@ -191,7 +191,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
 
         l_runcfgfiles = [l_tripfile, l_routefile, l_configfile]
 
-        if [fname for fname in l_runcfgfiles if not fname.exists()]:
+        if [i_fname for i_fname in l_runcfgfiles if not i_fname.exists()]:
             self._log.debug(
                 'Incomplete/non-existing SUMO run configuration for %s, %s, %d -> (re)building',
                 l_scenarioname, initial_sorting.name, run_number
@@ -251,8 +251,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
         self._log.debug('Generating node xml')
 
         # parameters
-        l_length = scenarioconfig.get('parameters').get('length')
-        l_nbswitches = scenarioconfig.get('parameters').get('switches')
+        l_length: float = scenarioconfig.get('parameters').get('length')
+        l_nbswitches: int = scenarioconfig.get('parameters').get('switches')
         l_segmentlength = l_length / (l_nbswitches + 1)
 
         if self._run_config.get('onlyoneotlsegment'):     # for only one 2+1 segment, the
@@ -313,9 +313,9 @@ class SumoConfig(colmto.common.configuration.Configuration):
         self._log.debug('Generating edge xml for %s', scenario_name)
 
         # parameters
-        l_length = scenario_config.get('parameters').get('length')
-        l_nbswitches = scenario_config.get('parameters').get('switches')
-        l_maxspeed = scenario_config.get('parameters').get('speedlimit')
+        l_length: float = scenario_config.get('parameters').get('length')
+        l_nbswitches: int = scenario_config.get('parameters').get('switches')
+        l_maxspeed: float = scenario_config.get('parameters').get('speedlimit')
 
         # assume even distributed otl segment lengths
         l_segmentlength = l_length / (l_nbswitches + 1)
@@ -398,10 +398,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         self._log.debug('generating switches')
 
-        l_length = scenario_config.get('parameters').get('length')
-        l_nbswitches = scenario_config.get('parameters').get('switches')
+        l_length: float = scenario_config.get('parameters').get('length')
+        l_nbswitches: int = scenario_config.get('parameters').get('switches')
         l_segmentlength = l_length / (l_nbswitches + 1)
-        l_parameters = scenario_config.get('parameters')
+        l_parameters: dict = scenario_config.get('parameters')
 
         if isinstance(l_parameters.get('switchpositions'), (list, tuple)):
             # add splits and joins
