@@ -163,7 +163,9 @@ class Runtime(object):
                     ]
                 )
 
-            # retrieve results, update vehicle objects, apply cse rules
+                # todo: provide vehicle object with traci reference to enable vehicle sided actions and (un)cooperative behaviour
+
+                # retrieve results, update vehicle objects, apply cse rules
             for i_vehicle_id, i_results in traci.vehicle.getSubscriptionResults().items():
 
                 # vehicle object corresponding to current vehicle fetched from traci
@@ -194,7 +196,7 @@ class Runtime(object):
                             i_vehicle_id,
                             (255, 0, 0, 255)
                         )
-                        traci.vehicle.changeLane(i_vehicle_id, 0, 1000)
+                        traci.vehicle.changeLane(i_vehicle_id, 0, 1) # todo: make vehicle do the actual lane change request.
                     else:
                         traci.vehicle.setColor(
                             i_vehicle_id,

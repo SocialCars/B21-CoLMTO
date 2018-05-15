@@ -272,7 +272,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # generate intermediate nodes
-        for i in range(int(l_length//20), int(l_length), int(l_length//20)):
+        for i in range(int(l_length/20), int(l_length/2)+1, int(l_length/20)):
             self._log.debug('intermediate node at %s', i)
             etree.SubElement(
                 l_nodes, 'node', attrib={'id': f'21_{i}', 'x': str(i), 'y': '0'}
@@ -345,7 +345,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         if self._run_config.get('onlyoneotlsegment'):
-            l_subnodes = ['21start'] + [f'21_{i}' for i in range(int(l_segmentlength//20), int(l_segmentlength), int(l_segmentlength//20))] + ['21end']
+            l_subnodes = ['21start'] + [f'21_{i}' for i in range(int(l_segmentlength/20), int(l_segmentlength/2)+1, int(l_segmentlength/20))] + ['21end']
             l_21edges = [
                 etree.SubElement(
                     l_edges,
@@ -388,7 +388,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 l_21edges[-1],
                 'split',
                 attrib={
-                    'pos': str(int(l_segmentlength//20)-1),
+                    'pos': str(int(l_segmentlength/2)-1),
                     'lanes': '0',
                     'speed': str(scenario_config.get('parameters').get('speedlimit'))
                 }
