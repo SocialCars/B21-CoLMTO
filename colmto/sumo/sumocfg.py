@@ -272,7 +272,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # generate intermediate nodes
-        for i in range(int(l_length//10), int(l_length), int(l_length//10)):
+        for i in range(int(l_length/20), int(l_length/2)+1, int(l_length/20)):
             self._log.debug('intermediate node at %s', i)
             etree.SubElement(
                 l_nodes, 'node', attrib={'id': f'21_{i}', 'x': str(i), 'y': '0'}
@@ -345,7 +345,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         if self._run_config.get('onlyoneotlsegment'):
-            l_subnodes = ['21start'] + [f'21_{i}' for i in range(int(l_segmentlength//10), int(l_segmentlength), int(l_segmentlength//10))] + ['21end']
+            l_subnodes = ['21start'] + [f'21_{i}' for i in range(int(l_segmentlength/20), int(l_segmentlength/2)+1, int(l_segmentlength/20))] + ['21end']
             l_21edges = [
                 etree.SubElement(
                     l_edges,
@@ -359,7 +359,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                         'speed': str(l_maxspeed)
                     }
                 ) for i in range(len(l_subnodes)-1)
-            ]
+            ] # type: typing.List[etree.Element]
             # deny access to lane 1 (OTL) to vehicle with vClass 'custom2'
             # <lane index='1' disallow='custom2'/>
             for i_edge in l_21edges:
@@ -371,26 +371,24 @@ class SumoConfig(colmto.common.configuration.Configuration):
                         'disallow': 'custom1'
                     }
                 )
-
             # Exit lane
-            l_exit = etree.SubElement(
+            etree.SubElement(
                 l_edges,
                 'edge',
                 attrib={
                     'id': '21end_exit',
                     'from': '21end',
                     'to': 'exit',
-                    'numLanes': '2',
-                    'spreadType': 'center',
+                    'numLanes': '1',
+                    'spreadType': 'left',
                     'speed': str(l_maxspeed)
                 }
             )
-
             etree.SubElement(
-                l_exit,
+                l_21edges[-1],
                 'split',
                 attrib={
-                    'pos': '1',
+                    'pos': str(int(l_segmentlength/2)-1),
                     'lanes': '0',
                     'speed': str(scenario_config.get('parameters').get('speedlimit'))
                 }
