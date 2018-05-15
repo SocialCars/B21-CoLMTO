@@ -194,6 +194,7 @@ class Runtime(object):
                             i_vehicle_id,
                             (255, 0, 0, 255)
                         )
+                        traci.vehicle.changeLane(i_vehicle_id, 0, 1000)
                     else:
                         traci.vehicle.setColor(
                             i_vehicle_id,
