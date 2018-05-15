@@ -270,6 +270,14 @@ class SumoConfig(colmto.common.configuration.Configuration):
         etree.SubElement(
             l_nodes, 'node', attrib={'id': '21start', 'x': '0', 'y': '0'}
         )
+
+        # generate intermediate nodes
+        for i in range(int(l_length//10), int(l_length), int(l_length//10)):
+            self._log.debug('intermediate node at %s', i)
+            etree.SubElement(
+                l_nodes, 'node', attrib={'id': f'21_{i}', 'x': str(i), 'y': '0'}
+            )
+
         etree.SubElement(
             l_nodes, 'node', attrib={'id': '21end', 'x': str(l_length), 'y': '0'}
         )
@@ -284,7 +292,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 'x': str(
                     l_length + 0.1
                     if l_nbswitches % 2 == 1 and not self._run_config.get('onlyoneotlsegment')
-                    else l_length
+                    else l_length + self.run_config.get('entrylanepercent')/100. * l_segmentlength
                 ),
                 'y': '0'
             }
@@ -300,7 +308,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         '''
         Generate SUMO's edge configuration file.
 
-        :param scenario_name: Name of scenario (required to id detector positions)
+        :param scenario_name: Name of scenario
         :param scenario_config: Scenario configuration
         :param edgefile: Destination to write edge file
         :param forcerebuildscenarios: Rebuild scenarios,
@@ -336,53 +344,99 @@ class SumoConfig(colmto.common.configuration.Configuration):
             }
         )
 
-        # 2+1 Roadway
-        l_21edge = etree.SubElement(
-            l_edges,
-            'edge',
-            attrib={
-                'id': '21segment',
-                'from': '21start',
-                'to': '21end',
-                'numLanes': '2',
-                'spreadType': 'center',
-                'speed': str(l_maxspeed)
-            }
-        )
+        if self._run_config.get('onlyoneotlsegment'):
+            l_subnodes = ['21start'] + [f'21_{i}' for i in range(int(l_segmentlength//10), int(l_segmentlength), int(l_segmentlength//10))] + ['21end']
+            l_21edges = [
+                etree.SubElement(
+                    l_edges,
+                    'edge',
+                    attrib={
+                        'id': f'{l_subnodes[i]}_{l_subnodes[i+1]}',
+                        'from': l_subnodes[i],
+                        'to': l_subnodes[i+1],
+                        'numLanes': '2',
+                        'spreadType': 'center',
+                        'speed': str(l_maxspeed)
+                    }
+                ) for i in range(len(l_subnodes)-1)
+            ]
+            # deny access to lane 1 (OTL) to vehicle with vClass 'custom2'
+            # <lane index='1' disallow='custom2'/>
+            for i_edge in l_21edges:
+                etree.SubElement(
+                    i_edge,
+                    'lane',
+                    attrib={
+                        'index': '1',
+                        'disallow': 'custom1'
+                    }
+                )
 
-        # deny access to lane 1 (OTL) to vehicle with vClass 'custom2'
-        # <lane index='1' disallow='custom2'/>
-        etree.SubElement(
-            l_21edge,
-            'lane',
-            attrib={
-                'index': '1',
-                'disallow': 'custom1'
-            }
-        )
+            # Exit lane
+            l_exit = etree.SubElement(
+                l_edges,
+                'edge',
+                attrib={
+                    'id': '21end_exit',
+                    'from': '21end',
+                    'to': 'exit',
+                    'numLanes': '2',
+                    'spreadType': 'center',
+                    'speed': str(l_maxspeed)
+                }
+            )
 
-        if self.scenario_config.get(
-                scenario_name
-        ).get('parameters').get('detectorpositions') is None:
-            self.scenario_config.get(
-                scenario_name
-            ).get('parameters')['detectorpositions'] = [0, l_segmentlength]
+            etree.SubElement(
+                l_exit,
+                'split',
+                attrib={
+                    'pos': '1',
+                    'lanes': '0',
+                    'speed': str(scenario_config.get('parameters').get('speedlimit'))
+                }
+            )
 
-        self._generate_switches(l_21edge, scenario_config)
+        else:
+            # 2+1 Roadway
+            l_21edge = etree.SubElement(
+                l_edges,
+                'edge',
+                attrib={
+                    'id': '21segment',
+                    'from': '21start',
+                    'to': '21end',
+                    'numLanes': '2',
+                    'spreadType': 'center',
+                    'speed': str(l_maxspeed)
+                }
+            )
 
-        # Exit lane
-        etree.SubElement(
-            l_edges,
-            'edge',
-            attrib={
-                'id': '21end_exit',
-                'from': '21end',
-                'to': 'exit',
-                'numLanes': '1',
-                'spreadType': 'right',
-                'speed': str(l_maxspeed)
-            }
-        )
+            # deny access to lane 1 (OTL) to vehicle with vClass 'custom2'
+            # <lane index='1' disallow='custom2'/>
+            etree.SubElement(
+                l_21edge,
+                'lane',
+                attrib={
+                    'index': '1',
+                    'disallow': 'custom1'
+                }
+            )
+
+            self._generate_switches(l_21edge, scenario_config)
+
+            # Exit lane
+            etree.SubElement(
+                l_edges,
+                'edge',
+                attrib={
+                    'id': '21end_exit',
+                    'from': '21end',
+                    'to': 'exit',
+                    'numLanes': '1',
+                    'spreadType': 'right',
+                    'speed': str(l_maxspeed)
+                }
+            )
 
         with open(edgefile, 'w') as f_edgexml:
             f_edgexml.write(

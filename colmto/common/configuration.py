@@ -110,7 +110,6 @@ _DEFAULT_CONFIG_SCENARIO = {
         },
         'parameters': {
             'aadt': 13000.0,
-            'detectorpositions': [0, 1360, 2720, 4080, 5440],
             'length': 6800.0,
             'speedlimit': 27.77777777777778,
             'switches': 4,
@@ -126,7 +125,6 @@ _DEFAULT_CONFIG_SCENARIO = {
         },
         'parameters': {
             'aadt': 13000.0,
-            'detectorpositions': [0, 1171, 2342, 3513, 4684, 5855, 7026, 8197],
             'length': 8200.0,
             'speedlimit': 27.77777777777778,
             'switches': 6,
@@ -142,7 +140,6 @@ _DEFAULT_CONFIG_SCENARIO = {
         },
         'parameters': {
             'aadt': 17000.0,
-            'detectorpositions': [0, 977, 1954, 2931, 3908, 4885, 5862, 6839, 7816, 8793],
             'length': 8800.0,
             'speedlimit': 27.77777777777778,
             'switches': 8,
@@ -158,7 +155,6 @@ _DEFAULT_CONFIG_SCENARIO = {
         },
         'parameters': {
             'aadt': 19000.0,
-            'detectorpositions': [0, 900, 1800, 2700, 3600],
             'length': 4500.0,
             'speedlimit': 27.77777777777778,
             'switches': 4,
@@ -174,7 +170,6 @@ _DEFAULT_CONFIG_SCENARIO = {
         },
         'parameters': {
             'aadt': 20000.0,
-            'detectorpositions': [0, 1375, 2750, 4125, 5500, 6875, 8250, 9625],
             'length': 11000.0,
             'speedlimit': 27.77777777777778,
             'switches': 7,
@@ -190,7 +185,6 @@ _DEFAULT_CONFIG_SCENARIO = {
         },
         'parameters': {
             'aadt': 16000.0,
-            'detectorpositions': [0, 1280, 2560, 3840, 5120],
             'length': 6400.0,
             'speedlimit': 27.77777777777778,
             'switches': 4,
