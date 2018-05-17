@@ -56,7 +56,7 @@ class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
         )
 
     @staticmethod
-    def map(name: str, max_value: float, value: float):
+    def map(name: str, max_value: int, value: int):
         '''
         Map value to a colour based on given colourmap and max_value for scaling
 
@@ -66,8 +66,7 @@ class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
         :return: Colour
 
         '''
-
-        return Colour(*plt.get_cmap(name=name, lut=max_value)(value))
+        return Colour(*plt.get_cmap(name=name, lut=int(max_value))(int(value)))
 
 
 class Position(namedtuple('Position', ('x', 'y'))):

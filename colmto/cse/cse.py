@@ -25,6 +25,8 @@
 '''CSE classes'''
 
 import typing
+if typing.TYPE_CHECKING:
+    import traci
 
 import colmto.common.log
 import colmto.cse.rule
@@ -60,36 +62,38 @@ class BaseCSE(object):
 
         return frozenset(self._rules)
 
-    def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]]) -> 'BaseCSE':
+    def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]], traci: 'traci'=None) -> 'BaseCSE':
         '''
         Apply rules to vehicles
 
         :param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
+        :param traci: Optional TraCI reference for controlling vehicle.
         :return: `BaseCSE` as future reference
 
         '''
 
         for i_vehicle in vehicles.values() if isinstance(vehicles, dict) else vehicles:
-            self.apply_one(i_vehicle)
+            self.apply_one(i_vehicle, traci)
 
         return self
 
-    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle) -> 'BaseCSE':
+    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle, traci: 'traci'=None) -> 'BaseCSE':
         '''
         Apply rules to one vehicle
 
         :param vehicle: Vehicle
+        :param traci: Optional TraCI reference for controlling vehicle.
         :return: `BaseCSE` as future reference
 
         '''
 
         for i_rule in self._rules:
             if i_rule.applies_to(vehicle):
-                vehicle.change_vehicle_class(colmto.cse.rule.SUMORule.disallowed_class_name())
+                vehicle.deny_otl_access(traci)
                 return self
 
         # default case: no applicable rule found
-        vehicle.change_vehicle_class(colmto.cse.rule.SUMORule.allowed_class_name())
+        vehicle.allow_otl_access(traci)
 
         return self
 

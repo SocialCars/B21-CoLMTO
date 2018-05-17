@@ -24,6 +24,10 @@
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
 from types import MappingProxyType
+import typing
+if typing.TYPE_CHECKING:
+    import traci
+
 from collections import OrderedDict
 import pandas
 
@@ -176,6 +180,22 @@ class SUMOVehicle(BaseVehicle):
         self._properties['grid_position'] = GridPosition(*position)
 
     @property
+    def sumo_id(self) -> str:
+        '''
+        Get assigned SUMO vehicle id
+        :return: vehicle id
+        '''
+        return self._properties.get('sumo_id')
+
+    @sumo_id.setter
+    def sumo_id(self, sumo_id: str):
+        '''
+        Set SUMO vehicle id
+        :param sumo_id: vehicle id
+        '''
+        self._properties['sumo_id'] = str(sumo_id)
+
+    @property
     def vehicle_type(self) -> VehicleType:
         '''
         :return: vehicle type
@@ -231,17 +251,25 @@ class SUMOVehicle(BaseVehicle):
     @property
     def colour(self) -> Colour:
         '''
+        Get current colour
         :return: colour
         '''
         return Colour(*self._properties.get('colour'))
 
-    @colour.setter
-    def colour(self, colour: Colour):
+    @property
+    def default_colour(self) -> Colour:
         '''
-        Update colour
+        :return: colour
+        '''
+        return Colour(*self._properties.get('default_colour'))
+
+    @default_colour.setter
+    def default_colour(self, colour: Colour):
+        '''
+        Set default colour
         :param colour: Color (rgba tuple, e.g. (255, 255, 0, 255))
         '''
-        self._properties['colour'] = Colour(*colour)
+        self._properties['default_colour'] = Colour(*colour)
 
     @property
     def vehicle_class(self) -> str:
@@ -313,16 +341,46 @@ class SUMOVehicle(BaseVehicle):
             keys=(i_metric.value for i_metric in StatisticSeries.GRID.metrics())
         ) if interpolate else l_grid_based_series
 
-    def change_vehicle_class(self, class_name: str) -> BaseVehicle:
+    def allow_otl_access(self, traci: 'traci'=None):
         '''
-        Change vehicle class
+        Signal the vehicle that overtaking lane (OTL) access has been allowed.
+        It is now the vehicle's responsibility to act cooperatively, i.e.
+        1. set own class to allow, 2. change colour back to default and 3. do a lane change to the right.
 
-        :param class_name: vehicle class
-        :return: future self
+        :note: This is the place where cooperative behaviour can be implemented. Vehicles acting uncooperative could simply not set their class accordingly.
 
+        :param traci: traci control reference
+        :return: self
         '''
 
-        self._properties['vClass'] = str(class_name)
+        self._properties['vClass'] = colmto.cse.rule.SUMORule.allowed_class_name()
+        self._properties['colour'] = self.default_colour
+        #Colour(0, 255, 0, 255)
+        if traci:
+            traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
+            traci.vehicle.setColor(self.sumo_id, self.colour)
+        return self
+
+    def deny_otl_access(self, traci: 'traci'=None):
+        '''
+        Signal the vehicle that overtaking lane (OTL) access has been denied.
+        It is now the vehicle's responsibility to act cooperatively, i.e.
+        1. set own class to deny, 2. change colour to red and 3. do a lane change to the right.
+
+        :note: This is the place where cooperative behaviour can be implemented. Vehicles acting uncooperative could simply not set their class accordingly.
+
+        :param traci: traci control reference
+        :return: self
+        '''
+
+        self._properties['vClass'] = colmto.cse.rule.SUMORule.disallowed_class_name()
+        self._properties['colour'] = Colour(255, 0, 0, 255)
+
+        if traci:
+            traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
+            traci.vehicle.setColor(self.sumo_id, self.colour)
+            # change to the right lane (0) and stay there for 1ms
+            traci.vehicle.changeLane(self.sumo_id, 0, 1)
         return self
 
     def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:

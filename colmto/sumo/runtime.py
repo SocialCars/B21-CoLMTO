@@ -139,18 +139,18 @@ class Runtime(object):
                     )
 
         # initial fetch of subscription results
-        l_results_simulation = traci.simulation.getSubscriptionResults()
+        l_simulation_results = traci.simulation.getSubscriptionResults()
 
         # main loop through traci driven simulation runs
-        while l_results_simulation.get(traci.constants.VAR_MIN_EXPECTED_VEHICLES) > 0:
+        while l_simulation_results.get(traci.constants.VAR_MIN_EXPECTED_VEHICLES) > 0:
 
             # set initial attribute start_time of newly entering vehicles
             # and subscribe to parameters
-            for i_vehicle_id in l_results_simulation.get(traci.constants.VAR_DEPARTED_VEHICLES_IDS):
+            for i_vehicle_id in l_simulation_results.get(traci.constants.VAR_DEPARTED_VEHICLES_IDS):
 
                 # set TraCI -> vehicle.start_time
                 run_config.get('vehicles').get(i_vehicle_id).start_time = \
-                    l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
+                    l_simulation_results.get(traci.constants.VAR_TIME_STEP)/10.**3
 
                 # subscribe to parameters
                 traci.vehicle.subscribe(
@@ -163,9 +163,7 @@ class Runtime(object):
                     ]
                 )
 
-                # todo: provide vehicle object with traci reference to enable vehicle sided actions and (un)cooperative behaviour
-
-                # retrieve results, update vehicle objects, apply cse rules
+            # retrieve results, update vehicle objects, apply cse rules
             for i_vehicle_id, i_results in traci.vehicle.getSubscriptionResults().items():
 
                 # vehicle object corresponding to current vehicle fetched from traci
@@ -180,33 +178,17 @@ class Runtime(object):
                         i_results.get(traci.constants.VAR_POSITION),
                         i_results.get(traci.constants.VAR_LANE_INDEX),
                         i_results.get(traci.constants.VAR_SPEED),
-                        l_results_simulation.get(traci.constants.VAR_TIME_STEP)/10.**3
-                    )
+                        l_simulation_results.get(traci.constants.VAR_TIME_STEP)/10.**3
+                    ),
+
+                    traci
 
                 )
-
-                # update vehicle class via traci if vclass changed due to applying CSE
-                if i_results.get(traci.constants.VAR_VEHICLECLASS) != l_vehicle.vehicle_class:
-                    traci.vehicle.setVehicleClass(
-                        i_vehicle_id,
-                        l_vehicle.vehicle_class
-                    )
-                    if l_vehicle.vehicle_class == colmto.cse.rule.SUMORule.disallowed_class_name():
-                        traci.vehicle.setColor(
-                            i_vehicle_id,
-                            (255, 0, 0, 255)
-                        )
-                        traci.vehicle.changeLane(i_vehicle_id, 0, 1) # todo: make vehicle do the actual lane change request.
-                    else:
-                        traci.vehicle.setColor(
-                            i_vehicle_id,
-                            tuple(l_vehicle.colour)
-                        )
 
             traci.simulationStep()
 
             # fetch new results for next simulation step/cycle
-            l_results_simulation = traci.simulation.getSubscriptionResults()
+            l_simulation_results = traci.simulation.getSubscriptionResults()
 
         traci.close()
 

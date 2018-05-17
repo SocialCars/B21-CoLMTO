@@ -611,12 +611,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
             colmto.environment.vehicle.SUMOVehicle(
                 vehicle_type=vtype,
                 vtype_sumo_cfg=self.vtypes_config.get(vtype),
-                speed_deviation=self._run_config.get(
-                    'vtypedistribution'
-                ).get(vtype).get('speedDev'),
-                sigma=self._run_config.get(
-                    'vtypedistribution'
-                ).get(vtype).get('sigma'),
+                speed_deviation=self._run_config.get('vtypedistribution').get(vtype).get('speedDev'),
+                sigma=self._run_config.get('vtypedistribution').get(vtype).get('sigma'),
                 speed_max=min(
                     self._prng.choice(
                         self._run_config.get('vtypedistribution').get(vtype).get('desiredSpeeds')
@@ -642,10 +638,10 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_vehicles = OrderedDict()
         for i, i_vehicle in enumerate(l_vehicle_list):
             # update colours depending on maximum speed of vehicles
-            i_vehicle.colour = Colour.map(
+            i_vehicle.default_colour = Colour.map(
                 'plasma',
-                self.scenario_config.get(scenario_name).get('parameters').get('speedlimit'),
-                i_vehicle.speed_max
+                int(self.scenario_config.get(scenario_name).get('parameters').get('speedlimit')),
+                int(i_vehicle.speed_max)
             ) * 255.
 
             # update start time
@@ -657,6 +653,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 else self._run_config.get('vehiclespersecond').get('value'),
                 l_vehicle_list[i - 1].start_time if i > 0 else 0
             )
+            i_vehicle.sumo_id = f'vehicle_{i:0>4}'
             l_vehicles[f'vehicle_{i:0>4}'] = i_vehicle
         return l_vehicles
 
