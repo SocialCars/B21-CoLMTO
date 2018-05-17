@@ -64,8 +64,8 @@ class TestRule(unittest.TestCase):
         with self.assertRaises(TypeError):
             colmto.cse.rule.SUMORule()  # pylint: disable=abstract-class-instantiated
 
-        self.assertEqual(colmto.cse.rule.SUMORule.to_disallowed_class(), 'custom1')
-        self.assertEqual(colmto.cse.rule.SUMORule.to_allowed_class(), 'custom2')
+        self.assertEqual(colmto.cse.rule.SUMORule.disallowed_class_name(), 'custom1')
+        self.assertEqual(colmto.cse.rule.SUMORule.allowed_class_name(), 'custom2')
 
 
     def test_sumo_null_rule(self):
@@ -85,8 +85,8 @@ class TestRule(unittest.TestCase):
             i_vehicle.change_vehicle_class(
                 random.choice(
                     [
-                        colmto.cse.rule.SUMORule.to_disallowed_class(),
-                        colmto.cse.rule.SUMORule.to_allowed_class()
+                        colmto.cse.rule.SUMORule.disallowed_class_name(),
+                        colmto.cse.rule.SUMORule.allowed_class_name()
                     ]
                 )
             )
@@ -403,12 +403,12 @@ class TestRule(unittest.TestCase):
                 if l_vehicles[i].speed_max < 60.0:
                     self.assertEqual(
                         i_results.vehicle_class,
-                        colmto.cse.rule.SUMORule.to_disallowed_class()
+                        colmto.cse.rule.SUMORule.disallowed_class_name()
                     )
                 else:
                     self.assertEqual(
                         i_results.vehicle_class,
-                        colmto.cse.rule.SUMORule.to_allowed_class()
+                        colmto.cse.rule.SUMORule.allowed_class_name()
                     )
 
     def test_extendable_speed_rule(self):
@@ -474,7 +474,7 @@ class TestRule(unittest.TestCase):
                     )
                     self.assertEqual(
                         i_results.vehicle_class,
-                        colmto.cse.rule.SUMORule.to_disallowed_class()
+                        colmto.cse.rule.SUMORule.disallowed_class_name()
                     )
                 else:
                     self.assertFalse(
@@ -482,7 +482,7 @@ class TestRule(unittest.TestCase):
                     )
                     self.assertEqual(
                         i_results.vehicle_class,
-                        colmto.cse.rule.SUMORule.to_allowed_class()
+                        colmto.cse.rule.SUMORule.allowed_class_name()
                     )
 
         self.assertTupleEqual(

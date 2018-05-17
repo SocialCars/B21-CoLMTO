@@ -100,12 +100,12 @@ class TestCSE(unittest.TestCase):
                     i_vehicle.speed_max >= 80.0:
                 self.assertEqual(
                     i_vehicle.vehicle_class,
-                    colmto.cse.rule.SUMORule.to_allowed_class()
+                    colmto.cse.rule.SUMORule.allowed_class_name()
                 )
             else:
                 self.assertEqual(
                     i_vehicle.vehicle_class,
-                    colmto.cse.rule.SUMORule.to_disallowed_class()
+                    colmto.cse.rule.SUMORule.disallowed_class_name()
                 )
 
         self.assertEqual(

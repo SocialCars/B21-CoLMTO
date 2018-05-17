@@ -129,7 +129,7 @@ class SUMOVehicle(BaseVehicle):
                 'sigma': sigma,
                 'maxSpeed': speed_max,
                 'vType': vehicle_type,
-                'vClass': colmto.cse.rule.SUMORule.to_allowed_class(),
+                'vClass': colmto.cse.rule.SUMORule.allowed_class_name(),
                 'grid_position': Position(x=0, y=0),
                 'time_step': 0.0,
                 'travel_time': 0.0,

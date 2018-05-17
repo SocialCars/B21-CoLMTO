@@ -191,7 +191,7 @@ class Runtime(object):
                         i_vehicle_id,
                         l_vehicle.vehicle_class
                     )
-                    if l_vehicle.vehicle_class == colmto.cse.rule.SUMORule.to_disallowed_class():
+                    if l_vehicle.vehicle_class == colmto.cse.rule.SUMORule.disallowed_class_name():
                         traci.vehicle.setColor(
                             i_vehicle_id,
                             (255, 0, 0, 255)

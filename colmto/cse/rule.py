@@ -130,13 +130,13 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
     '''
 
     @staticmethod
-    def to_allowed_class() -> str:
-        '''Get the SUMO class for allowed vehicles'''
+    def allowed_class_name() -> str:
+        '''Get the SUMO vehicle class name for allowed vehicles'''
         return Behaviour.ALLOW.vclass
 
     @staticmethod
-    def to_disallowed_class() -> str:
-        '''Get the SUMO class for disallowed vehicles'''
+    def disallowed_class_name() -> str:
+        '''Get the SUMO vehicle class name for disallowed vehicles'''
         return Behaviour.DENY.vclass
 
     @abstractmethod
@@ -158,7 +158,7 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         '''
 
         return (
-            i_vehicle.change_vehicle_class(self.to_disallowed_class())
+            i_vehicle.change_vehicle_class(self.disallowed_class_name())
             if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         )
