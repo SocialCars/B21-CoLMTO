@@ -128,6 +128,7 @@ class SUMOVehicle(BaseVehicle):
         self._properties.update(
             {
                 'colour': Colour(red=255, green=255, blue=0, alpha=255),
+                'normal_colour': Colour(red=255, green=255, blue=0, alpha=255),
                 'start_time': 0.0,
                 'speedDev': speed_deviation,
                 'sigma': sigma,
@@ -257,19 +258,19 @@ class SUMOVehicle(BaseVehicle):
         return Colour(*self._properties.get('colour'))
 
     @property
-    def default_colour(self) -> Colour:
+    def normal_colour(self) -> Colour:
         '''
         :return: colour
         '''
-        return Colour(*self._properties.get('default_colour'))
+        return Colour(*self._properties.get('normal_colour'))
 
-    @default_colour.setter
-    def default_colour(self, colour: Colour):
+    @normal_colour.setter
+    def normal_colour(self, colour: Colour):
         '''
-        Set default colour
+        Set normal colour a vehicle should have if not in 'denied access state'
         :param colour: Color (rgba tuple, e.g. (255, 255, 0, 255))
         '''
-        self._properties['default_colour'] = Colour(*colour)
+        self._properties['normal_colour'] = Colour(*colour)
 
     @property
     def vehicle_class(self) -> str:
@@ -354,14 +355,14 @@ class SUMOVehicle(BaseVehicle):
         '''
 
         self._properties['vClass'] = colmto.cse.rule.SUMORule.allowed_class_name()
-        self._properties['colour'] = self.default_colour
+        self._properties['colour'] = self.normal_colour
         #Colour(0, 255, 0, 255)
         if traci:
             traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
             traci.vehicle.setColor(self.sumo_id, self.colour)
         return self
 
-    def deny_otl_access(self, traci: 'traci'=None):
+    def deny_otl_access(self, traci: 'traci'=None) -> BaseVehicle:
         '''
         Signal the vehicle that overtaking lane (OTL) access has been denied.
         It is now the vehicle's responsibility to act cooperatively, i.e.

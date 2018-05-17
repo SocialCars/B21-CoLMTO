@@ -158,7 +158,7 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         '''
 
         return (
-            i_vehicle.change_vehicle_class(self.disallowed_class_name())
+            i_vehicle.deny_otl_access()
             if self.applies_to(i_vehicle) else i_vehicle
             for i_vehicle in vehicles
         )

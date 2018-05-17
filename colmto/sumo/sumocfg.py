@@ -638,7 +638,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         l_vehicles = OrderedDict()
         for i, i_vehicle in enumerate(l_vehicle_list):
             # update colours depending on maximum speed of vehicles
-            i_vehicle.default_colour = Colour.map(
+            i_vehicle.normal_colour = Colour.map(
                 'plasma',
                 int(self.scenario_config.get(scenario_name).get('parameters').get('speedlimit')),
                 int(i_vehicle.speed_max)

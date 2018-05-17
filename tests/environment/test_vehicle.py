@@ -87,13 +87,13 @@ class TestVehicle(unittest.TestCase):
             }
         )
         l_sumovehicle.position = numpy.array([42.0, 0])
-        l_sumovehicle.colour = (128, 64, 255, 255)
+        l_sumovehicle.normal_colour = (128, 64, 255, 255)
         l_sumovehicle.start_time = 13
 
         self.assertEqual(l_sumovehicle.speed_max, 27.777)
         self.assertEqual(l_sumovehicle.position, (42.0, 0))
         self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
-        self.assertEqual(l_sumovehicle.colour, (128, 64, 255, 255))
+        self.assertEqual(l_sumovehicle.normal_colour, (128, 64, 255, 255))
         self.assertEqual(l_sumovehicle.start_time, 13)
         self.assertEqual(l_sumovehicle._grid_position, (0, 0))  # pylint: disable=protected-access
 

@@ -82,14 +82,10 @@ class TestRule(unittest.TestCase):
         ]
 
         for i_vehicle in l_vehicles:
-            i_vehicle.change_vehicle_class(
-                random.choice(
-                    [
-                        colmto.cse.rule.SUMORule.disallowed_class_name(),
-                        colmto.cse.rule.SUMORule.allowed_class_name()
-                    ]
-                )
-            )
+            if random.random() < 0.5:
+                i_vehicle.allow_otl_access()
+            else:
+                i_vehicle.deny_otl_access()
 
         l_results = l_sumo_rule.apply(l_vehicles)
 
