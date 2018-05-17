@@ -6,10 +6,10 @@ pytest-cov==2.5.1
 h5py==2.7.1
 lxml==4.2.1
 matplotlib==2.2.2
-numexpr==2.6.4
-numpy==1.14.2
+numexpr==2.6.5
+numpy==1.14.3
 bottleneck==1.2.1
-pandas==0.22.0
+pandas==0.23.0
 PyYAML==3.12
 pygments-style-solarized==0.1.1
 sh==1.12.14
