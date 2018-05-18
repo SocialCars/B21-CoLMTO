@@ -166,6 +166,21 @@ class SUMOVehicle(BaseVehicle):
         self._properties['position'] = Position(*position)
 
     @property
+    def _lane(self) -> int:
+        '''
+        :return: current lane index
+        '''
+        return int(self._properties.get('lane_index'))
+
+    @_lane.setter
+    def _lane(self, lane_index: int):
+        '''
+        Updates current lane index
+        :param lane_index: current lane index
+        '''
+        self._properties['lane_index'] = int(lane_index)
+
+    @property
     def _grid_position(self) -> GridPosition:
         '''
         :return: current grid position
@@ -380,8 +395,9 @@ class SUMOVehicle(BaseVehicle):
         if traci:
             traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
             traci.vehicle.setColor(self.sumo_id, self.colour)
-            # change to the right lane (0) and stay there for 1ms
-            traci.vehicle.changeLane(self.sumo_id, 0, 1)
+            # change to the right lane (0) and stay there for 1ms if we are not on the right lane
+            if self._lane != 0:
+                traci.vehicle.changeLane(self.sumo_id, 0, 1)
         return self
 
     def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:
@@ -407,6 +423,7 @@ class SUMOVehicle(BaseVehicle):
         self._speed = float(speed)
         self._time_step = float(time_step)
         self._travel_time = float(time_step) - self.start_time
+        self._lane = int(lane_index)
 
         # update data series based on grid cell
         self._properties['dissatisfaction'] = colmto.common.model.dissatisfaction(
@@ -422,6 +439,6 @@ class SUMOVehicle(BaseVehicle):
         self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, self._grid_position.x)] = self._travel_time
         self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] = time_step - self.start_time - self._position.x / self.speed_max
         self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
-        self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[(Metric.LANE_INDEX.value, self._grid_position.x)] = lane_index
+        self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[(Metric.LANE_INDEX.value, self._grid_position.x)] = self._lane
 
         return self
