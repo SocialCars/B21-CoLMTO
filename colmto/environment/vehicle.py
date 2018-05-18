@@ -33,6 +33,7 @@ import pandas
 
 import colmto.cse.rule
 import colmto.common.model
+import colmto.common.log
 from colmto.common.helper import Position, VehicleType, StatisticSeries
 from colmto.common.helper import GridPosition
 from colmto.common.helper import Colour
@@ -44,7 +45,7 @@ class BaseVehicle(object):
 
     def __init__(self):
         '''Initialisation'''
-
+        self._log = colmto.common.log.logger(f'{__name__} ({hex(id(self))})', loglevel='debug')
         self._properties = {
             'position': Position(x=0.0, y=0.0),
             'speed': 0.0,
@@ -388,16 +389,14 @@ class SUMOVehicle(BaseVehicle):
         :param traci: traci control reference
         :return: self
         '''
-
         self._properties['vClass'] = colmto.cse.rule.SUMORule.disallowed_class_name()
         self._properties['colour'] = Colour(255, 0, 0, 255)
 
         if traci:
-            traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
+            # traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
             traci.vehicle.setColor(self.sumo_id, self.colour)
-            # change to the right lane (0) and stay there for 1ms if we are not on the right lane
-            if self._lane != 0:
-                traci.vehicle.changeLane(self.sumo_id, 0, 1)
+            # as i'm cooperative, always keep to the right lane!
+            traci.vehicle.changeLane(self.sumo_id, 0, 1)
         return self
 
     def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:

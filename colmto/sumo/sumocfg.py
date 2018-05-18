@@ -655,6 +655,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
             )
             i_vehicle.sumo_id = f'vehicle_{i:0>4}'
             l_vehicles[f'vehicle_{i:0>4}'] = i_vehicle
+
         return l_vehicles
 
     def aadt(self, scenario_runs):
