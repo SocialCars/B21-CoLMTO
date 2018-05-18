@@ -298,6 +298,7 @@ class StatisticSeries(enum.Enum):
                 Metric.RELATIVE_TIME_LOSS,
                 Metric.LANE_INDEX)
 
+# todo: remove custom1/custom2 and lane deny xml code in sumocfg, cleanup code. mark vehicles as 'disallowed' externally from CSE but let vehicle decide on behaviour. add new colour for uncooperative behaviour.
 
 @enum.unique
 class Behaviour(enum.Enum):
