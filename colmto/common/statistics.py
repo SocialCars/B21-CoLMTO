@@ -50,6 +50,7 @@ class Statistics(object):
     def merge_vehicle_series(self, run: int, vehicles: typing.Dict[str, SUMOVehicle]) -> typing.Dict[str, dict]:
         '''
         merge vehicle data series into a dictionary structure suitable for writing to hdf5
+
         :param run: current run number
         :param vehicles: named dictionary of vehicles
         :return: dictionary of metrics for current run
@@ -105,6 +106,7 @@ class Statistics(object):
     def global_stats(self, merged_series: typing.Dict[str, dict]):
         '''
         Inplace ddd global statistics, i.e. unfairness and inefficiency for each series element.
+
         :param merged_series: data aquired by calling `merge_vehicle_series`
         :return: inplace updated `merged series data`
         '''

@@ -50,6 +50,7 @@ class BaseRule(metaclass=ABCMeta):
     def __init__(self, **kwargs):
         '''
         Initialisation
+
         :param kwargs: configuration args
         '''
         pass
@@ -555,6 +556,7 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
     def __init__(self, dissatisfaction_range=DissatisfactionRange(0.0, 0.5), outside=False):
         '''
         Initialisation
+
         :param dissatisfaction_range: vehicle have to be in- or outside for this rule to apply
         :param outside: controls whether this rules applies to vehicles inside (default) or outside of range
 

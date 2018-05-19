@@ -283,7 +283,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         # dummy node for easier from-to routing
-        # add 5% of segment length as exit lane
+        # add ```entrylanepercent``` of segment length as exit lane
         etree.SubElement(
             l_nodes,
             'node',

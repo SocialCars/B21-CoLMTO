@@ -69,6 +69,7 @@ class BaseVehicle(object):
     def _speed(self, speed: float):
         '''
         Set vehicle speed
+
         :param speed: current position
         '''
         self._properties['speed'] = float(speed)
@@ -84,6 +85,7 @@ class BaseVehicle(object):
     def position(self, position: Position):
         '''
         Set vehicle position
+
         :param position: current position
         '''
         self._properties['position'] = Position(*position)
@@ -162,6 +164,7 @@ class SUMOVehicle(BaseVehicle):
     def _position(self, position: Position):
         '''
         Updates current position
+
         :param position: current position
         '''
         self._properties['position'] = Position(*position)
@@ -177,6 +180,7 @@ class SUMOVehicle(BaseVehicle):
     def _lane(self, lane_index: int):
         '''
         Updates current lane index
+
         :param lane_index: current lane index
         '''
         self._properties['lane_index'] = int(lane_index)
@@ -192,6 +196,7 @@ class SUMOVehicle(BaseVehicle):
     def _grid_position(self, position: GridPosition):
         '''
         Updates current position
+
         :param position: current grid position
         '''
         self._properties['grid_position'] = GridPosition(*position)
@@ -208,6 +213,7 @@ class SUMOVehicle(BaseVehicle):
     def sumo_id(self, sumo_id: str):
         '''
         Set SUMO vehicle id
+
         :param sumo_id: vehicle id
         '''
         self._properties['sumo_id'] = str(sumo_id)
@@ -245,6 +251,7 @@ class SUMOVehicle(BaseVehicle):
     def _travel_time(self, travel_time: float):
         '''
         Updates current travel time
+
         :param travel_time: current travel time
         '''
         self._properties['travel_time'] = float(travel_time)
@@ -261,6 +268,7 @@ class SUMOVehicle(BaseVehicle):
     def _time_step(self, time_step: float):
         '''
         Updates current time step
+
         :param time_step: time step
         '''
         self._properties['time_step'] = float(time_step)
@@ -269,6 +277,7 @@ class SUMOVehicle(BaseVehicle):
     def colour(self) -> Colour:
         '''
         Get current colour
+
         :return: colour
         '''
         return Colour(*self._properties.get('colour'))
@@ -284,6 +293,7 @@ class SUMOVehicle(BaseVehicle):
     def normal_colour(self, colour: Colour):
         '''
         Set normal colour a vehicle should have if not in 'denied access state'
+
         :param colour: Color (rgba tuple, e.g. (255, 255, 0, 255))
         '''
         self._properties['normal_colour'] = Colour(*colour)
@@ -306,6 +316,7 @@ class SUMOVehicle(BaseVehicle):
     def dissatisfaction(self) -> float:
         '''
         Current dissatisfaction (updated via update() function)
+
         :return: Dissatisfaction, float of range [0, 1]
 
         '''

@@ -201,6 +201,7 @@ class Writer(object):
             Expand dictionary.
 
             yields (key, value) pairs of sub-dictionaries
+
             :return: (key, value) pairs
             '''
             for i_k, i_v in dictionary.items():
