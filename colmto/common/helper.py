@@ -272,6 +272,7 @@ class StatisticSeries(enum.Enum):
     def from_vehicle(vehicle: 'SUMOVehicle', interpolate=False) -> pandas.Series:
         '''
         return statistic series from given vehicle
+
         :param vehicle: Vehicle
         :param interpolate: interpolate values (True|False)
         :return: pandas.Series
@@ -284,6 +285,7 @@ class StatisticSeries(enum.Enum):
     def metrics():
         '''
         Returns a tuple of metrics for grid-based series
+
         :param seriestype: defines for which type of series the metrics shall be returned
         :return: tuple of metrics
 
@@ -312,7 +314,11 @@ class Behaviour(enum.Enum):
 
     @property
     def vclass(self) -> str:
-        '''returns vehicle class string'''
+        '''
+        returns vehicle class string
+
+        :return: vehicle class
+        '''
         return self.value
 
     @staticmethod
@@ -352,7 +358,6 @@ class RuleOperator(enum.Enum):
 
         :param args: iterable
         :return: True|False depending on RuleOperator
-
         '''
 
         return self.value(args)  # pylint: disable=too-many-function-args
