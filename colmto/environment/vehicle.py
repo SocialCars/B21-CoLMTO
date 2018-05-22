@@ -34,7 +34,10 @@ import pandas
 import colmto.cse.rule
 import colmto.common.model
 import colmto.common.log
-from colmto.common.helper import Position, VehicleType, StatisticSeries
+from colmto.common.helper import Position
+from colmto.common.helper import VehicleType
+from colmto.common.helper import VehicleDisposition
+from colmto.common.helper import StatisticSeries
 from colmto.common.helper import GridPosition
 from colmto.common.helper import Colour
 from colmto.common.helper import Metric
@@ -48,7 +51,7 @@ class BaseVehicle(object):
         self._log = colmto.common.log.logger(f'{__name__} ({hex(id(self))})', loglevel='debug')
         self._properties = {
             'position': Position(x=0.0, y=0.0),
-            'speed': 0.0,
+            'speed': 0.0
         }
 
     @property
@@ -141,7 +144,8 @@ class SUMOVehicle(BaseVehicle):
                 'grid_position': Position(x=0, y=0),
                 'time_step': 0.0,
                 'travel_time': 0.0,
-                'dissatisfaction': 0.0
+                'dissatisfaction': 0.0,
+                'disposition': VehicleDisposition.COOPERATIVE
             }
         )
 
@@ -225,6 +229,15 @@ class SUMOVehicle(BaseVehicle):
         '''
         return VehicleType[str(self._properties.get('vType')).upper()] \
             if self._properties.get('vType') else VehicleType.UNDEFINED
+
+    @property
+    def disposition(self) -> VehicleDisposition:
+        '''
+        Vehicle dispostion, i.e. cooperative or uncooperative
+
+        :return: VehicleDisposition
+        '''
+        return self._properties['disposition']
 
     @property
     def start_time(self) -> float:
@@ -395,19 +408,26 @@ class SUMOVehicle(BaseVehicle):
         It is now the vehicle's responsibility to act cooperatively, i.e.
         1. set own class to deny, 2. change colour to red and 3. do a lane change to the right.
 
-        :note: This is the place where cooperative behaviour can be implemented. Vehicles acting uncooperative could simply not set their class accordingly.
+        :note: This is the place where cooperative behaviour is implemented. Vehicles acting uncooperative won't behave according to rules.
 
         :param traci: traci control reference
         :return: self
         '''
-        self._properties['vClass'] = colmto.cse.rule.SUMORule.disallowed_class_name()
-        self._properties['colour'] = Colour(255, 0, 0, 255)
 
-        if traci:
-            # traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
-            traci.vehicle.setColor(self.sumo_id, self.colour)
-            # as i'm cooperative, always keep to the right lane!
-            traci.vehicle.changeLane(self.sumo_id, 0, 1)
+        if self.disposition == VehicleDisposition.COOPERATIVE:
+            self._properties['vClass'] = colmto.cse.rule.SUMORule.disallowed_class_name()
+            self._properties['colour'] = Colour(255, 0, 0, 255)
+            if traci:
+                # traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
+                traci.vehicle.setColor(self.sumo_id, self.colour)
+                # as i'm cooperative, always keep to the right lane!
+                traci.vehicle.changeLane(self.sumo_id, 0, 1)
+        else:
+            self._properties['vClass'] = colmto.cse.rule.SUMORule.allowed_class_name()
+            self._properties['colour'] = Colour(127, 127, 127, 255)
+            if traci:
+                # traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
+                traci.vehicle.setColor(self.sumo_id, self.colour)
         return self
 
     def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:

@@ -377,3 +377,14 @@ class RuleOperator(enum.Enum):
             return RuleOperator[rule_operator.upper()]
         except KeyError:
             raise KeyError(f'provided rule operator string \"{rule_operator}\" is not valid! Available strings are \"{RuleOperator.ALL.name}\", \"{RuleOperator.ANY.name}')
+
+
+@enum.unique
+class VehicleDisposition(enum.Enum):
+    '''
+    Vehicle agent's disposition
+    Describes whether a vehicle agent is cooperative or uncoorperative
+    '''
+
+    COOPERATIVE = 'cooperative'
+    UNCOOPERATIVE = 'uncooperative'
