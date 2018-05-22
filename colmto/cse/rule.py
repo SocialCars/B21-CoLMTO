@@ -149,21 +149,6 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         '''
         pass
 
-    def apply(self, vehicles: typing.Iterable['SUMOVehicle']) -> typing.Generator['SUMOVehicle', typing.Any, None]:
-        '''
-        Apply rule to vehicles.
-
-        :param vehicles: iterable object containing BaseVehicles, or inherited objects
-        :return: List of vehicles with applied, i.e. set attributes, whether they can use otl or not
-
-        '''
-
-        return (
-            i_vehicle.deny_otl_access()
-            if self.applies_to(i_vehicle) else i_vehicle
-            for i_vehicle in vehicles
-        )
-
 
 class ExtendableRule(BaseRule, metaclass=ABCMeta):
     '''

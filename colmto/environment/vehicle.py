@@ -322,7 +322,7 @@ class SUMOVehicle(BaseVehicle):
     @vehicle_class.setter
     def vehicle_class(self, vehicle_class: str):
         '''
-        :return: SUMO vehicle class
+        Set UMO vehicle class
         '''
         self._properties['vClass'] = str(vehicle_class)
 

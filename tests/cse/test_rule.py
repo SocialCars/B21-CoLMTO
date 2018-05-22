@@ -28,6 +28,7 @@ import random
 import typing   # pylint: disable=unused-import
 import unittest
 
+import colmto.cse.cse
 import colmto.cse.rule
 import colmto.environment.vehicle
 import colmto.common.helper
@@ -87,9 +88,9 @@ class TestRule(unittest.TestCase):
             else:
                 i_vehicle.deny_otl_access()
 
-        l_results = l_sumo_rule.apply(l_vehicles)
+        colmto.cse.cse.SumoCSE().add_rule(l_sumo_rule).apply(l_vehicles)
 
-        for i, i_result in enumerate(l_results):
+        for i, i_result in enumerate(l_vehicles):
             with self.subTest(pattern=(i, i_result.vehicle_class)):
                 self.assertEqual(l_vehicles[i].vehicle_class, i_result.vehicle_class)
                 self.assertFalse(l_sumo_rule.applies_to(l_vehicles[i]))
@@ -125,52 +126,23 @@ class TestRule(unittest.TestCase):
                 )
             )
         )
-
+        l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200,'gridcellwidth': 4},
+            vehicle_type='passenger'
+        )
+        colmto.cse.cse.SumoCSE().add_rule(colmto.cse.rule.SUMOVTypeRule(vehicle_type='passenger')).apply((l_vehicle,))
         self.assertEqual(
-            next(
-                colmto.cse.rule.SUMOVTypeRule(
-                    vehicle_type='passenger'
-                ).apply(
-                    (
-                        colmto.environment.vehicle.SUMOVehicle(
-                            environment={'gridlength': 200, 'gridcellwidth': 4},
-                            vehicle_type='passenger'
-                        ),
-                    )
-                )
-            ).vehicle_class,
+            l_vehicle.vehicle_class,
             colmto.common.helper.Behaviour.DENY.value
         )
 
-        self.assertEqual(
-            next(
-                colmto.cse.rule.SUMOVTypeRule(
-                    vehicle_type='passenger'
-                ).apply(
-                    (
-                        colmto.environment.vehicle.SUMOVehicle(
-                            environment={'gridlength': 200, 'gridcellwidth': 4},
-                            vehicle_type='passenger'
-                        ),
-                    )
-                )
-            ).vehicle_class,
-            colmto.common.helper.Behaviour.DENY.value
+        l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+            environment={'gridlength': 200,'gridcellwidth': 4},
+            vehicle_type='passenger'
         )
-
+        colmto.cse.cse.SumoCSE().add_rule(colmto.cse.rule.SUMOVTypeRule(vehicle_type='truck')).apply((l_vehicle,))
         self.assertEqual(
-            next(
-                colmto.cse.rule.SUMOVTypeRule(
-                    vehicle_type='truck'
-                ).apply(
-                    (
-                        colmto.environment.vehicle.SUMOVehicle(
-                            environment={'gridlength': 200, 'gridcellwidth': 4},
-                            vehicle_type='passenger'
-                        ),
-                    )
-                )
-            ).vehicle_class,
+            l_vehicle.vehicle_class,
             colmto.common.helper.Behaviour.ALLOW.value
         )
 
@@ -360,22 +332,13 @@ class TestRule(unittest.TestCase):
 
 
     def test_sumo_universal_rule(self):
-        '''Test SUMOUniversalRule class'''
-
-        self.assertTrue(
-            colmto.cse.rule.SUMOUniversalRule().applies_to(
-                colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4})
-            )
-        )
-
-        self.assertEqual(
-            next(
-                colmto.cse.rule.SUMOUniversalRule().apply(
-                    (colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4}),)
-                )
-            ).vehicle_class,
-            'custom1'
-        )
+        '''
+        Test SUMOUniversalRule class
+        '''
+        l_vehicle = colmto.environment.vehicle.SUMOVehicle(environment={'gridlength': 200, 'gridcellwidth': 4})
+        self.assertTrue(colmto.cse.rule.SUMOUniversalRule().applies_to(l_vehicle))
+        colmto.cse.cse.SumoCSE().add_rule(colmto.cse.rule.SUMOUniversalRule()).apply((l_vehicle,))
+        self.assertEqual(l_vehicle.vehicle_class, 'custom1')
 
 
     def test_sumo_speed_rule(self):
@@ -392,9 +355,9 @@ class TestRule(unittest.TestCase):
             ) for _ in range(1000)
         ]
 
-        l_results = l_sumo_rule.apply(l_vehicles)
+        colmto.cse.cse.SumoCSE().add_rule(l_sumo_rule).apply(l_vehicles)
 
-        for i, i_results in enumerate(l_results):
+        for i, i_results in enumerate(l_vehicles):
             with self.subTest(pattern=(i, i_results)):
                 if l_vehicles[i].speed_max < 60.0:
                     self.assertEqual(
@@ -460,9 +423,9 @@ class TestRule(unittest.TestCase):
         for i_vehicle in l_vehicles:
             i_vehicle.position = (random.randrange(0, 200), 0.)
 
-        l_results = l_sumo_rule.apply(l_vehicles)  # type: typing.List[colmto.environment.vehicle.SUMOVehicle]
+        colmto.cse.cse.SumoCSE().add_rule(l_sumo_rule).apply(l_vehicles)
 
-        for i, i_results in enumerate(l_results):
+        for i, i_results in enumerate(l_vehicles):
             with self.subTest(pattern=(i, i_results.position)):
                 if 0. <= l_vehicles[i].position[0] <= 100.0:
                     self.assertTrue(
