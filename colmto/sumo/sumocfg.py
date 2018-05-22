@@ -360,17 +360,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                     }
                 ) for i in range(len(l_subnodes)-1)
             ] # type: typing.List[etree.Element]
-            # deny access to lane 1 (OTL) to vehicle with vClass 'custom2'
-            # <lane index='1' disallow='custom2'/>
-            for i_edge in l_21edges:
-                etree.SubElement(
-                    i_edge,
-                    'lane',
-                    attrib={
-                        'index': '1',
-                        'disallow': 'custom1'
-                    }
-                )
+
             # Exit lane
             etree.SubElement(
                 l_edges,
@@ -406,17 +396,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
                     'numLanes': '2',
                     'spreadType': 'center',
                     'speed': str(l_maxspeed)
-                }
-            )
-
-            # deny access to lane 1 (OTL) to vehicle with vClass 'custom2'
-            # <lane index='1' disallow='custom2'/>
-            etree.SubElement(
-                l_21edge,
-                'lane',
-                attrib={
-                    'index': '1',
-                    'disallow': 'custom1'
                 }
             )
 

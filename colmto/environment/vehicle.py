@@ -385,10 +385,10 @@ class SUMOVehicle(BaseVehicle):
     def allow_otl_access(self, traci: 'traci'=None):
         '''
         Signal the vehicle that overtaking lane (OTL) access has been allowed.
-        It is now the vehicle's responsibility to act cooperatively, i.e.
-        1. set own class to allow, 2. change colour back to default and 3. do a lane change to the right.
+        It is now the vehicle's responsibility to act cooperatively, e.g.
+        1. set own class to allow, 2. change colour back to default.
 
-        :note: This is the place where cooperative behaviour can be implemented. Vehicles acting uncooperative could simply not set their class accordingly.
+        :note: This is the place where cooperative behaviour can be implemented.
 
         :param traci: traci control reference
         :return: self
@@ -396,7 +396,6 @@ class SUMOVehicle(BaseVehicle):
 
         self._properties['vClass'] = colmto.cse.rule.SUMORule.allowed_class_name()
         self._properties['colour'] = self.normal_colour
-        #Colour(0, 255, 0, 255)
         if traci:
             traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
             traci.vehicle.setColor(self.sumo_id, self.colour)
@@ -418,7 +417,7 @@ class SUMOVehicle(BaseVehicle):
             self._properties['vClass'] = colmto.cse.rule.SUMORule.disallowed_class_name()
             self._properties['colour'] = Colour(255, 0, 0, 255)
             if traci:
-                # traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
+                traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
                 traci.vehicle.setColor(self.sumo_id, self.colour)
                 # as i'm cooperative, always keep to the right lane!
                 traci.vehicle.changeLane(self.sumo_id, 0, 1)
@@ -426,7 +425,7 @@ class SUMOVehicle(BaseVehicle):
             self._properties['vClass'] = colmto.cse.rule.SUMORule.allowed_class_name()
             self._properties['colour'] = Colour(127, 127, 127, 255)
             if traci:
-                # traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
+                traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
                 traci.vehicle.setColor(self.sumo_id, self.colour)
         return self
 
