@@ -345,22 +345,18 @@ class SumoConfig(colmto.common.configuration.Configuration):
         )
 
         if self._run_config.get('onlyoneotlsegment'):
-            l_subnodes = ['21start'] + [f'21_{i}' for i in range(int(l_segmentlength/20), int(l_segmentlength/2)+1, int(l_segmentlength/20))] + ['21end']
-            l_21edges = [
-                etree.SubElement(
-                    l_edges,
-                    'edge',
-                    attrib={
-                        'id': f'{l_subnodes[i]}_{l_subnodes[i+1]}',
-                        'from': l_subnodes[i],
-                        'to': l_subnodes[i+1],
-                        'numLanes': '2',
-                        'spreadType': 'center',
-                        'speed': str(l_maxspeed)
-                    }
-                ) for i in range(len(l_subnodes)-1)
-            ] # type: typing.List[etree.Element]
-
+            l_21edge = etree.SubElement(
+                l_edges,
+                'edge',
+                attrib={
+                    'id': '21edge',
+                    'from': '21start',
+                    'to': '21end',
+                    'numLanes': '2',
+                    'spreadType': 'center',
+                    'speed': str(l_maxspeed)
+                }
+            )
             # Exit lane
             etree.SubElement(
                 l_edges,
@@ -370,15 +366,15 @@ class SumoConfig(colmto.common.configuration.Configuration):
                     'from': '21end',
                     'to': 'exit',
                     'numLanes': '1',
-                    'spreadType': 'left',
+                    'spreadType': 'right',
                     'speed': str(l_maxspeed)
                 }
             )
             etree.SubElement(
-                l_21edges[-1],
+                l_21edge,
                 'split',
                 attrib={
-                    'pos': str(int(l_segmentlength/2)-1),
+                    'pos': str(int(l_segmentlength)-1),
                     'lanes': '0',
                     'speed': str(scenario_config.get('parameters').get('speedlimit'))
                 }
