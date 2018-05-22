@@ -427,7 +427,7 @@ class SUMOVehicle(BaseVehicle):
                 # as I'm cooperative, always keep to the right lane
                 traci.vehicle.changeLane(self.sumo_id, 0, 1)
         else:
-            # how that I'm uncooperative by painting myself gray
+            # show that I'm uncooperative by painting myself gray
             self._properties['colour'] = Colour(127, 127, 127, 255)
             if traci:
                 traci.vehicle.setColor(self.sumo_id, self.colour)
