@@ -300,7 +300,6 @@ class StatisticSeries(enum.Enum):
                 Metric.RELATIVE_TIME_LOSS,
                 Metric.LANE_INDEX)
 
-# todo: mark vehicles as 'disallowed' externally from CSE but let vehicle decide on behaviour.
 
 @enum.unique
 class Behaviour(enum.Enum):
@@ -388,3 +387,17 @@ class VehicleDisposition(enum.Enum):
 
     COOPERATIVE = 'cooperative'
     UNCOOPERATIVE = 'uncooperative'
+    _prng = numpy.random.RandomState()  # pylint: disable=no-member
+
+    @staticmethod
+    def choose(distribution: typing.Tuple[float, float]) -> 'VehicleDisposition':
+        '''
+        Pick a random disposition by given distribution (default 50/50)
+
+        :param distribution: Iterable containing two floats
+        :return: VehicleDisposition.COOPERATIVE | VehicleDisposition.UNCOOPERATIVE
+        '''
+
+        return VehicleDisposition._prng.value.choice(
+            (VehicleDisposition.COOPERATIVE, VehicleDisposition.UNCOOPERATIVE), p=distribution
+        )

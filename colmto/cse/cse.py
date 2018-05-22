@@ -90,9 +90,15 @@ class BaseCSE(object):
         for i_rule in self._rules:
             if i_rule.applies_to(vehicle):
                 vehicle.deny_otl_access(traci)
+                vehicle.vehicle_class = colmto.cse.rule.SUMORule.disallowed_class_name()
+                if traci:
+                    traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class)
                 return self
 
-        # default case: no applicable rule found
+        # default case: no applicable rule found -> allow
+        vehicle.vehicle_class = colmto.cse.rule.SUMORule.allowed_class_name()
+        if traci:
+            traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class)
         vehicle.allow_otl_access(traci)
 
         return self

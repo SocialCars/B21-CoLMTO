@@ -29,6 +29,7 @@ if typing.TYPE_CHECKING:
     import traci
 
 from collections import OrderedDict
+import numpy
 import pandas
 
 import colmto.cse.rule
@@ -145,7 +146,7 @@ class SUMOVehicle(BaseVehicle):
                 'time_step': 0.0,
                 'travel_time': 0.0,
                 'dissatisfaction': 0.0,
-                'disposition': VehicleDisposition.COOPERATIVE
+                'disposition': VehicleDisposition.COOPERATIVE # VehicleDisposition.choose((0.5, 0.5))
             }
         )
 
@@ -318,6 +319,13 @@ class SUMOVehicle(BaseVehicle):
         '''
         return str(self._properties.get('vClass'))
 
+    @vehicle_class.setter
+    def vehicle_class(self, vehicle_class: str):
+        '''
+        :return: SUMO vehicle class
+        '''
+        self._properties['vClass'] = str(vehicle_class)
+
     @property
     def speed_max(self) -> float:
         '''
@@ -388,16 +396,14 @@ class SUMOVehicle(BaseVehicle):
         It is now the vehicle's responsibility to act cooperatively, e.g.
         1. set own class to allow, 2. change colour back to default.
 
-        :note: This is the place where cooperative behaviour can be implemented.
+        :note: This is the place where cooperative behaviour can be implemented. I.e. 'free will' (TM) starts here.
 
         :param traci: traci control reference
         :return: self
         '''
 
-        self._properties['vClass'] = colmto.cse.rule.SUMORule.allowed_class_name()
         self._properties['colour'] = self.normal_colour
         if traci:
-            traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
             traci.vehicle.setColor(self.sumo_id, self.colour)
         return self
 
@@ -407,25 +413,23 @@ class SUMOVehicle(BaseVehicle):
         It is now the vehicle's responsibility to act cooperatively, i.e.
         1. set own class to deny, 2. change colour to red and 3. do a lane change to the right.
 
-        :note: This is the place where cooperative behaviour is implemented. Vehicles acting uncooperative won't behave according to rules.
+        :note: This is the place where cooperative behaviour is implemented. Vehicles acting uncooperative won't behave according to rules. I.e. 'free will' (TM) starts here.
 
         :param traci: traci control reference
         :return: self
         '''
 
         if self.disposition == VehicleDisposition.COOPERATIVE:
-            self._properties['vClass'] = colmto.cse.rule.SUMORule.disallowed_class_name()
+            # show that I'm cooperative by painting myself red
             self._properties['colour'] = Colour(255, 0, 0, 255)
             if traci:
-                traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
                 traci.vehicle.setColor(self.sumo_id, self.colour)
-                # as i'm cooperative, always keep to the right lane!
+                # as I'm cooperative, always keep to the right lane
                 traci.vehicle.changeLane(self.sumo_id, 0, 1)
         else:
-            self._properties['vClass'] = colmto.cse.rule.SUMORule.allowed_class_name()
+            # how that I'm uncooperative by painting myself gray
             self._properties['colour'] = Colour(127, 127, 127, 255)
             if traci:
-                traci.vehicle.setVehicleClass(self.sumo_id, self.vehicle_class)
                 traci.vehicle.setColor(self.sumo_id, self.colour)
         return self
 
