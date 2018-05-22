@@ -27,7 +27,9 @@ colmto: Test module for environment.vehicle.
 import unittest
 import numpy
 import colmto.environment.vehicle
+from colmto.common.helper import Behaviour
 from colmto.common.helper import VehicleType
+from colmto.common.helper import VehicleDisposition
 
 
 class TestVehicle(unittest.TestCase):
@@ -66,7 +68,6 @@ class TestVehicle(unittest.TestCase):
         l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
             environment={'gridlength': 200, 'gridcellwidth': 4}
         )
-
         self.assertEqual(l_sumovehicle.speed_max, 0.0)
         self.assertEqual(l_sumovehicle._speed, 0.0)         # pylint: disable=protected-access
         self.assertEqual(l_sumovehicle.position, (0.0, 0))
@@ -75,6 +76,8 @@ class TestVehicle(unittest.TestCase):
         self.assertEqual(l_sumovehicle._time_step, 0.0)     # pylint: disable=protected-access
         l_sumovehicle._time_step = 42.1                     # pylint: disable=protected-access
         self.assertEqual(l_sumovehicle._time_step, 42.1)    # pylint: disable=protected-access
+        self.assertIsInstance(l_sumovehicle.properties.get('disposition'), VehicleDisposition)
+        self.assertIs(l_sumovehicle.properties.get('disposition'), VehicleDisposition.COOPERATIVE)
         # test custom values
         l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
             speed_max=27.777,
@@ -102,6 +105,27 @@ class TestVehicle(unittest.TestCase):
         self.assertEqual(l_sumovehicle._grid_position, (1, 2))  # pylint: disable=protected-access
         self.assertEqual(l_sumovehicle.properties.get('grid_position'), (1, 2))
         self.assertEqual(l_sumovehicle._travel_time, 0.0)       # pylint: disable=protected-access
+
+    def test_disposition(self):
+        '''Test disposition, i.e. cooperativity of vehicle'''
+        l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
+            speed_max=27.777,
+            speed_deviation=1.2,
+            environment={'gridlength': 200, 'gridcellwidth': 4},
+            vehicle_type='passenger',
+            vtype_sumo_cfg={
+                'length': 3.00,
+                'minGap': 2.50
+            }
+        )
+        l_sumovehicle._properties['disposition'] = VehicleDisposition.UNCOOPERATIVE # pylint: disable=protected-access
+        self.assertIsInstance(l_sumovehicle.properties.get('disposition'), VehicleDisposition)
+        self.assertIs(l_sumovehicle.properties.get('disposition'), VehicleDisposition.UNCOOPERATIVE)
+        self.assertEqual(l_sumovehicle.vehicle_class, Behaviour.ALLOW.vclass)
+        l_sumovehicle.deny_otl_access()
+        self.assertEqual(l_sumovehicle.vehicle_class, Behaviour.ALLOW.vclass)
+        self.assertEqual(l_sumovehicle.colour, (127, 127, 127, 255))
+
 
 
     def test_update(self):

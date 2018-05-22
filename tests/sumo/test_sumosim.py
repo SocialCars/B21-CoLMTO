@@ -35,10 +35,10 @@ try:
     sys.path.append(os.path.join('sumo', 'tools'))
     sys.path.append(os.path.join(os.environ.get('SUMO_HOME', os.path.join('..', '..')), 'tools'))
     import sumolib
+    import colmto.sumo.sumosim
 except ImportError:  # pragma: no cover
-    raise ImportError('please declare environment variable \'SUMO_HOME\' as the root')
+    print('Environment variable \'SUMO_HOME\' not properly declared. Skipping tests.')
 
-import colmto.sumo.sumosim
 
 
 class Namespace(object):
@@ -54,6 +54,9 @@ class TestSumoSim(unittest.TestCase):
     Test cases for SumoSim
     '''
 
+    @unittest.skipUnless(
+        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
+        f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
     def test_sumosim(self):
         '''
         Test SumoSim class
@@ -84,9 +87,40 @@ class TestSumoSim(unittest.TestCase):
     @unittest.skipUnless(
         Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
         f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
-    def test_sumosim_runscenarios():
+    def test_sumosim_runscenario_full():
         '''
         Test SumoSim.runscenarios()
+        '''
+        with tempfile.NamedTemporaryFile() as f_tmp:
+            colmto.sumo.sumosim.SumoSim(
+                Namespace(
+                    loglevel='DEBUG',
+                    quiet=False,
+                    logfile=f_tmp.name,
+                    output_dir=Path(f_tmp.name).parent,
+                    runconfigfile=Path(f_tmp.name),
+                    scenarioconfigfile=Path(f_tmp.name),
+                    vtypesconfigfile=Path(f_tmp.name),
+                    freshconfigs=True,
+                    headless=True,
+                    gui=False,
+                    onlyoneotlsegment=False,
+                    cse_enabled=False,
+                    runs=1,
+                    scenarios=['NI-B210'],
+                    run_prefix='foo',
+                    forcerebuildscenarios=True,
+                    initialsortings=['random']
+                )
+            ).run_scenarios()
+
+    @staticmethod
+    @unittest.skipUnless(
+        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
+        f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
+    def test_sumosim_runscenario_onesegment():
+        '''
+        Test SumoSim.runscenarios() for one otl segment
         '''
         with tempfile.NamedTemporaryFile() as f_tmp:
             colmto.sumo.sumosim.SumoSim(
@@ -111,6 +145,9 @@ class TestSumoSim(unittest.TestCase):
                 )
             ).run_scenarios()
 
+    @unittest.skipUnless(
+        Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
+        f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
     def test_sumosim_runscenarios_cse_exception(self):
         '''
         Test SumoSim.runscenarios() with CSE passing None as a scenario name
