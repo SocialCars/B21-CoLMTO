@@ -26,7 +26,7 @@ from setuptools import find_packages
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 from sphinx.setup_command import BuildDoc
-
+import versioneer
 
 class PyTest(TestCommand):
     '''pytest class'''
@@ -40,7 +40,7 @@ class PyTest(TestCommand):
         sys.exit(pytest.main(self.test_args))
 
 
-VERSION = '0.1.2'
+VERSION = versioneer.get_version()
 NAME = 'colmto'
 DESCRIPTION = 'Cooperative Lane Management and Traffic flow Optimisation'
 
@@ -65,10 +65,11 @@ setup(
     include_package_data=True,
     zip_safe=False,
     tests_require=['pytest'],
-    cmdclass={
-        'test': PyTest,
-        'build_sphinx': BuildDoc
-    },
+    # cmdclass={
+    #     'test': PyTest,
+    #     'build_sphinx': BuildDoc
+    # },
+    cmdclass=versioneer.get_cmdclass(),
     command_options={
         'build_sphinx': {
             'project': ('setup.py', DESCRIPTION),

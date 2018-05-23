@@ -14,4 +14,5 @@ PyYAML==3.12
 pygments-style-solarized==0.1.1
 sh==1.12.14
 Sphinx==1.7.4
+versioneer==0.18
 git+https://github.com/rtfd/sphinx_rtd_theme.git
