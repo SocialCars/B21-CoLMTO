@@ -77,6 +77,7 @@ _DEFAULT_CONFIG_RUN = {
         'enabled': False,
         'value': 0.5
     },
+    'cooperation_probability': None,
     'vtypedistribution': {
         'passenger': {
             'desiredSpeeds': [34.0],
@@ -370,6 +371,8 @@ class Configuration(object):
                 self._run_config['scenarios'] = list(self._scenario_config.keys())
         if self._args.initialsortings is not None:
             self._run_config['initialsortings'] = self._args.initialsortings
+        if self._args.cooperation_probability is not None:
+            self._run_config['cooperation_probability'] = self._args.cooperation_probability
 
     @property
     def run_config(self) -> MappingProxyType:

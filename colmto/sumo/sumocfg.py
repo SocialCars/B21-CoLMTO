@@ -602,7 +602,8 @@ class SumoConfig(colmto.common.configuration.Configuration):
                     'gridlength': int(round((1 + self._run_config.get('entrylanepercent') / 100.) * self.scenario_config.get(scenario_name).get('parameters').get('length') / self._run_config.get('gridcellwidth')))
                                   if not self._run_config.get('onlyoneotlsegment')
                                   else int(round((1 + self._run_config.get('entrylanepercent') / 100.) * (self.scenario_config.get(scenario_name).get('parameters').get('length') / (self.scenario_config.get(scenario_name).get('parameters').get('switches')+1)) / self._run_config.get('gridcellwidth')))
-                }
+                },
+                cooperation_probability=self.run_config.get('cooperation_probability')
             ) for vtype in vtype_list
         ]  # type: typing.List[colmto.environment.vehicle.SUMOVehicle]
 

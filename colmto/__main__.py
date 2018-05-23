@@ -95,6 +95,11 @@ class Colmto(object):
         )
 
         l_parser.add_argument(
+            '--cooperation-probability', dest='cooperation_probability', type=float,
+            default=None
+        )
+
+        l_parser.add_argument(
             '--runs', dest='runs', type=int,
             default=None
         )

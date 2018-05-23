@@ -246,7 +246,7 @@ class SUMOVehicle(BaseVehicle):
 
         :return: VehicleDisposition
         '''
-        return self._properties['cooperation_disposition']
+        return self._properties.get('cooperation_disposition')
 
     @property
     def start_time(self) -> float:
