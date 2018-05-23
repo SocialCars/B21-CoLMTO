@@ -110,20 +110,20 @@ class SUMOVehicle(BaseVehicle):
     # pylint: disable=too-many-arguments
     def __init__(self,
                  environment: dict,
-                 vehicle_type=None,
-                 vtype_sumo_cfg=None,
-                 speed_deviation=0.0,
-                 sigma=0.0,
-                 speed_max=0.0):
+                 vehicle_type: str = None,
+                 vtype_sumo_cfg: dict=None,
+                 speed_deviation: float=0.0,
+                 sigma: float=0.0,
+                 speed_max: float=0.0):
         '''
         Initialisation.
 
-        :param vehicle_type:
-        :param vtype_sumo_cfg:
-        :param speed_deviation:
-        :param sigma:
-        :param speed_max:
-        :param grid_length:
+        :type vehicle_type: str
+        :param vehicle_type: SUMO vehicle type (as string)
+        :param vtype_sumo_cfg: (optional) SUMO config
+        :param speed_deviation: speed deviation (Krauss driver model)
+        :param sigma: sigma (Krauss driver model)
+        :param speed_max: maximum desired or capable speed of vehicle
 
         '''
 
