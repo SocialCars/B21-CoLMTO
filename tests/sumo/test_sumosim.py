@@ -79,7 +79,8 @@ class TestSumoSim(unittest.TestCase):
                 scenarios=None,
                 run_prefix='foo',
                 forcerebuildscenarios=True,
-                initialsortings=['random']
+                initialsortings=['random'],
+                cooperation_probability=None
             )
             self.assertEqual(colmto.sumo.sumosim.SumoSim(l_args)._args, l_args)  # pylint: disable=protected-access
 
@@ -110,7 +111,8 @@ class TestSumoSim(unittest.TestCase):
                     scenarios=['NI-B210'],
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=0.5
                 )
             ).run_scenarios()
 
@@ -141,7 +143,8 @@ class TestSumoSim(unittest.TestCase):
                     scenarios=['NI-B210'],
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=0.5
                 )
             ).run_scenarios()
 
@@ -173,7 +176,8 @@ class TestSumoSim(unittest.TestCase):
                         run_prefix='foo',
                         forcerebuildscenarios=True,
                         results_hdf5_file=Path(f_tmp_hdf5.name),
-                        initialsortings=['random']
+                        initialsortings=['random'],
+                        cooperation_probability=None
                     )
                 ).run_scenario(None)
 
@@ -205,7 +209,8 @@ class TestSumoSim(unittest.TestCase):
                     run_prefix='foo',
                     forcerebuildscenarios=True,
                     results_hdf5_file=Path(f_tmp_hdf5.name),
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=0.5
                 )
             ).run_scenarios()
 

@@ -247,16 +247,16 @@ class HelperTests(unittest.TestCase):
         for i_dispo in (helper.VehicleDisposition.choose(1) for _ in range(100)):
             with self.subTest(pattern=i_dispo):
                 self.assertIs(i_dispo, helper.VehicleDisposition.COOPERATIVE)
-        l_distribution = [helper.VehicleDisposition.choose() for _ in range(10000)]
+        l_distribution = [helper.VehicleDisposition.choose() for _ in range(100000)]
         self.assertAlmostEqual(
-            l_distribution.count(helper.VehicleDisposition.COOPERATIVE)/10000,
-            l_distribution.count(helper.VehicleDisposition.UNCOOPERATIVE)/10000,
+            l_distribution.count(helper.VehicleDisposition.COOPERATIVE)/100000,
+            l_distribution.count(helper.VehicleDisposition.UNCOOPERATIVE)/100000,
             1
         )
-        l_distribution = [helper.VehicleDisposition.choose(0.1) for _ in range(10000)]
+        l_distribution = [helper.VehicleDisposition.choose(0.1) for _ in range(100000)]
         self.assertAlmostEqual(
-            l_distribution.count(helper.VehicleDisposition.COOPERATIVE)/0.1/10000,
-            l_distribution.count(helper.VehicleDisposition.UNCOOPERATIVE)/0.9/10000,
+            l_distribution.count(helper.VehicleDisposition.COOPERATIVE)/0.1/100000,
+            l_distribution.count(helper.VehicleDisposition.UNCOOPERATIVE)/0.9/100000,
             1
         )
 

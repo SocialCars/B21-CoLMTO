@@ -71,7 +71,8 @@ class TestSUMOConfiguration(unittest.TestCase):
                             scenarios=None,
                             run_prefix='foo',
                             forcerebuildscenarios=i_force,
-                            initialsortings=['random']
+                            initialsortings=['random'],
+                            cooperation_probability=None
                         ),
                         netconvertbinary=None,
                         duarouterbinary=None
@@ -100,7 +101,8 @@ class TestSUMOConfiguration(unittest.TestCase):
                     scenarios=None,
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=0.5
                 ),
                 netconvertbinary=None,
                 duarouterbinary=None
@@ -145,7 +147,8 @@ class TestSUMOConfiguration(unittest.TestCase):
                     scenarios=None,
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=1
                 ),
                 netconvertbinary=None,
                 duarouterbinary=None
@@ -176,7 +179,8 @@ class TestSUMOConfiguration(unittest.TestCase):
                     scenarios=None,
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=0
                 ),
                 netconvertbinary=None,
                 duarouterbinary=None
@@ -208,7 +212,8 @@ class TestSUMOConfiguration(unittest.TestCase):
                     scenarios=None,
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=None
                 ),
                 netconvertbinary=None,
                 duarouterbinary=None
@@ -233,7 +238,8 @@ class TestSUMOConfiguration(unittest.TestCase):
                     scenarios=None,
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=None
                 ),
                 netconvertbinary=None,
                 duarouterbinary=None
@@ -264,7 +270,8 @@ class TestSUMOConfiguration(unittest.TestCase):
                     scenarios=None,
                     run_prefix='foo',
                     forcerebuildscenarios=True,
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=None
                 ),
                 netconvertbinary=None,
                 duarouterbinary=None

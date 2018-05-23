@@ -65,7 +65,8 @@ class TestConfiguration(unittest.TestCase):
                 cse_enabled=True,
                 runs=1,
                 scenarios=None,
-                initialsortings=['random']
+                initialsortings=['random'],
+                cooperation_probability=None
             )
             self.assertEqual(colmto.common.configuration.Configuration(l_args)._args, l_args)  # pylint: disable=protected-access
 
@@ -84,7 +85,8 @@ class TestConfiguration(unittest.TestCase):
                     cse_enabled=False,
                     runs=None,
                     scenarios=['all'],
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=None
                 )
             )
             colmto.common.configuration.Configuration(
@@ -102,7 +104,8 @@ class TestConfiguration(unittest.TestCase):
                     cse_enabled=False,
                     runs=None,
                     scenarios='foo',
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=None
                 )
             )
 
@@ -127,7 +130,8 @@ class TestConfiguration(unittest.TestCase):
                         cse_enabled=True,
                         runs=1,
                         scenarios=None,
-                        initialsortings=['random']
+                        initialsortings=['random'],
+                        cooperation_probability=None
                     )
                 )
             with self.assertRaises(BaseException):
@@ -146,7 +150,8 @@ class TestConfiguration(unittest.TestCase):
                         cse_enabled=True,
                         runs=1,
                         scenarios=None,
-                        initialsortings=['random']
+                        initialsortings=['random'],
+                        cooperation_probability=None
                     )
                 )
 
@@ -174,7 +179,8 @@ class TestConfiguration(unittest.TestCase):
                     scenario_dir=Path(f_tmp.name),
                     output_dir=Path(f_tmp.name),
                     run_prefix='foo',
-                    initialsortings=['random']
+                    initialsortings=['random'],
+                    cooperation_probability=None
                 )
             )
             self.assertIsInstance(l_config.run_config, MappingProxyType)
@@ -190,3 +196,8 @@ class TestConfiguration(unittest.TestCase):
             self.assertDictEqual(dict(l_config.vtypes_config), colmto.common.configuration._DEFAULT_CONFIG_VTYPES) # pylint: disable=protected-access
             self.assertEqual(l_config.output_dir, Path(f_tmp.name))
             self.assertEqual(l_config.run_prefix, 'foo')
+            self.assertEqual(l_config.run_config.get('cooperation_probability'), None)
+
+
+if __name__ == '__main__':
+    unittest.main()
