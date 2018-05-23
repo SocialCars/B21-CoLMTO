@@ -270,14 +270,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
         etree.SubElement(
             l_nodes, 'node', attrib={'id': '21start', 'x': '0', 'y': '0'}
         )
-
-        # generate intermediate nodes
-        for i in range(int(l_length/20), int(l_length/2)+1, int(l_length/20)):
-            self._log.debug('intermediate node at %s', i)
-            etree.SubElement(
-                l_nodes, 'node', attrib={'id': f'21_{i}', 'x': str(i), 'y': '0'}
-            )
-
         etree.SubElement(
             l_nodes, 'node', attrib={'id': '21end', 'x': str(l_length), 'y': '0'}
         )
