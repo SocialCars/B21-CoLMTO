@@ -427,7 +427,7 @@ class SUMOVehicle(BaseVehicle):
         :return: self
         '''
 
-        if self.disposition == VehicleDisposition.COOPERATIVE:
+        if self.cooperation_disposition == VehicleDisposition.COOPERATIVE:
             # show that I'm cooperative by painting myself red
             self._properties['colour'] = Colour(255, 0, 0, 255)
             if _traci:
