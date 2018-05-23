@@ -76,8 +76,8 @@ class TestVehicle(unittest.TestCase):
         self.assertEqual(l_sumovehicle._time_step, 0.0)     # pylint: disable=protected-access
         l_sumovehicle._time_step = 42.1                     # pylint: disable=protected-access
         self.assertEqual(l_sumovehicle._time_step, 42.1)    # pylint: disable=protected-access
-        self.assertIsInstance(l_sumovehicle.properties.get('disposition'), VehicleDisposition)
-        self.assertIs(l_sumovehicle.properties.get('disposition'), VehicleDisposition.COOPERATIVE)
+        self.assertIsInstance(l_sumovehicle.properties.get('cooperation_disposition'), VehicleDisposition)
+        self.assertIs(l_sumovehicle.properties.get('cooperation_disposition'), VehicleDisposition.COOPERATIVE)
         # test custom values
         l_sumovehicle = colmto.environment.vehicle.SUMOVehicle(
             speed_max=27.777,
@@ -118,9 +118,9 @@ class TestVehicle(unittest.TestCase):
                 'minGap': 2.50
             }
         )
-        l_sumovehicle._properties['disposition'] = VehicleDisposition.UNCOOPERATIVE # pylint: disable=protected-access
-        self.assertIsInstance(l_sumovehicle.properties.get('disposition'), VehicleDisposition)
-        self.assertIs(l_sumovehicle.properties.get('disposition'), VehicleDisposition.UNCOOPERATIVE)
+        l_sumovehicle._properties['cooperation_disposition'] = VehicleDisposition.UNCOOPERATIVE # pylint: disable=protected-access
+        self.assertIsInstance(l_sumovehicle.properties.get('cooperation_disposition'), VehicleDisposition)
+        self.assertIs(l_sumovehicle.properties.get('cooperation_disposition'), VehicleDisposition.UNCOOPERATIVE)
         self.assertEqual(l_sumovehicle.vehicle_class, Behaviour.ALLOW.vclass)
         l_sumovehicle.deny_otl_access()
         self.assertEqual(l_sumovehicle.vehicle_class, Behaviour.ALLOW.vclass)

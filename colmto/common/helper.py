@@ -390,14 +390,15 @@ class VehicleDisposition(enum.Enum):
     _prng = numpy.random.RandomState()  # pylint: disable=no-member
 
     @staticmethod
-    def choose(distribution: typing.Tuple[float, float] = (0.5, 0.5)) -> 'VehicleDisposition':
+    def choose(cooperation_probability: float = 0.5) -> 'VehicleDisposition':
         '''
-        Pick a random disposition by given distribution (default 50/50)
+        Pick a random disposition by given probability (default 50/50)
 
-        :param distribution: Iterable containing two floats
+        :param cooperation_probability: probability p=[0,1] (default: 0.5)
         :return: VehicleDisposition.COOPERATIVE | VehicleDisposition.UNCOOPERATIVE
         '''
 
         return VehicleDisposition._prng.value.choice(
-            (VehicleDisposition.COOPERATIVE, VehicleDisposition.UNCOOPERATIVE), p=distribution
+            (VehicleDisposition.COOPERATIVE, VehicleDisposition.UNCOOPERATIVE),
+            p=(cooperation_probability, 1-cooperation_probability)
         )

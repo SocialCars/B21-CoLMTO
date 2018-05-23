@@ -113,16 +113,25 @@ class SUMOVehicle(BaseVehicle):
                  vtype_sumo_cfg: dict = None,
                  speed_deviation: float = 0.0,
                  sigma: float = 0.0,
-                 speed_max: float = 0.0):
+                 speed_max: float = 0.0,
+                 cooperation_probability: typing.Union[None, float]=None):
         '''
         Initialisation.
 
+        :type environment: dict
+        :param environment: environment
         :type vehicle_type: str
-        :param vehicle_type: SUMO vehicle type (as string)
+        :param vehicle_type: SUMO vehicle type
+        :type vtype_sumo_cfg: dict
         :param vtype_sumo_cfg: (optional) SUMO config
+        :type speed_deviation: float
         :param speed_deviation: speed deviation (Krauss driver model)
+        :type sigma: float
         :param sigma: sigma (Krauss driver model)
+        :type speed_max: float
         :param speed_max: maximum desired or capable speed of vehicle
+        :type cooperation_probability: float
+        :param cooperation_probability: disposition for cooperative driving with :math:`p\in [0,1]\cup \{None\}`. :math:`p=1` or `None` means always cooperative (default), :math:`p=0` always uncooperative
 
         '''
 
@@ -145,7 +154,7 @@ class SUMOVehicle(BaseVehicle):
                 'time_step': 0.0,
                 'travel_time': 0.0,
                 'dissatisfaction': 0.0,
-                'disposition': VehicleDisposition.COOPERATIVE # VehicleDisposition.choose((0.5, 0.5))
+                'cooperation_disposition': VehicleDisposition.COOPERATIVE if not cooperation_probability else VehicleDisposition.choose(cooperation_probability)
             }
         )
 
@@ -231,13 +240,13 @@ class SUMOVehicle(BaseVehicle):
             if self._properties.get('vType') else VehicleType.UNDEFINED
 
     @property
-    def disposition(self) -> VehicleDisposition:
+    def cooperation_disposition(self) -> VehicleDisposition:
         '''
-        Vehicle dispostion, i.e. cooperative or uncooperative
+        Vehicle cooperation dispostion, i.e. cooperative or uncooperative
 
         :return: VehicleDisposition
         '''
-        return self._properties['disposition']
+        return self._properties['cooperation_disposition']
 
     @property
     def start_time(self) -> float:
