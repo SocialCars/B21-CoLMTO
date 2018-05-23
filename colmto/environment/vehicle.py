@@ -23,15 +23,6 @@
 # @endcond
 '''Vehicle classes for storing vehicle data/attributes/states.'''
 
-from types import MappingProxyType
-import typing
-if typing.TYPE_CHECKING:
-    import traci
-
-from collections import OrderedDict
-import numpy
-import pandas
-
 import colmto.cse.rule
 import colmto.common.model
 import colmto.common.log
@@ -42,6 +33,14 @@ from colmto.common.helper import StatisticSeries
 from colmto.common.helper import GridPosition
 from colmto.common.helper import Colour
 from colmto.common.helper import Metric
+
+from types import MappingProxyType
+import typing
+if typing.TYPE_CHECKING:
+    import traci
+
+from collections import OrderedDict
+import pandas
 
 
 class BaseVehicle(object):
@@ -111,10 +110,10 @@ class SUMOVehicle(BaseVehicle):
     def __init__(self,
                  environment: dict,
                  vehicle_type: str = None,
-                 vtype_sumo_cfg: dict=None,
-                 speed_deviation: float=0.0,
-                 sigma: float=0.0,
-                 speed_max: float=0.0):
+                 vtype_sumo_cfg: dict = None,
+                 speed_deviation: float = 0.0,
+                 sigma: float = 0.0,
+                 speed_max: float = 0.0):
         '''
         Initialisation.
 
@@ -407,7 +406,7 @@ class SUMOVehicle(BaseVehicle):
             traci.vehicle.setColor(self.sumo_id, self.colour)
         return self
 
-    def deny_otl_access(self, traci: 'traci'=None) -> BaseVehicle:
+    def deny_otl_access(self, _traci: 'traci' = None) -> BaseVehicle:
         '''
         Signal the vehicle that overtaking lane (OTL) access has been denied.
         It is now the vehicle's responsibility to act cooperatively, i.e.
@@ -415,22 +414,22 @@ class SUMOVehicle(BaseVehicle):
 
         :note: This is the place where cooperative behaviour is implemented. Vehicles acting uncooperative won't behave according to rules. I.e. 'free will' (TM) starts here.
 
-        :param traci: traci control reference
+        :param _traci: traci control reference
         :return: self
         '''
 
         if self.disposition == VehicleDisposition.COOPERATIVE:
             # show that I'm cooperative by painting myself red
             self._properties['colour'] = Colour(255, 0, 0, 255)
-            if traci:
-                traci.vehicle.setColor(self.sumo_id, self.colour)
+            if _traci:
+                _traci.vehicle.setColor(self.sumo_id, self.colour)
                 # as I'm cooperative, always keep to the right lane
-                traci.vehicle.changeLane(self.sumo_id, 0, 1)
+                _traci.vehicle.changeLane(self.sumo_id, 0, 1)
         else:
             # show that I'm uncooperative by painting myself gray
             self._properties['colour'] = Colour(127, 127, 127, 255)
-            if traci:
-                traci.vehicle.setColor(self.sumo_id, self.colour)
+            if _traci:
+                _traci.vehicle.setColor(self.sumo_id, self.colour)
         return self
 
     def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:

@@ -62,27 +62,27 @@ class BaseCSE(object):
 
         return frozenset(self._rules)
 
-    def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]], traci: 'traci'=None) -> 'BaseCSE':
+    def apply(self, vehicles: typing.Union[colmto.environment.vehicle.SUMOVehicle, typing.Dict[str, colmto.environment.vehicle.SUMOVehicle]], _traci: 'traci' = None) -> 'BaseCSE':
         '''
         Apply rules to vehicles
 
         :param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
-        :param traci: Optional TraCI reference for controlling vehicle.
+        :param _traci: Optional TraCI reference for controlling vehicle.
         :return: `BaseCSE` as future reference
 
         '''
 
         for i_vehicle in vehicles.values() if isinstance(vehicles, dict) else vehicles:
-            self.apply_one(i_vehicle, traci)
+            self.apply_one(i_vehicle, _traci)
 
         return self
 
-    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle, traci: 'traci'=None) -> 'BaseCSE':
+    def apply_one(self, vehicle: colmto.environment.vehicle.SUMOVehicle, _traci: 'traci' = None) -> 'BaseCSE':
         '''
         Apply rules to one vehicle
 
         :param vehicle: Vehicle
-        :param traci: Optional TraCI reference for controlling vehicle.
+        :param _traci: Optional TraCI reference for controlling vehicle.
         :return: `BaseCSE` as future reference
 
         '''
@@ -90,14 +90,14 @@ class BaseCSE(object):
         for i_rule in self._rules:
             if i_rule.applies_to(vehicle):
                 vehicle.deny_otl_access(traci).vehicle_class = colmto.cse.rule.SUMORule.disallowed_class_name()
-                if traci:
-                    traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class)
+                if _traci:
+                    _traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class)
                 return self
 
         # default case: no applicable rule found -> allow
         vehicle.allow_otl_access(traci).vehicle_class = colmto.cse.rule.SUMORule.allowed_class_name()
-        if traci:
-            traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class)
+        if _traci:
+            _traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class)
 
         return self
 

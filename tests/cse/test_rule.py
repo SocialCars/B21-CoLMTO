@@ -127,7 +127,7 @@ class TestRule(unittest.TestCase):
             )
         )
         l_vehicle = colmto.environment.vehicle.SUMOVehicle(
-            environment={'gridlength': 200,'gridcellwidth': 4},
+            environment={'gridlength': 200, 'gridcellwidth': 4},
             vehicle_type='passenger'
         )
         colmto.cse.cse.SumoCSE().add_rule(colmto.cse.rule.SUMOVTypeRule(vehicle_type='passenger')).apply((l_vehicle,))
@@ -137,7 +137,7 @@ class TestRule(unittest.TestCase):
         )
 
         l_vehicle = colmto.environment.vehicle.SUMOVehicle(
-            environment={'gridlength': 200,'gridcellwidth': 4},
+            environment={'gridlength': 200, 'gridcellwidth': 4},
             vehicle_type='passenger'
         )
         colmto.cse.cse.SumoCSE().add_rule(colmto.cse.rule.SUMOVTypeRule(vehicle_type='truck')).apply((l_vehicle,))

@@ -390,7 +390,7 @@ class VehicleDisposition(enum.Enum):
     _prng = numpy.random.RandomState()  # pylint: disable=no-member
 
     @staticmethod
-    def choose(distribution: typing.Tuple[float, float]=(0.5, 0.5)) -> 'VehicleDisposition':
+    def choose(distribution: typing.Tuple[float, float] = (0.5, 0.5)) -> 'VehicleDisposition':
         '''
         Pick a random disposition by given distribution (default 50/50)
 
