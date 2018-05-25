@@ -202,6 +202,9 @@ class TestRule(unittest.TestCase):
         with self.assertRaises(TypeError):
             l_evtrule.add_subrule(colmto.cse.rule.ExtendableSUMOVTypeRule(vehicle_type='passenger'))
 
+        with self.assertRaises(TypeError):
+            colmto.cse.rule.ExtendableSUMOVTypeRule(vehicle_type='passenger', subrule_operator=42)
+
     def test_sumo_extendable_rule(self):
         '''Test SUMOExtendableRule class'''
         with self.assertRaises(TypeError):
