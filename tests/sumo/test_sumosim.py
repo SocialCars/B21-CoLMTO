@@ -31,6 +31,7 @@ from pathlib import Path
 import os
 import sys
 
+import colmto.sumo.runtime
 try:
     sys.path.append(os.path.join('sumo', 'tools'))
     sys.path.append(os.path.join(os.environ.get('SUMO_HOME', os.path.join('..', '..')), 'tools'))
@@ -38,7 +39,6 @@ try:
     import colmto.sumo.sumosim
 except ImportError:  # pragma: no cover
     print('Environment variable \'SUMO_HOME\' not properly declared. Skipping tests.')
-
 
 
 class Namespace(object):
@@ -213,6 +213,23 @@ class TestSumoSim(unittest.TestCase):
                     cooperation_probability=0.5
                 )
             ).run_scenarios()
+
+
+    def test_runtime(self):
+        '''
+        Test runtime
+        '''
+        with self.assertRaises(AttributeError):
+            with tempfile.NamedTemporaryFile() as f_tmp:
+                colmto.sumo.runtime.Runtime(
+                    args=Namespace(
+                        loglevel='DEBUG',
+                        quiet=False,
+                        logfile=f_tmp.name
+                    ),
+                    sumo_config=None,
+                    sumo_binary=None
+                ).run_traci({}, 'foo')
 
 
 if __name__ == '__main__':
