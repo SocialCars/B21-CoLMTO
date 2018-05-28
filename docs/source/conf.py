@@ -126,6 +126,7 @@ htmlhelp_basename = 'CoLMTOdoc'
 # -- Options for LaTeX output ---------------------------------------------
 if shutil.which('xelatex') and os.environ.get('CIRCLECI') != 'true':
     latex_engine = 'xelatex'
+
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
@@ -137,7 +138,7 @@ latex_elements = {
 
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    'preamble': r'\let\cleardoublepage\clearpage',
 
     # Latex figure (float) alignment
     #
