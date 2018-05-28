@@ -123,7 +123,7 @@ htmlhelp_basename = 'CoLMTOdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
-
+latex_engine = 'xelatex'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
@@ -140,13 +140,33 @@ latex_elements = {
     # Latex figure (float) alignment
     #
     'figure_align': 'htbp',
+    'fontpkg': r'''
+\usepackage{ifxetex}
+\ifxetex
+\usepackage{xltxtra}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\IfFontExistsTF{Charter}{
+\setmainfont{Charter}
+}{}
+\IfFontExistsTF{Fira Sans}{
+\setsansfont{Fira Sans}
+}{}
+\IfFontExistsTF{Source Code Pro}{
+\setmonofont{Source Code Pro}
+}{}
+''',
+    'fncychap': r'\usepackage[Bjornstrup]{fncychap}',
+    'printindex': r'\footnotesize\raggedright\printindex',
 }
+
+latex_show_urls = 'footnote'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'CoLMTO-doc.tex', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
+    (master_doc, 'CoLMTO-doc.tex', u'Cooperative Lane Management and Traffic flow Optimisation -- Technical Documentation',
      u'Malte Aschermann', 'manual'),
 ]
 
@@ -156,7 +176,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
+    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation - Technical Documentation',
      [author], 1)
 ]
 
@@ -167,9 +187,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation Documentation',
-     author, 'CoLMTO', 'One line description of project.',
-     'Miscellaneous'),
+    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation',
+     author, 'CoLMTO', 'Technical Documentation',
+     'Appendix'),
 ]
 
 autodoc_default_flags = [
