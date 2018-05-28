@@ -20,6 +20,7 @@ import os
 import sys
 import versioneer
 import _version
+import shutil
 
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -123,7 +124,8 @@ htmlhelp_basename = 'CoLMTOdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
-latex_engine = 'xelatex'
+if shutil.which('xelatex'):
+    latex_engine = 'xelatex'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
@@ -155,6 +157,7 @@ latex_elements = {
 \IfFontExistsTF{Source Code Pro}{
 \setmonofont{Source Code Pro}
 }{}
+\else\fi
 ''',
     'fncychap': r'\usepackage[Bjornstrup]{fncychap}',
     'printindex': r'\footnotesize\raggedright\printindex',
