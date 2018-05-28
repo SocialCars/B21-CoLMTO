@@ -173,7 +173,7 @@ latex_show_pagerefs = True
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'CoLMTO-doc.tex', u'Cooperative Lane Management and Traffic flow Optimisation -- Technical Documentation',
+    (master_doc, 'CoLMTO-doc.tex', u'Cooperative Lane Management and Traffic flow Optimisation \\\\ Source Code Documentation',
      u'Malte Aschermann', 'manual'),
 ]
 
@@ -183,7 +183,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation - Technical Documentation',
+    (master_doc, 'CoLMTO', u'Cooperative Lane Management and Traffic flow Optimisation',
      [author], 1)
 ]
 
