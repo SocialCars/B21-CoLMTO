@@ -124,7 +124,7 @@ htmlhelp_basename = 'CoLMTOdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
-if shutil.which('xelatex'):
+if shutil.which('xelatex') and os.environ['CIRCLECI'] != 'true':
     latex_engine = 'xelatex'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
