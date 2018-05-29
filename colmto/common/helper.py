@@ -142,6 +142,20 @@ class SpeedRange(Range):
         return super(cls, SpeedRange).__new__(cls, rmin, rmax)
 
 
+class DemandRange(Range):
+    '''
+    Named tuple to represent allowed demand range.
+    '''
+
+    __slots__ = ()
+
+    def __new__(cls, dmin, dmax):
+        if dmin > dmax:
+            raise ValueError(f'DemandRange minumium is larger than maximum.')
+        # noinspection PyArgumentList
+        return super(cls, DemandRange).__new__(cls, dmin, dmax)
+
+
 class DissatisfactionRange(Range):
     '''
     Named tuple to represent allowed speed range.

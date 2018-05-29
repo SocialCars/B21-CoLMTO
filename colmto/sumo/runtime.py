@@ -121,6 +121,9 @@ class Runtime(object):
             ]
         )
 
+        # provide CSE with traci reference
+        cse.traci(traci)
+
         # add polygon of otl denied positions if --gui enabled
         # and cse contains instance objects of colmto.cse.rule.SUMOPositionRule
         if self._args.gui:
@@ -172,17 +175,13 @@ class Runtime(object):
                 # set vclass according to rules for each vehicle, i.e.
                 # allow vehicles access to OTL depending on rule
                 cse.apply_one(
-
                     # update vehicle position, speed and pass timestep to let vehicle calculate statistics
                     l_vehicle.update(
                         i_results.get(traci.constants.VAR_POSITION),
                         i_results.get(traci.constants.VAR_LANE_INDEX),
                         i_results.get(traci.constants.VAR_SPEED),
                         l_simulation_results.get(traci.constants.VAR_TIME_STEP)/10.**3
-                    ),
-
-                    traci
-
+                    )
                 )
 
             traci.simulationStep()

@@ -34,6 +34,7 @@ from colmto.common.helper import BoundingBox
 from colmto.common.helper import Behaviour
 from colmto.common.helper import RuleOperator
 from colmto.common.helper import DissatisfactionRange
+from colmto.common.helper import DemandRange
 
 
 class BaseRule(metaclass=ABCMeta):
@@ -141,7 +142,7 @@ class SUMORule(BaseRule, metaclass=ABCMeta):
         return Behaviour.DENY.vclass
 
     @abstractmethod
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this rule applies to given vehicle
 
@@ -271,7 +272,7 @@ class SUMOUniversalRule(SUMORule, rule_name='SUMOUniversalRule'):
     Universal rule, i.e. always applies to any vehicle
     '''
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this rule applies to given vehicle
 
@@ -288,7 +289,7 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
     Null rule, i.e. no restrictions: Applies to no vehicle
     '''
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this rule applies to given vehicle
 
@@ -304,7 +305,7 @@ class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
     '''Base class for vehicle attribute specific rules.'''
 
     @abstractmethod
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         applies to
         :param vehicle: vehicles
@@ -332,7 +333,7 @@ class SUMOVTypeRule(SUMOVehicleRule, rule_name='SUMOVTypeRule'):
         return f'{self.__class__}: ' \
                f'vehicle_type = {self._vehicle_type}'
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this rule applies to given vehicle.
 
@@ -370,7 +371,7 @@ class ExtendableSUMOVTypeRule(SUMOVTypeRule, ExtendableSUMORule, rule_name='Exte
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this rule applies to given vehicle.
 
@@ -399,7 +400,7 @@ class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
         return f'{self.__class__}: ' \
                f'minimal_speed = {self._minimal_speed}'
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this rule applies to given vehicle.
 
@@ -437,7 +438,7 @@ class ExtendableSUMOMinimalSpeedRule(SUMOMinimalSpeedRule, ExtendableSUMORule, r
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this (and sub)rules apply to given vehicle.
 
@@ -480,7 +481,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
 
         return BoundingBox(*self._bounding_box)
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this (and sub)rules apply to given vehicle
 
@@ -520,7 +521,7 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this (and sub)rules apply to given vehicle.
 
@@ -565,7 +566,7 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
 
         return self._dissatisfaction_range
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this (and sub)rules apply to given vehicle
 
@@ -604,7 +605,7 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
                f'subrule_operator: {self._subrule_operator}, ' \
                f'subrules: {self.subrules_as_str}'
 
-    def applies_to(self, vehicle: 'SUMOVehicle') -> bool:
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
         Test whether this (and sub)rules apply to given vehicle
 
@@ -614,3 +615,52 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
         '''
 
         return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)
+
+
+class SUMODemandRule(SUMOVehicleRule, rule_name='SUMODemandRule'):
+    '''
+    Demand-based rule
+    '''
+
+    def __init__(self, *, demand_threshold: float = None, demand_range: DemandRange = None, outside=False):
+        '''
+        Initialisation
+
+        :type demand_threshold: float
+        :param demand_threshold: demand has to be below/equal (inside) or above (outside) for this rule to apply
+        :type demand_range: DemandRange
+        :param demand_range: demand has to be in- or outside for this rule to apply
+        :type outside: bool
+        :param outside: controls whether this rules applies to vehicles inside (default) or outside of range
+
+        '''
+
+        super().__init__()
+
+        if demand_threshold is demand_threshold is None:
+            raise ValueError('demand_threshold and demand_range can\'t be both None.')
+
+        self._demand_threshold = float(demand_threshold)
+        self._demand_range = DemandRange(*demand_range)
+        self._outside = bool(outside)
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'demand_threshold = {self._demand_threshold}, ' \
+               f'demand_range = {self._demand_range}, ' \
+               f'outside = {self._outside}'
+
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
+        '''
+        Test whether this rule applies to given vehicle
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+
+        return self._outside ^ (
+            self._demand_range.contains(kwargs.get('demand', float('NaN')))
+            if self._demand_range
+            else self._demand_threshold <= kwargs.get('demand', float('NaN'))
+        )
