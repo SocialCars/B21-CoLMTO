@@ -339,7 +339,6 @@ class TestRule(unittest.TestCase):
             )
         )
 
-
     def test_sumo_universal_rule(self):
         '''
         Test SUMOUniversalRule class
@@ -348,7 +347,6 @@ class TestRule(unittest.TestCase):
         self.assertTrue(colmto.cse.rule.SUMOUniversalRule().applies_to(l_vehicle))
         colmto.cse.cse.SumoCSE().add_rule(colmto.cse.rule.SUMOUniversalRule()).apply((l_vehicle,))
         self.assertEqual(l_vehicle.vehicle_class, 'custom1')
-
 
     def test_sumo_speed_rule(self):
         '''
@@ -588,6 +586,37 @@ class TestRule(unittest.TestCase):
                 l_vehicle._properties['dissatisfaction'] = i_dsat   # pylint: disable=protected-access
                 self.assertFalse(l_esdr.applies_to(l_vehicle))
 
+    def test_sumodemandrule(self):
+        '''
+        test SUMODemandRule
+        '''
+        for i_dr in ((0.1, 0.5), (0.25, 0.75)):
+            with self.subTest(pattern=colmto.common.helper.DemandRange(*i_dr)):
+                self.assertTupleEqual(
+                    colmto.cse.rule.SUMODemandRule(demand_range=i_dr)._demand_range, # pylint: disable=protected-access
+                    i_dr
+                )
+        self.assertEqual(
+            str(colmto.cse.rule.SUMODemandRule()),
+            '<class \'colmto.cse.rule.SUMODemandRule\'>: demand_range = DemandRange(min=0.0, max=1.0), outside = False'
+        )
+        self.assertEqual(
+            str(colmto.cse.rule.SUMODemandRule(demand_range=(1.0, 2.0), outside=True)),
+            '<class \'colmto.cse.rule.SUMODemandRule\'>: demand_range = DemandRange(min=1.0, max=2.0), outside = True'
+        )
+        l_demand_rule = colmto.cse.rule.SUMODemandRule(demand_range=(0, 50))
+        for i_demand in range(100):
+            with self.subTest(pattern=(l_demand_rule._demand_range, i_demand)):
+                l_vehicle = colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    vehicle_type='passenger',
+                )
+                if i_demand <= 50:
+                    self.assertTrue(l_demand_rule.applies_to(l_vehicle, demand=i_demand))
+                else:
+                    self.assertFalse(l_demand_rule.applies_to(l_vehicle, demand=i_demand))
+
+        self.assertFalse(l_demand_rule.applies_to(l_vehicle))
 
 if __name__ == '__main__':
     unittest.main()

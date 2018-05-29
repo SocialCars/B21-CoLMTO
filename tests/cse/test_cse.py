@@ -53,6 +53,7 @@ class TestCSE(unittest.TestCase):
             colmto.cse.cse.BaseCSE
         )
 
+
     def test_sumo_cse(self):
         '''
         Test SumoCSE class
@@ -79,6 +80,11 @@ class TestCSE(unittest.TestCase):
         self.assertIsInstance(l_sumo_cse.rules, frozenset)
         self.assertIn(l_rule_speed, l_sumo_cse.rules)
         self.assertIn(l_rule_outside_position, l_sumo_cse.rules)
+
+        self.assertIs(l_sumo_cse._traci, None)  # pylint: disable=protected-access
+        l_sumo_cse.traci('foo')
+        self.assertEqual(l_sumo_cse._traci, 'foo')  # pylint: disable=protected-access
+        l_sumo_cse.traci(None)
 
         with self.assertRaises(TypeError):
             l_sumo_cse.add_rule('foo')

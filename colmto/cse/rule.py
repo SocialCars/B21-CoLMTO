@@ -622,31 +622,23 @@ class SUMODemandRule(SUMOVehicleRule, rule_name='SUMODemandRule'):
     Demand-based rule
     '''
 
-    def __init__(self, *, demand_threshold: float = None, demand_range: DemandRange = None, outside=False):
+    def __init__(self, demand_range: typing.Union[typing.Tuple[float, float], DemandRange] = (0., 1.), outside=False):
         '''
         Initialisation
 
-        :type demand_threshold: float
-        :param demand_threshold: demand has to be below/equal (inside) or above (outside) for this rule to apply
         :type demand_range: DemandRange
-        :param demand_range: demand has to be in- or outside for this rule to apply
+        :param demand_range: demand has to be in- or outside for this rule to apply, default: [0, 1]
         :type outside: bool
         :param outside: controls whether this rules applies to vehicles inside (default) or outside of range
 
         '''
 
         super().__init__()
-
-        if demand_threshold is demand_threshold is None:
-            raise ValueError('demand_threshold and demand_range can\'t be both None.')
-
-        self._demand_threshold = float(demand_threshold)
         self._demand_range = DemandRange(*demand_range)
         self._outside = bool(outside)
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'demand_threshold = {self._demand_threshold}, ' \
                f'demand_range = {self._demand_range}, ' \
                f'outside = {self._outside}'
 
@@ -659,8 +651,4 @@ class SUMODemandRule(SUMOVehicleRule, rule_name='SUMODemandRule'):
 
         '''
 
-        return self._outside ^ (
-            self._demand_range.contains(kwargs.get('demand', float('NaN')))
-            if self._demand_range
-            else self._demand_threshold <= kwargs.get('demand', float('NaN'))
-        )
+        return self._outside ^ self._demand_range.contains(kwargs.get('demand', float('NaN')))

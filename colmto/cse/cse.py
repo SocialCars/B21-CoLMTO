@@ -31,10 +31,6 @@ if typing.TYPE_CHECKING:
 import colmto.common.log
 from colmto.cse.rule import BaseRule
 from colmto.cse.rule import SUMORule
-from colmto.cse.rule import SUMODemandRule
-from colmto.cse.rule import SUMONullRule
-from colmto.cse.rule import SUMOVehicleRule
-from colmto.environment.vehicle import BaseVehicle
 from colmto.environment.vehicle import SUMOVehicle
 
 
@@ -65,38 +61,6 @@ class BaseCSE(object):
         '''
 
         return frozenset(self._rules)
-
-    def apply(self, vehicles: typing.Union[SUMOVehicle, typing.Dict[str, SUMOVehicle]]) -> 'BaseCSE':
-        '''
-        Apply rules to vehicles
-
-        :param vehicles: Iterable of vehicles or dictionary Id -> Vehicle
-        :return: `BaseCSE` as future reference
-
-        '''
-
-        for i_vehicle in vehicles.values() if isinstance(vehicles, dict) else vehicles:
-            self.apply_one(i_vehicle)
-
-        return self
-
-    def apply_one(self, vehicle: BaseVehicle) -> 'BaseCSE':
-        '''
-        Apply rules to one vehicle
-
-        :type vehicle: BaseVehicle
-        :param vehicle: Vehicle
-        :return: `BaseCSE` as future reference
-
-        '''
-
-        for i_rule in self._rules:
-            if i_rule.applies_to(vehicle):
-                vehicle.vehicle_class = SUMORule.disallowed_class_name()
-                return self
-        # default case: no applicable rule found -> allow
-        vehicle.vehicle_class = SUMORule.allowed_class_name()
-        return self
 
 
 class SumoCSE(BaseCSE):
@@ -177,7 +141,7 @@ class SumoCSE(BaseCSE):
 
         return self
 
-    def apply(self, vehicles: typing.Union[SUMOVehicle, typing.Dict[str, SUMOVehicle]]) -> 'SumoCSE':
+    def apply(self, vehicles: typing.Union[typing.Iterable[SUMOVehicle], typing.Dict[str, SUMOVehicle]]) -> 'SumoCSE':
         '''
         Apply rules to vehicles
 
@@ -202,7 +166,7 @@ class SumoCSE(BaseCSE):
         '''
 
         for i_rule in self._rules:
-            if i_rule.applies_to(vehicle, demand=5): # todo: pass demand=traci.get.demand() argument; add **kwargs to applies_to methods of rules
+            if i_rule.applies_to(vehicle, demand=5): # todo: pass demand=traci.get.demand() argument
                 vehicle.deny_otl_access(self._traci).vehicle_class = SUMORule.disallowed_class_name()
                 self._traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class) if self._traci else None
                 return self
