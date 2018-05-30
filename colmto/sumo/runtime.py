@@ -172,8 +172,10 @@ class Runtime(object):
                 # vehicle object corresponding to current vehicle fetched from traci
                 l_vehicle = run_config.get('vehicles').get(i_vehicle_id)
 
-                # set vclass according to rules for each vehicle, i.e.
-                # allow vehicles access to OTL depending on rule
+                # ITERATE CSE
+                # 1. tell CSE to observe traffic
+                # todo: add observe_traffic() method to CSE. Its method uses a fixed-length collections.deque to measure the median traffic flow per minute, i.e. maxlen=60
+                # 2. apply rule on vehicle, i.e. tell CSE to tell vehicle whether it can use OTL or not :)
                 cse.apply_one(
                     # update vehicle position, speed and pass timestep to let vehicle calculate statistics
                     l_vehicle.update(
