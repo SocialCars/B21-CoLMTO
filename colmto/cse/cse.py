@@ -75,11 +75,16 @@ class SumoCSE(BaseCSE):
         super().__init__(args)
         self._traci = None
 
-    def traci(self, _traci: 'traci'):
+    def traci(self, _traci: 'traci') -> 'SumoCSE':
         '''
         Set TraCI reference
+
+        :return: self
+
         '''
+
         self._traci = _traci
+        return self
 
     def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
         '''

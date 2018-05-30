@@ -84,7 +84,7 @@ class TestCSE(unittest.TestCase):
         self.assertIs(l_sumo_cse._traci, None)  # pylint: disable=protected-access
         l_sumo_cse.traci('foo')
         self.assertEqual(l_sumo_cse._traci, 'foo')  # pylint: disable=protected-access
-        l_sumo_cse.traci(None)
+        self.assertIs(l_sumo_cse.traci(None), l_sumo_cse)
 
         with self.assertRaises(TypeError):
             l_sumo_cse.add_rule('foo')
