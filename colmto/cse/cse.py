@@ -28,7 +28,9 @@ import typing
 if typing.TYPE_CHECKING:
     import traci
 
+from collections import deque
 import colmto.common.log
+from colmto.common.helper import VehicleType
 from colmto.cse.rule import BaseRule
 from colmto.cse.rule import SUMORule
 from colmto.environment.vehicle import SUMOVehicle
@@ -74,6 +76,11 @@ class SumoCSE(BaseCSE):
         '''
         super().__init__(args)
         self._traci = None
+        self._demand = deque((float('nan') for _ in range(60)), maxlen=60)
+        self._satisfaction = {
+            i_vtype: deque((float('nan') for _ in range(60)), maxlen=60)
+            for i_vtype in VehicleType
+        }
 
     def traci(self, _traci: 'traci') -> 'SumoCSE':
         '''
@@ -85,6 +92,18 @@ class SumoCSE(BaseCSE):
 
         self._traci = _traci
         return self
+
+    def observe_traffic(self, subscription_results: list) -> None:
+        '''
+        Observe traffic, i.e. collect data about traffic via TraCI (if provided) to base future rule decisions on
+
+        todo: add observe_traffic() method to CSE. Its method uses a fixed-length collections.deque to measure the median traffic flow per minute, i.e. maxlen=60
+
+        :param subscription_results: traci subscription results
+        :type subscription_results: list
+        '''
+
+
 
     def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
         '''

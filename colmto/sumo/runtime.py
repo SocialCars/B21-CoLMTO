@@ -150,11 +150,9 @@ class Runtime(object):
             # set initial attribute start_time of newly entering vehicles
             # and subscribe to parameters
             for i_vehicle_id in l_simulation_results.get(traci.constants.VAR_DEPARTED_VEHICLES_IDS):
-
                 # set TraCI -> vehicle.start_time
                 run_config.get('vehicles').get(i_vehicle_id).start_time = \
                     l_simulation_results.get(traci.constants.VAR_TIME_STEP)/10.**3
-
                 # subscribe to parameters
                 traci.vehicle.subscribe(
                     i_vehicle_id, [
@@ -166,16 +164,16 @@ class Runtime(object):
                     ]
                 )
 
+            # retrieve results
+            l_results = traci.vehicle.getSubscriptionResults().items()
+            # ITERATE CSE
+            # 1. let CSE observe traffic
+            cse.observe_traffic(l_results)
+            # 2. apply rule on vehicle, i.e. tell CSE to tell vehicle whether it can use OTL or not
             # retrieve results, update vehicle objects, apply cse rules
-            for i_vehicle_id, i_results in traci.vehicle.getSubscriptionResults().items():
-
+            for i_vehicle_id, i_results in l_results:
                 # vehicle object corresponding to current vehicle fetched from traci
                 l_vehicle = run_config.get('vehicles').get(i_vehicle_id)
-
-                # ITERATE CSE
-                # 1. tell CSE to observe traffic
-                # todo: add observe_traffic() method to CSE. Its method uses a fixed-length collections.deque to measure the median traffic flow per minute, i.e. maxlen=60
-                # 2. apply rule on vehicle, i.e. tell CSE to tell vehicle whether it can use OTL or not :)
                 cse.apply_one(
                     # update vehicle position, speed and pass timestep to let vehicle calculate statistics
                     l_vehicle.update(
