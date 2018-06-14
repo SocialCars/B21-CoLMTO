@@ -142,18 +142,18 @@ class SpeedRange(Range):
         return super(cls, SpeedRange).__new__(cls, rmin, rmax)
 
 
-class DemandRange(Range):
+class OccupancyRange(Range):
     '''
-    Named tuple to represent allowed demand range.
+    Named tuple to represent allowed occupancy range.
     '''
 
     __slots__ = ()
 
     def __new__(cls, dmin, dmax):
         if dmin > dmax:
-            raise ValueError(f'DemandRange minumium is larger than maximum.')
+            raise ValueError(f'OccupancyRange minumium is larger than maximum.')
         # noinspection PyArgumentList
-        return super(cls, DemandRange).__new__(cls, dmin, dmax)
+        return super(cls, OccupancyRange).__new__(cls, dmin, dmax)
 
 
 class DissatisfactionRange(Range):
@@ -199,7 +199,7 @@ class Distribution(enum.Enum):
         '''
 
         if self is Distribution.POISSON:
-            return prev_start_time + self._prng.value.exponential(scale=lamb)
+            return prev_start_time + self._prng.value.exponential(scale=1/lamb)
 
         return prev_start_time + 1 / lamb # i.e. Distribution.LINEAR
 

@@ -611,7 +611,6 @@ class SumoConfig(colmto.common.configuration.Configuration):
                 int(self.scenario_config.get(scenario_name).get('parameters').get('speedlimit')),
                 int(i_vehicle.speed_max)
             ) * 255.
-
             # update start time
             i_vehicle.start_time = Distribution[
                 self.run_config.get('starttimedistribution').upper()

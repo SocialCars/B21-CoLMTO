@@ -29,6 +29,7 @@ if typing.TYPE_CHECKING:
     import traci
 
 from collections import deque
+import numpy
 import colmto.common.log
 from colmto.common.helper import VehicleType
 from colmto.cse.rule import BaseRule
@@ -76,9 +77,12 @@ class SumoCSE(BaseCSE):
         '''
         super().__init__(args)
         self._traci = None
-        self._demand = deque((float('nan') for _ in range(60)), maxlen=60)
+        self._occupancy = {
+            i_lane: deque((float('NaN') for _ in range(60)), maxlen=60)
+            for i_lane in ('21edge_0', '21edge_1')
+        }
         self._satisfaction = {
-            i_vtype: deque((float('nan') for _ in range(60)), maxlen=60)
+            i_vtype: deque((float('NaN') for _ in range(60)), maxlen=60)
             for i_vtype in VehicleType
         }
 
@@ -93,16 +97,35 @@ class SumoCSE(BaseCSE):
         self._traci = _traci
         return self
 
-    def observe_traffic(self, subscription_results: list) -> None:
+    def observe_traffic(self, lane_subscription_results: typing.Dict[str, typing.Dict[int, float]]) -> None:
         '''
         Observe traffic, i.e. collect data about traffic via TraCI (if provided) to base future rule decisions on
 
-        todo: add observe_traffic() method to CSE. Its method uses a fixed-length collections.deque to measure the median traffic flow per minute, i.e. maxlen=60
+        :todo: add driver dissatisfaction stats
 
-        :param subscription_results: traci subscription results
-        :type subscription_results: list
+        :param lane_subscription_results: traci lane subscription results
+        :type lane_subscription_results: dict
         '''
 
+        if not self._traci:
+            raise ValueError('Can\'t observe traffic without TraCI reference')
+
+        for i_key, i_value in lane_subscription_results.items():
+            self._occupancy.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
+
+    def _median_occupancy(self, lane: str=None) -> typing.Union[float, typing.Dict[str, float]]:
+        '''
+        Calculate median (ignoring NaN values) of occupancy for given lane (optional). If lane is None, return dict for all lanes.
+        :param lane: laneID (optional)
+        :type lane: str
+        :return: median of occupancy
+
+        '''
+
+        return float(numpy.nanmedian(self._occupancy.get(lane))) if lane else {
+            i_lane: numpy.nanmedian(self._occupancy.get(i_lane))
+            for i_lane in self._occupancy
+        }
 
 
     def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
@@ -190,7 +213,7 @@ class SumoCSE(BaseCSE):
         '''
 
         for i_rule in self._rules:
-            if i_rule.applies_to(vehicle, demand=5): # todo: pass demand=traci.get.demand() argument
+            if i_rule.applies_to(vehicle, occupancy=self._median_occupancy()):
                 vehicle.deny_otl_access(self._traci).vehicle_class = SUMORule.disallowed_class_name()
                 self._traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class) if self._traci else None
                 return self

@@ -588,25 +588,25 @@ class TestRule(unittest.TestCase):
 
     def test_sumodemandrule(self):
         '''
-        test SUMODemandRule
+        test SUMOOccupancyRule
         '''
         for i_dr in ((0.1, 0.5), (0.25, 0.75)):
-            with self.subTest(pattern=colmto.common.helper.DemandRange(*i_dr)):
+            with self.subTest(pattern=colmto.common.helper.OccupancyRange(*i_dr)):
                 self.assertTupleEqual(
-                    colmto.cse.rule.SUMODemandRule(demand_range=i_dr)._demand_range, # pylint: disable=protected-access
+                    colmto.cse.rule.SUMOOccupancyRule(occupancy_range=i_dr)._occupancy_range, # pylint: disable=protected-access
                     i_dr
                 )
         self.assertEqual(
-            str(colmto.cse.rule.SUMODemandRule()),
-            '<class \'colmto.cse.rule.SUMODemandRule\'>: demand_range = DemandRange(min=0.0, max=1.0), outside = False'
+            str(colmto.cse.rule.SUMOOccupancyRule()),
+            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: demand_range = OccupancyRange(min=0.0, max=1.0), outside = False'
         )
         self.assertEqual(
-            str(colmto.cse.rule.SUMODemandRule(demand_range=(1.0, 2.0), outside=True)),
-            '<class \'colmto.cse.rule.SUMODemandRule\'>: demand_range = DemandRange(min=1.0, max=2.0), outside = True'
+            str(colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(1.0, 2.0), outside=True)),
+            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: demand_range = OccupancyRange(min=1.0, max=2.0), outside = True'
         )
-        l_demand_rule = colmto.cse.rule.SUMODemandRule(demand_range=(0, 50))
+        l_demand_rule = colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(0, 50))
         for i_demand in range(100):
-            with self.subTest(pattern=(l_demand_rule._demand_range, i_demand)):
+            with self.subTest(pattern=(l_demand_rule._occupancy_range, i_demand)):
                 l_vehicle = colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',

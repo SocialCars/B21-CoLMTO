@@ -34,7 +34,7 @@ from colmto.common.helper import BoundingBox
 from colmto.common.helper import Behaviour
 from colmto.common.helper import RuleOperator
 from colmto.common.helper import DissatisfactionRange
-from colmto.common.helper import DemandRange
+from colmto.common.helper import OccupancyRange
 
 
 class BaseRule(metaclass=ABCMeta):
@@ -617,29 +617,29 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
         return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)
 
 
-class SUMODemandRule(SUMOVehicleRule, rule_name='SUMODemandRule'):
+class SUMOOccupancyRule(SUMOVehicleRule, rule_name='SUMOOccupancyRule'):
     '''
-    Demand-based rule
+    Occupancy-based rule
     '''
 
-    def __init__(self, demand_range: typing.Union[typing.Tuple[float, float], DemandRange] = (0., 1.), outside=False):
+    def __init__(self, occupancy_range: typing.Union[typing.Tuple[float, float], OccupancyRange] = (0., 1.), outside=False):
         '''
         Initialisation
 
-        :type demand_range: DemandRange
-        :param demand_range: demand has to be in- or outside for this rule to apply, default: [0, 1]
+        :type occupancy_range: OccupancyRange
+        :param occupancy_range: occupancy has to be in- or outside for this rule to apply, default: [0, 1]
         :type outside: bool
         :param outside: controls whether this rules applies to vehicles inside (default) or outside of range
 
         '''
 
         super().__init__()
-        self._demand_range = DemandRange(*demand_range)
+        self._occupancy_range = OccupancyRange(*occupancy_range)
         self._outside = bool(outside)
 
     def __str__(self):
         return f'{self.__class__}: ' \
-               f'demand_range = {self._demand_range}, ' \
+               f'occupancy_range = {self._occupancy_range}, ' \
                f'outside = {self._outside}'
 
     def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
@@ -651,4 +651,4 @@ class SUMODemandRule(SUMOVehicleRule, rule_name='SUMODemandRule'):
 
         '''
 
-        return self._outside ^ self._demand_range.contains(kwargs.get('demand', float('NaN')))
+        return self._outside ^ self._occupancy_range.contains(kwargs.get('occupancy', {}).get('21edge_1', float('NaN')))

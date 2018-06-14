@@ -113,12 +113,26 @@ class Runtime(object):
 
         # subscribe to global simulation vars
         traci.simulation.subscribe(
-            [
+            (
                 traci.constants.VAR_TIME_STEP,
                 traci.constants.VAR_DEPARTED_VEHICLES_IDS,
                 traci.constants.VAR_ARRIVED_VEHICLES_IDS,
-                traci.constants.VAR_MIN_EXPECTED_VEHICLES
-            ]
+                traci.constants.VAR_MIN_EXPECTED_VEHICLES,
+            )
+        )
+
+        # subscribe to lane stats to allow CSE to 'observe' traffic
+        traci.lane.subscribe(
+            '21edge_0',
+            (
+                traci.constants.LAST_STEP_OCCUPANCY,
+            )
+        )
+        traci.lane.subscribe(
+            '21edge_1',
+            (
+                traci.constants.LAST_STEP_OCCUPANCY,
+            )
         )
 
         # provide CSE with traci reference
@@ -142,36 +156,36 @@ class Runtime(object):
                     )
 
         # initial fetch of subscription results
-        l_simulation_results = traci.simulation.getSubscriptionResults()
+        l_simulation_subscription_results = traci.simulation.getSubscriptionResults()
 
         # main loop through traci driven simulation runs
-        while l_simulation_results.get(traci.constants.VAR_MIN_EXPECTED_VEHICLES) > 0:
+        while l_simulation_subscription_results.get(traci.constants.VAR_MIN_EXPECTED_VEHICLES) > 0:
 
             # set initial attribute start_time of newly entering vehicles
             # and subscribe to parameters
-            for i_vehicle_id in l_simulation_results.get(traci.constants.VAR_DEPARTED_VEHICLES_IDS):
+            for i_vehicle_id in l_simulation_subscription_results.get(traci.constants.VAR_DEPARTED_VEHICLES_IDS):
                 # set TraCI -> vehicle.start_time
                 run_config.get('vehicles').get(i_vehicle_id).start_time = \
-                    l_simulation_results.get(traci.constants.VAR_TIME_STEP)/10.**3
+                    l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/10.**3
                 # subscribe to parameters
                 traci.vehicle.subscribe(
-                    i_vehicle_id, [
+                    i_vehicle_id, (
                         traci.constants.VAR_POSITION,
                         traci.constants.VAR_LANE_INDEX,
                         traci.constants.VAR_VEHICLECLASS,
                         traci.constants.VAR_MAXSPEED,
                         traci.constants.VAR_SPEED
-                    ]
+                    )
                 )
+            # retrieve vehicle subscription results
+            l_vehicle_subscription_results = traci.vehicle.getSubscriptionResults().items()
 
-            # retrieve results
-            l_results = traci.vehicle.getSubscriptionResults().items()
             # ITERATE CSE
             # 1. let CSE observe traffic
-            cse.observe_traffic(l_results)
+            cse.observe_traffic(traci.lane.getSubscriptionResults())
             # 2. apply rule on vehicle, i.e. tell CSE to tell vehicle whether it can use OTL or not
             # retrieve results, update vehicle objects, apply cse rules
-            for i_vehicle_id, i_results in l_results:
+            for i_vehicle_id, i_results in l_vehicle_subscription_results:
                 # vehicle object corresponding to current vehicle fetched from traci
                 l_vehicle = run_config.get('vehicles').get(i_vehicle_id)
                 cse.apply_one(
@@ -180,14 +194,14 @@ class Runtime(object):
                         i_results.get(traci.constants.VAR_POSITION),
                         i_results.get(traci.constants.VAR_LANE_INDEX),
                         i_results.get(traci.constants.VAR_SPEED),
-                        l_simulation_results.get(traci.constants.VAR_TIME_STEP)/10.**3
+                        l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/10.**3
                     )
                 )
 
             traci.simulationStep()
 
             # fetch new results for next simulation step/cycle
-            l_simulation_results = traci.simulation.getSubscriptionResults()
+            l_simulation_subscription_results = traci.simulation.getSubscriptionResults()
 
         traci.close()
 
