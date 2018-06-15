@@ -191,6 +191,8 @@ class Distribution(enum.Enum):
         For every other value of distribution this function just returns the input value of
         prev_start_time.
 
+        :todo: run statistical tests
+
         :param lamb: lambda
         :param prev_start_time: start time
         :param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
