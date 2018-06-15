@@ -112,6 +112,8 @@ class SumoCSE(BaseCSE):
             raise ValueError('Can\'t observe traffic without TraCI reference')
 
         for i_key, i_value in lane_subscription_results.items():
+            if not i_key in self._occupancy:
+                raise KeyError(f'Unexpected key (\'{i_key}\') of subcription results. Expected one of {list(self._occupancy.keys())}.')
             self._occupancy.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
 
     def _median_occupancy(self) -> typing.Dict[str, float]:

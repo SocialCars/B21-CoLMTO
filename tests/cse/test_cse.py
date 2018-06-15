@@ -158,6 +158,30 @@ class TestCSE(unittest.TestCase):
 
         self.assertIn(l_rule_speed, l_sumo_cse.rules)
 
+    def test_observe_traffic(self):
+        '''
+        Test observe_traffic method
+
+        '''
+
+        with self.assertRaises(ValueError):
+            colmto.cse.cse.SumoCSE(
+                SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+            ).observe_traffic({'foo': {1: 1.2}})
+
+        l_cse = colmto.cse.cse.SumoCSE(
+            SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+        )
+        l_cse.traci(SimpleNamespace(constants=SimpleNamespace(LAST_STEP_OCCUPANCY=13)))
+        l_cse.observe_traffic({'21edge_0': {13: 1.2}})
+        l_cse.observe_traffic({'21edge_0': {13: 1.5}})
+        l_cse.observe_traffic({'21edge_0': {13: 8}})
+        self.assertEqual(l_cse._median_occupancy().get('21edge_0'), 1.5)
+        l_cse.observe_traffic({'21edge_1': {13: 2.0}})
+        self.assertEqual(l_cse._median_occupancy().get('21edge_1'), 2.0)
+        self.assertListEqual(sorted(l_cse._median_occupancy().keys()), ['21edge_0', '21edge_1'])
+        with self.assertRaises(KeyError):
+            l_cse.observe_traffic({'foo': {13: 2.0}})
 
 if __name__ == '__main__':
     unittest.main()
