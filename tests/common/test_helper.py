@@ -27,6 +27,7 @@ colmto: Test module for common.helper.
 
 import random
 import unittest
+import numpy
 
 import colmto.common.helper as helper
 from colmto.environment.vehicle import SUMOVehicle
@@ -109,6 +110,7 @@ class HelperTests(unittest.TestCase):
     def test_dissatisfactionrange(self):
         '''
         Test DissatisfactionRange
+
         '''
 
         l_dsatrange = helper.DissatisfactionRange(12, 120)
@@ -128,7 +130,9 @@ class HelperTests(unittest.TestCase):
     def test_distribution(self):
         '''
         Test Distribution
+
         '''
+
         self.assertGreater(
             helper.Distribution.POISSON.next_timestep(10.5, 1),
             1
@@ -137,6 +141,15 @@ class HelperTests(unittest.TestCase):
             helper.Distribution.LINEAR.next_timestep(10.5, 1),
             1 + 1/10.5
         )
+
+        l_data = [helper.Distribution.POISSON.next_timestep(lamb=1/3, prev_start_time=0.0) for _ in range(10**6)]
+        self.assertAlmostEqual(numpy.mean(l_data), 3, 2)
+        l_data = [helper.Distribution.POISSON.next_timestep(lamb=1/3, prev_start_time=2.13) for _ in range(10**6)]
+        self.assertAlmostEqual(numpy.mean(l_data)-2.13, 3, 2)
+        l_data = [helper.Distribution.LINEAR.next_timestep(lamb=1/3, prev_start_time=0.0) for _ in range(10**6)]
+        self.assertAlmostEqual(numpy.mean(l_data), 3, 2)
+        l_data = [helper.Distribution.LINEAR.next_timestep(lamb=1/3, prev_start_time=2.13) for _ in range(10**6)]
+        self.assertAlmostEqual(numpy.mean(l_data)-2.13, 3, 2)
 
     def test_initialsorting_best(self):
         '''
