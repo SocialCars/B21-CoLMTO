@@ -102,7 +102,6 @@ class SumoCSE(BaseCSE):
         Observe traffic, i.e. collect data about traffic via TraCI (if provided) to base future rule decisions on
 
         :todo: add driver dissatisfaction stats
-        :todo: add test
 
         :param lane_subscription_results: traci lane subscription results
         :type lane_subscription_results: dict
