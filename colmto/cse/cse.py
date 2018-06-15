@@ -113,17 +113,26 @@ class SumoCSE(BaseCSE):
         for i_key, i_value in lane_subscription_results.items():
             self._occupancy.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
 
-    def _median_occupancy(self, lane: str=None) -> typing.Union[float, typing.Dict[str, float]]:
+    def _median_occupancy(self) -> typing.Dict[str, float]:
         '''
-        Calculate median (ignoring NaN values) of occupancy for given lane (optional). If lane is None, return dict for all lanes.
-        :param lane: laneID (optional)
-        :type lane: str
-        :return: median of occupancy
+        Calculate median (ignoring NaN values) occupancy for all lanes.
+        Result can be NaN, iff observation window (self._occupancy) only contains NaN values.
+
+        Example:
+
+        >>> self._median_occupancy()
+        {'21edge_0': 0.24, '21edge_1': 0.02}
+
+        :return: median of occupancy for all lanes in a dictionary.
 
         '''
 
-        return float(numpy.nanmedian(self._occupancy.get(lane))) if lane else {
-            i_lane: numpy.nanmedian(self._occupancy.get(i_lane))
+        return {
+            i_lane: float(
+                numpy.nanmedian(list(self._occupancy.get(i_lane)))
+                if not numpy.isnan(list(self._occupancy.get(i_lane))).all()
+                else 'nan'
+            )
             for i_lane in self._occupancy
         }
 
