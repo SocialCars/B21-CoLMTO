@@ -97,7 +97,7 @@ class SumoCSE(BaseCSE):
         self._traci = _traci
         return self
 
-    def observe_traffic(self, lane_subscription_results: typing.Dict[str, typing.Dict[int, float]]) -> None:
+    def observe_traffic(self, lane_subscription_results: typing.Dict[str, typing.Dict[int, float]]) -> 'SumoCSE':
         '''
         Observe traffic, i.e. collect data about traffic via TraCI (if provided) to base future rule decisions on
 
@@ -105,6 +105,8 @@ class SumoCSE(BaseCSE):
 
         :param lane_subscription_results: traci lane subscription results
         :type lane_subscription_results: dict
+        :return: self
+
         '''
 
         if not self._traci:
@@ -114,6 +116,8 @@ class SumoCSE(BaseCSE):
             if not i_key in self._occupancy:
                 raise KeyError(f'Unexpected key (\'{i_key}\') of subcription results. Expected one of {list(self._occupancy.keys())}.')
             self._occupancy.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
+
+        return self
 
     def _median_occupancy(self) -> typing.Dict[str, float]:
         '''
