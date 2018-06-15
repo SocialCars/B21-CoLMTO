@@ -173,7 +173,7 @@ class TestCSE(unittest.TestCase):
             SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
         )
         l_cse.traci(SimpleNamespace(constants=SimpleNamespace(LAST_STEP_OCCUPANCY=13)))
-        l_cse.observe_traffic({'21edge_0': {13: 1.2}})
+        self.assertEqual(l_cse.observe_traffic({'21edge_0': {13: 1.2}}), l_cse)
         l_cse.observe_traffic({'21edge_0': {13: 1.5}})
         l_cse.observe_traffic({'21edge_0': {13: 8}})
         self.assertEqual(l_cse._median_occupancy().get('21edge_0'), 1.5)
