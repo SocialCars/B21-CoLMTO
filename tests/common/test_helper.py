@@ -107,6 +107,13 @@ class HelperTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             helper.SpeedRange(12, -120)
 
+    def test_occupancyrange(self):
+        '''
+        Test OccupancyRange
+        '''
+        with self.assertRaises(ValueError):
+            helper.OccupancyRange(1, -1)
+
     def test_dissatisfactionrange(self):
         '''
         Test DissatisfactionRange
@@ -143,13 +150,13 @@ class HelperTests(unittest.TestCase):
         )
 
         l_data = [helper.Distribution.POISSON.next_timestep(lamb=1/3, prev_start_time=0.0) for _ in range(10**6)]
-        self.assertAlmostEqual(numpy.mean(l_data), 3, 2)
+        self.assertAlmostEqual(numpy.mean(l_data), 3, 1)
         l_data = [helper.Distribution.POISSON.next_timestep(lamb=1/3, prev_start_time=2.13) for _ in range(10**6)]
-        self.assertAlmostEqual(numpy.mean(l_data)-2.13, 3, 2)
+        self.assertAlmostEqual(numpy.mean(l_data)-2.13, 3, 1)
         l_data = [helper.Distribution.LINEAR.next_timestep(lamb=1/3, prev_start_time=0.0) for _ in range(10**6)]
-        self.assertAlmostEqual(numpy.mean(l_data), 3, 2)
+        self.assertAlmostEqual(numpy.mean(l_data), 3, 1)
         l_data = [helper.Distribution.LINEAR.next_timestep(lamb=1/3, prev_start_time=2.13) for _ in range(10**6)]
-        self.assertAlmostEqual(numpy.mean(l_data)-2.13, 3, 2)
+        self.assertAlmostEqual(numpy.mean(l_data)-2.13, 3, 1)
 
     def test_initialsorting_best(self):
         '''
