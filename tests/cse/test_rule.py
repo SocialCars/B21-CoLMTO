@@ -586,7 +586,7 @@ class TestRule(unittest.TestCase):
                 l_vehicle._properties['dissatisfaction'] = i_dsat   # pylint: disable=protected-access
                 self.assertFalse(l_esdr.applies_to(l_vehicle))
 
-    def test_sumodemandrule(self):
+    def test_sumooccupancyrule(self):
         '''
         test SUMOOccupancyRule
         '''
@@ -598,25 +598,25 @@ class TestRule(unittest.TestCase):
                 )
         self.assertEqual(
             str(colmto.cse.rule.SUMOOccupancyRule()),
-            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: demand_range = OccupancyRange(min=0.0, max=1.0), outside = False'
+            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: occupancy_range = OccupancyRange(min=0.0, max=1.0), outside = False'
         )
         self.assertEqual(
             str(colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(1.0, 2.0), outside=True)),
-            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: demand_range = OccupancyRange(min=1.0, max=2.0), outside = True'
+            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: occupancy_range = OccupancyRange(min=1.0, max=2.0), outside = True'
         )
-        l_demand_rule = colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(0, 50))
-        for i_demand in range(100):
-            with self.subTest(pattern=(l_demand_rule._occupancy_range, i_demand)):
+        l_occupancy_rule = colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(0, 50))
+        for i_occupancy in range(100):
+            with self.subTest(pattern=(l_occupancy_rule._occupancy_range, i_occupancy)):
                 l_vehicle = colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                 )
-                if i_demand <= 50:
-                    self.assertTrue(l_demand_rule.applies_to(l_vehicle, demand=i_demand))
+                if i_occupancy <= 50:
+                    self.assertTrue(l_occupancy_rule.applies_to(l_vehicle, occupancy={'21edge_1': i_occupancy}))
                 else:
-                    self.assertFalse(l_demand_rule.applies_to(l_vehicle, demand=i_demand))
+                    self.assertFalse(l_occupancy_rule.applies_to(l_vehicle, occupancy={'21edge_1': i_occupancy}))
 
-        self.assertFalse(l_demand_rule.applies_to(l_vehicle))
+        self.assertFalse(l_occupancy_rule.applies_to(l_vehicle))
 
 if __name__ == '__main__':
     unittest.main()
