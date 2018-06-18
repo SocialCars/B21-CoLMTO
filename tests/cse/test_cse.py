@@ -167,21 +167,64 @@ class TestCSE(unittest.TestCase):
         with self.assertRaises(ValueError):
             colmto.cse.cse.SumoCSE(
                 SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
-            ).observe_traffic({'foo': {1: 1.2}})
+            ).observe_traffic(
+                {'foo': {1: 1.2}},
+                {'foo': {1: 1.2}},
+                {'foo': colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    speed_max=random.randrange(0, 250))
+                }
+            )
 
         l_cse = colmto.cse.cse.SumoCSE(
             SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
         )
         l_cse.traci(SimpleNamespace(constants=SimpleNamespace(LAST_STEP_OCCUPANCY=13)))
-        self.assertEqual(l_cse.observe_traffic({'21edge_0': {13: 1.2}}), l_cse)
-        l_cse.observe_traffic({'21edge_0': {13: 1.5}})
-        l_cse.observe_traffic({'21edge_0': {13: 8}})
+        self.assertEqual(
+            l_cse.observe_traffic(
+                {'21edge_0': {13: 1.2}},
+                {'foo': {1: 1.2}},
+                {'foo': colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    speed_max=random.randrange(0, 250))
+                }
+            ), l_cse)
+        l_cse.observe_traffic(
+            {'21edge_0': {13: 1.5}},
+            {'foo': {1: 1.2}},
+            {'foo': colmto.environment.vehicle.SUMOVehicle(
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=random.randrange(0, 250))
+            }
+        )
+        l_cse.observe_traffic(
+            {'21edge_0': {13: 8}},
+            {'foo': {1: 1.2}},
+            {'foo': colmto.environment.vehicle.SUMOVehicle(
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=random.randrange(0, 250))
+            }
+        )
         self.assertEqual(l_cse._median_occupancy().get('21edge_0'), 1.5)
-        l_cse.observe_traffic({'21edge_1': {13: 2.0}})
+        l_cse.observe_traffic(
+            {'21edge_1': {13: 2.0}},
+            {'foo': {1: 1.2}},
+            {'foo': colmto.environment.vehicle.SUMOVehicle(
+                environment={'gridlength': 200, 'gridcellwidth': 4},
+                speed_max=random.randrange(0, 250))
+            }
+        )
         self.assertEqual(l_cse._median_occupancy().get('21edge_1'), 2.0)
         self.assertListEqual(sorted(l_cse._median_occupancy().keys()), ['21edge_0', '21edge_1'])
         with self.assertRaises(KeyError):
-            l_cse.observe_traffic({'foo': {13: 2.0}})
+            l_cse.observe_traffic(
+                {'foo': {13: 2.0}},
+                {'foo': {1: 1.2}},
+                {'foo': colmto.environment.vehicle.SUMOVehicle(
+                    environment={'gridlength': 200, 'gridcellwidth': 4},
+                    speed_max=random.randrange(0, 250))
+                }
+            )
 
 if __name__ == '__main__':
     unittest.main()
