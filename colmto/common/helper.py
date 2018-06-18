@@ -410,9 +410,35 @@ class VehicleDisposition(enum.Enum):
 
         :param cooperation_probability: probability p=[0,1] (default: 0.5)
         :return: VehicleDisposition.COOPERATIVE | VehicleDisposition.UNCOOPERATIVE
+
         '''
 
         return VehicleDisposition._prng.value.choice(
             (VehicleDisposition.COOPERATIVE, VehicleDisposition.UNCOOPERATIVE),
             p=(cooperation_probability, 1-cooperation_probability)
         )
+
+
+class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max'))):
+    '''
+    Named tuple to represent a statistical value containing a minimum, median, mean and maximum.
+
+    todo: unit tests
+    '''
+
+    __slots__ = ()
+
+    @staticmethod
+    def of(values: typing.Iterable[float]):
+        '''
+        Create new StatisticValue from iterable
+        :param values: iterable of floats
+        :return: StatisticValue
+        '''
+
+        return StatisticValue(
+            min=numpy.nanmin(values),
+            median=numpy.nanmedian(values),
+            mean=numpy.nanmean(values),
+            max=numpy.nanmax(values)
+        ) if values else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
