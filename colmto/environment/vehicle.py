@@ -25,7 +25,6 @@
 
 import colmto.cse.rule
 import colmto.common.model
-import colmto.common.log
 from colmto.common.helper import Position
 from colmto.common.helper import VehicleType
 from colmto.common.helper import VehicleDisposition
@@ -48,7 +47,6 @@ class BaseVehicle(object):
 
     def __init__(self):
         '''Initialisation'''
-        self._log = colmto.common.log.logger(f'{__name__} ({hex(id(self))})', loglevel='debug')
         self._properties = {
             'position': Position(x=0.0, y=0.0),
             'speed': 0.0
