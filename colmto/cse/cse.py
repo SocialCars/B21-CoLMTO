@@ -178,7 +178,7 @@ class SumoCSE(BaseCSE):
         '''
 
         return {
-            i_vtype: numpy.nanmedian(self._dissatisfaction.get(i_vtype), axis=0)
+            i_vtype: StatisticValue(*numpy.nanmedian(self._dissatisfaction.get(i_vtype), axis=0))
             for i_vtype in self._dissatisfaction
         }
 
