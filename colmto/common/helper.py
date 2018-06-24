@@ -423,7 +423,6 @@ class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max
     '''
     Named tuple to represent a statistical value containing a minimum, median, mean and maximum.
 
-    todo: unit tests
     '''
 
     __slots__ = ()
@@ -441,4 +440,4 @@ class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max
             median=numpy.nanmedian(values),
             mean=numpy.nanmean(values),
             max=numpy.nanmax(values)
-        ) if values and not all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
+        ) if values and not numpy.all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
