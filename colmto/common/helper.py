@@ -429,9 +429,9 @@ class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max
     __slots__ = ()
 
     @staticmethod
-    def of(values: typing.Iterable[float]):
+    def nanof(values: typing.Iterable[float]):
         '''
-        Create new StatisticValue from iterable
+        Create nan-safe new StatisticValue from iterable by using numpy.nan*
         :param values: iterable of floats
         :return: StatisticValue
         '''
@@ -441,4 +441,4 @@ class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max
             median=numpy.nanmedian(values),
             mean=numpy.nanmean(values),
             max=numpy.nanmax(values)
-        ) if values else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
+        ) if values and not all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)

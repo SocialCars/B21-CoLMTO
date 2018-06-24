@@ -105,8 +105,6 @@ class SumoCSE(BaseCSE):
         '''
         Observe traffic, i.e. collect data about traffic via TraCI (if provided) to base future rule decisions on
 
-        :todo: add driver dissatisfaction stats
-
         :param lane_subscription_results: traci lane subscription results
         :type lane_subscription_results: dict
         :param vehicle_subscription_results: traci vehicle subscription results
@@ -135,7 +133,7 @@ class SumoCSE(BaseCSE):
             l_vehicle = vehicles.get(i_vehicle_id)
             l_dissatisfaction.get(l_vehicle.vehicle_type).append(l_vehicle.dissatisfaction)
         for i_vtype, i_values in l_dissatisfaction.items():
-            self._dissatisfaction.get(i_vtype).appendleft(StatisticValue.of(i_values))
+            self._dissatisfaction.get(i_vtype).appendleft(StatisticValue.nanof(i_values))
 
         return self
 
