@@ -83,7 +83,7 @@ class SumoCSE(BaseCSE):
             for i_lane in ('21edge_0', '21edge_1')
         }
         self._dissatisfaction = {
-            i_vtype: deque((float('NaN') for _ in range(60)), maxlen=60)
+            i_vtype: deque((StatisticValue.nanof([]) for _ in range(60)), maxlen=60)
             for i_vtype in VehicleType
         }
 
@@ -162,9 +162,7 @@ class SumoCSE(BaseCSE):
 
     def _median_dissatisfaction(self) -> typing.Dict[VehicleType, float]:
         '''
-        Calculate median (ignoring NaN values) over min/median/mean/max dissatisfaction of each vehicle for each group of vehicle types.
-
-        todo: test cases
+        Calculate medians (ignoring NaN values) over min/median/mean/max dissatisfaction of each vehicle for each group of vehicle types.
 
         Example:
 
@@ -177,6 +175,7 @@ class SumoCSE(BaseCSE):
 
         return {
             i_vtype: StatisticValue(*numpy.nanmedian(self._dissatisfaction.get(i_vtype), axis=0))
+            if not numpy.isnan(list(self._dissatisfaction.get(i_vtype))).all() else StatisticValue.nanof([])
             for i_vtype in self._dissatisfaction
         }
 

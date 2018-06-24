@@ -440,4 +440,4 @@ class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max
             median=numpy.nanmedian(values),
             mean=numpy.nanmean(values),
             max=numpy.nanmax(values)
-        ) if values and not numpy.all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
+        ) if not numpy.isnan(values).all() else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
