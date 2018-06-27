@@ -288,14 +288,14 @@ class HelperTests(unittest.TestCase):
         l_statisticvalue = helper.StatisticValue(1., 2., 3., 4.)
 
         self.assertTupleEqual(l_statisticvalue, (1., 2., 3., 4.))
-        self.assertEqual(l_statisticvalue.min, 1.)
+        self.assertEqual(l_statisticvalue.minimum, 1.)
         self.assertEqual(l_statisticvalue.median, 2.)
         self.assertEqual(l_statisticvalue.mean, 3.)
-        self.assertEqual(l_statisticvalue.max, 4.)
+        self.assertEqual(l_statisticvalue.maximum, 4.)
 
         l_statisticvalue = helper.StatisticValue.nanof((2, 5, 3, 4, 2, float('nan')))
-        self.assertEqual(l_statisticvalue.min, 2)
-        self.assertEqual(l_statisticvalue.max, 5)
+        self.assertEqual(l_statisticvalue.minimum, 2)
+        self.assertEqual(l_statisticvalue.maximum, 5)
         self.assertEqual(l_statisticvalue.mean, 3.2)
         self.assertEqual(l_statisticvalue.median, 3)
 

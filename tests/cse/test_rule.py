@@ -508,25 +508,25 @@ class TestRule(unittest.TestCase):
 
     def test_sumo_dissatisfaction_rule(self):
         '''
-        Test SUMODissatisfactionRule
+        Test SUMOVehicleDissatisfactionRule
         '''
         for i_thr in ((0.1, 0.5), (0.25, 0.75)):
             with self.subTest(pattern=colmto.common.helper.DissatisfactionRange(*i_thr)):
                 self.assertTupleEqual(
-                    colmto.cse.rule.SUMODissatisfactionRule(dissatisfaction_range=i_thr).threshold_range,
+                    colmto.cse.rule.SUMOVehicleDissatisfactionRule(dissatisfaction_range=i_thr).threshold_range,
                     i_thr
                 )
 
         self.assertEqual(
-            str(colmto.cse.rule.SUMODissatisfactionRule()),
-            '<class \'colmto.cse.rule.SUMODissatisfactionRule\'>: dissatisfaction_range = DissatisfactionRange(min=0.0, max=0.5), outside = False'
+            str(colmto.cse.rule.SUMOVehicleDissatisfactionRule()),
+            '<class \'colmto.cse.rule.SUMOVehicleDissatisfactionRule\'>: dissatisfaction_range = DissatisfactionRange(min=0.0, max=0.5), outside = False'
         )
         self.assertEqual(
-            str(colmto.cse.rule.SUMODissatisfactionRule(dissatisfaction_range=(1.0, 2.0), outside=True)),
-            '<class \'colmto.cse.rule.SUMODissatisfactionRule\'>: dissatisfaction_range = DissatisfactionRange(min=1.0, max=2.0), outside = True'
+            str(colmto.cse.rule.SUMOVehicleDissatisfactionRule(dissatisfaction_range=(1.0, 2.0), outside=True)),
+            '<class \'colmto.cse.rule.SUMOVehicleDissatisfactionRule\'>: dissatisfaction_range = DissatisfactionRange(min=1.0, max=2.0), outside = True'
         )
 
-        l_dsat_rule = colmto.cse.rule.SUMODissatisfactionRule(dissatisfaction_range=(0, 50))
+        l_dsat_rule = colmto.cse.rule.SUMOVehicleDissatisfactionRule(dissatisfaction_range=(0, 50))
 
         for i_dsat in range(100):
             with self.subTest(pattern=(l_dsat_rule.threshold_range, i_dsat)):
@@ -543,9 +543,9 @@ class TestRule(unittest.TestCase):
 
     def test_extendable_sumodissatisfactionrule(self):
         '''
-        Test ExtendableSUMODissatisfactionRule
+        Test ExtendableSUMOVehicleDissatisfactionRule
         '''
-        l_esdr = colmto.cse.rule.ExtendableSUMODissatisfactionRule(dissatisfaction_range=(0, 50))
+        l_esdr = colmto.cse.rule.ExtendableSUMOVehicleDissatisfactionRule(dissatisfaction_range=(0, 50))
 
         for i_dsat in range(100):
             with self.subTest(pattern=i_dsat):
@@ -563,7 +563,7 @@ class TestRule(unittest.TestCase):
         )
         self.assertEqual(
             str(l_esdr),
-            "<class 'colmto.cse.rule.ExtendableSUMODissatisfactionRule'>: threshold = DissatisfactionRange(min=0, max=50), outside = False, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
+            "<class 'colmto.cse.rule.ExtendableSUMOVehicleDissatisfactionRule'>: threshold = DissatisfactionRange(min=0, max=50), outside = False, subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
         )
 
         for i_dsat, i_speed in zip((0, 50), (59, 20)):
