@@ -300,6 +300,7 @@ class HelperTests(unittest.TestCase):
         self.assertEqual(l_statisticvalue.median, 3)
 
         self.assertTupleEqual(helper.StatisticValue.nanof(None), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+        self.assertTupleEqual(helper.StatisticValue.nanof(), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
         self.assertTrue(
             numpy.all(
                 numpy.isnan(

@@ -83,7 +83,7 @@ class SumoCSE(BaseCSE):
             for i_lane in ('21edge_0', '21edge_1')
         }
         self._dissatisfaction = {
-            i_vtype: deque((float('NaN') for _ in range(60)), maxlen=60)
+            i_vtype: deque((StatisticValue.nanof(None) for _ in range(60)), maxlen=60)
             for i_vtype in VehicleType
         }
 
@@ -177,6 +177,7 @@ class SumoCSE(BaseCSE):
 
         return {
             i_vtype: StatisticValue(*numpy.nanmedian(self._dissatisfaction.get(i_vtype), axis=0))
+            if not numpy.isnan(self._dissatisfaction.get(i_vtype)).all() else StatisticValue.nanof()
             for i_vtype in self._dissatisfaction
         }
 
@@ -265,7 +266,7 @@ class SumoCSE(BaseCSE):
         '''
 
         for i_rule in self._rules:
-            if i_rule.applies_to(vehicle, occupancy=self._median_occupancy()):
+            if i_rule.applies_to(vehicle, occupancy=self._median_occupancy(), dissatisfaction=self._median_dissatisfaction()):
                 vehicle.deny_otl_access(self._traci).vehicle_class = SUMORule.disallowed_class_name()
                 self._traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class) if self._traci else None
                 return self

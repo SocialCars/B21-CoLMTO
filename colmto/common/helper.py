@@ -419,7 +419,7 @@ class VehicleDisposition(enum.Enum):
         )
 
 
-class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max'))):
+class StatisticValue(namedtuple('StatisticValue', ('minimum', 'median', 'mean', 'maximum'))):
     '''
     Named tuple to represent a statistical value containing a minimum, median, mean and maximum.
 
@@ -428,7 +428,7 @@ class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max
     __slots__ = ()
 
     @staticmethod
-    def nanof(values: typing.Iterable[float]):
+    def nanof(values: typing.Union[None, typing.Iterable[float]]=None):
         '''
         Create nan-safe new StatisticValue from iterable by using numpy.nan*
         :param values: iterable of floats
@@ -436,8 +436,8 @@ class StatisticValue(namedtuple('StatisticValue', ('min', 'median', 'mean', 'max
         '''
 
         return StatisticValue(
-            min=numpy.nanmin(values),
+            minimum=numpy.nanmin(values),
             median=numpy.nanmedian(values),
             mean=numpy.nanmean(values),
-            max=numpy.nanmax(values)
+            maximum=numpy.nanmax(values)
         ) if values and not numpy.all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)

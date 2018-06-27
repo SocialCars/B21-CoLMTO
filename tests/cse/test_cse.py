@@ -24,6 +24,7 @@
 '''
 colmto: Test module for environment.cse.
 '''
+import numpy
 import random
 from types import SimpleNamespace
 
@@ -32,6 +33,7 @@ import unittest
 import colmto.cse.cse
 import colmto.cse.rule
 import colmto.environment.vehicle
+from colmto.common.helper import VehicleType
 
 
 class TestCSE(unittest.TestCase):
@@ -163,6 +165,26 @@ class TestCSE(unittest.TestCase):
         Test observe_traffic method
 
         '''
+
+        for i_lane in ('21edge_0', '21edge_1'):
+            with self.subTest(pattern=i_lane):
+                self.assertTrue(
+                    numpy.isnan(
+                        colmto.cse.cse.SumoCSE(
+                            SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+                        )._occupancy.get(i_lane)
+                    ).all()
+                )
+
+        for i_vtype in VehicleType:
+            with self.subTest(pattern=i_vtype):
+                self.assertTrue(
+                    numpy.isnan(
+                        colmto.cse.cse.SumoCSE(
+                            SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+                        )._dissatisfaction.get(i_vtype)
+                    ).all()
+                )
 
         with self.assertRaises(ValueError):
             colmto.cse.cse.SumoCSE(
