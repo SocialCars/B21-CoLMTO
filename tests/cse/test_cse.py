@@ -34,7 +34,7 @@ import colmto.cse.cse
 import colmto.cse.rule
 import colmto.environment.vehicle
 from colmto.common.helper import VehicleType
-
+from colmto.common.helper import StatisticValue
 
 class TestCSE(unittest.TestCase):
     '''
@@ -247,6 +247,10 @@ class TestCSE(unittest.TestCase):
                     speed_max=random.randrange(0, 250))
                 }
             )
+        for i_vtype in VehicleType:
+            for _ in range(50):
+                l_cse._dissatisfaction.get(i_vtype).appendleft(StatisticValue.nanof((2, 3, 4, 5, 2)))
+            self.assertTupleEqual(l_cse._median_dissatisfaction().get(i_vtype), StatisticValue(2.0, 3.0, 3.2, 5.0))
 
 if __name__ == '__main__':
     unittest.main()

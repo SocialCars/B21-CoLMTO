@@ -302,11 +302,9 @@ class HelperTests(unittest.TestCase):
         self.assertTupleEqual(helper.StatisticValue.nanof(None), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
         self.assertTupleEqual(helper.StatisticValue.nanof(), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
         self.assertTrue(
-            numpy.all(
-                numpy.isnan(
-                    helper.StatisticValue.nanof((numpy.nan, numpy.nan, numpy.nan, numpy.nan))
-                )
-            )
+            numpy.isnan(
+                helper.StatisticValue.nanof((numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+            ).all()
         )
 
 
