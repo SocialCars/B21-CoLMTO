@@ -280,5 +280,33 @@ class HelperTests(unittest.TestCase):
             1
         )
 
+    def test_statisticvalue(self):
+        '''
+        Test StatisticValue
+        '''
+
+        l_statisticvalue = helper.StatisticValue(1., 2., 3., 4.)
+
+        self.assertTupleEqual(l_statisticvalue, (1., 2., 3., 4.))
+        self.assertEqual(l_statisticvalue.minimum, 1.)
+        self.assertEqual(l_statisticvalue.median, 2.)
+        self.assertEqual(l_statisticvalue.mean, 3.)
+        self.assertEqual(l_statisticvalue.maximum, 4.)
+
+        l_statisticvalue = helper.StatisticValue.nanof((2, 5, 3, 4, 2, float('nan')))
+        self.assertEqual(l_statisticvalue.minimum, 2)
+        self.assertEqual(l_statisticvalue.maximum, 5)
+        self.assertEqual(l_statisticvalue.mean, 3.2)
+        self.assertEqual(l_statisticvalue.median, 3)
+
+        self.assertTupleEqual(helper.StatisticValue.nanof(None), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+        self.assertTupleEqual(helper.StatisticValue.nanof(), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+        self.assertTrue(
+            numpy.isnan(
+                helper.StatisticValue.nanof((numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+            ).all()
+        )
+
+
 if __name__ == '__main__':
     unittest.main()

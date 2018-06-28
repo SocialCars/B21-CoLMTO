@@ -101,8 +101,8 @@ class BaseRule(metaclass=ABCMeta):
         >>> print(extendable_position_rule._valid_rules.keys())
         dict_keys(['SUMOUniversalRule', 'SUMONullRule', 'SUMOVehicleRule', 'SUMOVTypeRule',
                    'ExtendableSUMOVTypeRule', 'SUMOMinimalSpeedRule', 'ExtendableSUMOMinimalSpeedRule',
-                   'SUMOPositionRule', 'ExtendableSUMOPositionRule', 'SUMODissatisfactionRule',
-                   'ExtendableSUMODissatisfactionRule'])
+                   'SUMOPositionRule', 'ExtendableSUMOPositionRule', 'SUMOVehicleDissatisfactionRule',
+                   'ExtendableSUMOVehicleDissatisfactionRule'])
         >>> print(extendable_position_rule.add_subrule(vtype_rule))
         <class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: posbounding_boxBoundingBox(p1=Position(x=0, y=0), p2=Position(x=100, y=100)),
         subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOVTypeRule'>
@@ -533,9 +533,9 @@ class ExtendableSUMOPositionRule(SUMOPositionRule, ExtendableSUMORule, rule_name
         return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)
 
 
-class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRule'):
+class SUMOVehicleDissatisfactionRule(SUMOVehicleRule, rule_name='SUMOVehicleDissatisfactionRule'):
     '''
-    Dissatisfaction based rule:
+    Dissatisfaction rule based on vehicles:
     Applies to vehicles which are in- or outside a given dissatisfaction range (default: inside [0, 0.5]).
     '''
 
@@ -578,10 +578,10 @@ class SUMODissatisfactionRule(SUMOVehicleRule, rule_name='SUMODissatisfactionRul
         return self._outside ^ self._dissatisfaction_range.contains(vehicle.dissatisfaction)
 
 
-class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMORule, rule_name='ExtendableSUMODissatisfactionRule'):
+class ExtendableSUMOVehicleDissatisfactionRule(SUMOVehicleDissatisfactionRule, ExtendableSUMORule, rule_name='ExtendableSUMOVehicleDissatisfactionRule'):
     '''
-    Extendable dissatisfaction-based rule:
-    Applies to vehicles which have reached a given dissatisfaction threshold (default: >=0.5).
+    Extendable dissatisfaction rule for vehicles:
+    Applies to vehicles which have reached a given dissatisfaction threshold (default: <=0.5).
     '''
 
     def __init__(self, dissatisfaction_range=DissatisfactionRange(0.0, 0.5), outside=False,
@@ -595,7 +595,95 @@ class ExtendableSUMODissatisfactionRule(SUMODissatisfactionRule, ExtendableSUMOR
 
         '''
 
-        SUMODissatisfactionRule.__init__(self, dissatisfaction_range=dissatisfaction_range, outside=outside)
+        SUMOVehicleDissatisfactionRule.__init__(self, dissatisfaction_range=dissatisfaction_range, outside=outside)
+        ExtendableSUMORule.__init__(self, subrules=subrules, subrule_operator=subrule_operator)
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'threshold = {self._dissatisfaction_range}, ' \
+               f'outside = {self._outside}, ' \
+               f'subrule_operator: {self._subrule_operator}, ' \
+               f'subrules: {self.subrules_as_str}'
+
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
+        '''
+        Test whether this (and sub)rules apply to given vehicle
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+
+        return super().applies_to(vehicle) and self.applies_to_subrules(vehicle)
+
+
+class SUMOGlobalDissatisfactionRule(SUMOVehicleRule, rule_name='SUMOGlobalDissatisfactionRule'):
+    '''
+    Dissatisfaction rule based on global statistics:
+    Applies if the global dissatisfaction reaches a given threshold (default: >=0.5).
+
+    todo: test cases
+    '''
+
+    def __init__(self, dissatisfaction_range=DissatisfactionRange(0.0, 0.5), outside=False):
+        '''
+        Initialisation
+
+        :param dissatisfaction_range: aggregated dissatisfaction which have to be reached for this rule to apply
+        :param outside: controls whether this rules applies to vehicles inside (default) or outside of range
+
+        '''
+
+        super().__init__()
+        self._dissatisfaction_range = DissatisfactionRange(*dissatisfaction_range)
+        self._outside = bool(outside)
+
+    def __str__(self):
+        return f'{self.__class__}: ' \
+               f'dissatisfaction_range = {self._dissatisfaction_range}, ' \
+               f'outside = {self._outside}'
+
+    @property
+    def threshold_range(self) -> float:
+        '''
+        :return: dissatisfaction threshold range
+
+        '''
+
+        return self._dissatisfaction_range
+
+    def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
+        '''
+        Test whether this (and sub)rules apply to given vehicle
+
+        :param vehicle: Vehicle
+        :return: boolean
+
+        '''
+
+        return self._outside ^ self._dissatisfaction_range.contains(kwargs.get('dissatisfaction', {}).get(vehicle.vehicle_type, float('NaN')))
+
+
+class ExtendableSUMOGlobalDissatisfactionRule(SUMOGlobalDissatisfactionRule, ExtendableSUMORule, rule_name='ExtendableSUMOGlobalDissatisfactionRule'):
+    '''
+    Extendable global dissatisfaction-based rule:
+    Applies if the global dissatisfaction reaches a given threshold (default: <=0.5).
+
+    todo: test cases
+    '''
+
+    def __init__(self, dissatisfaction_range=DissatisfactionRange(0.0, 0.5), outside=False,
+                 subrules=tuple(), subrule_operator=RuleOperator.ANY):
+        '''
+        Initialisation
+
+        :param threshold: aggregated dissatisfaction which have to be reached for this rule to apply
+        :param subrules: List of sub-rules
+        :param subrule_operator: Rule operator of RuleOperator enum for applying sub-rules ANY|ALL
+
+        '''
+
+        SUMOVehicleDissatisfactionRule.__init__(self, dissatisfaction_range=dissatisfaction_range, outside=outside)
         ExtendableSUMORule.__init__(self, subrules=subrules, subrule_operator=subrule_operator)
 
     def __str__(self):

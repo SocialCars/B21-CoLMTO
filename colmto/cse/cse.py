@@ -32,6 +32,7 @@ from collections import deque
 import numpy
 import colmto.common.log
 from colmto.common.helper import VehicleType
+from colmto.common.helper import StatisticValue
 from colmto.cse.rule import BaseRule
 from colmto.cse.rule import SUMORule
 from colmto.environment.vehicle import SUMOVehicle
@@ -81,8 +82,8 @@ class SumoCSE(BaseCSE):
             i_lane: deque((float('NaN') for _ in range(60)), maxlen=60)
             for i_lane in ('21edge_0', '21edge_1')
         }
-        self._satisfaction = {
-            i_vtype: deque((float('NaN') for _ in range(60)), maxlen=60)
+        self._dissatisfaction = {
+            i_vtype: deque((StatisticValue.nanof(None) for _ in range(60)), maxlen=60)
             for i_vtype in VehicleType
         }
 
@@ -97,14 +98,19 @@ class SumoCSE(BaseCSE):
         self._traci = _traci
         return self
 
-    def observe_traffic(self, lane_subscription_results: typing.Dict[str, typing.Dict[int, float]]) -> 'SumoCSE':
+    def observe_traffic(self,
+                        lane_subscription_results: typing.Dict[str, typing.Dict[int, float]],
+                        vehicle_subscription_results: typing.Dict[str, typing.Dict[int, float]],
+                        vehicles: typing.Dict[str, SUMOVehicle]) -> 'SumoCSE':
         '''
         Observe traffic, i.e. collect data about traffic via TraCI (if provided) to base future rule decisions on
 
-        :todo: add driver dissatisfaction stats
-
         :param lane_subscription_results: traci lane subscription results
         :type lane_subscription_results: dict
+        :param vehicle_subscription_results: traci vehicle subscription results
+        :type vehicle_subscription_results: dict
+        :param vehicles: vehicle object dict
+        :type vehicles: dict
         :return: self
 
         '''
@@ -112,10 +118,22 @@ class SumoCSE(BaseCSE):
         if not self._traci:
             raise ValueError('Can\'t observe traffic without TraCI reference')
 
+        # record occupancy
         for i_key, i_value in lane_subscription_results.items():
             if not i_key in self._occupancy:
                 raise KeyError(f'Unexpected key (\'{i_key}\') of subcription results. Expected one of {list(self._occupancy.keys())}.')
             self._occupancy.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
+
+        # record dissatisfaction
+        l_dissatisfaction = {
+            i_vtype: []
+            for i_vtype in VehicleType
+        }
+        for i_vehicle_id in vehicle_subscription_results:
+            l_vehicle = vehicles.get(i_vehicle_id)
+            l_dissatisfaction.get(l_vehicle.vehicle_type).append(l_vehicle.dissatisfaction)
+        for i_vtype, i_values in l_dissatisfaction.items():
+            self._dissatisfaction.get(i_vtype).appendleft(StatisticValue.nanof(i_values))
 
         return self
 
@@ -142,6 +160,24 @@ class SumoCSE(BaseCSE):
             for i_lane in self._occupancy
         }
 
+    def _median_dissatisfaction(self) -> typing.Dict[VehicleType, float]:
+        '''
+        Calculate medians (ignoring NaN values) over min/median/mean/max dissatisfaction of each vehicle for each group of vehicle types.
+
+        Example:
+
+        >>> self._median_dissatisfaction()
+        { VehicleType.PASSENGER: 'passenger': StatisticValue(min=5, median=2, mean=15, max=20) ... }
+
+        :return: medians
+
+        '''
+
+        return {
+            i_vtype: StatisticValue(*numpy.nanmedian(self._dissatisfaction.get(i_vtype), axis=0))
+            if not numpy.isnan(list(self._dissatisfaction.get(i_vtype))).all() else StatisticValue.nanof([])
+            for i_vtype in self._dissatisfaction
+        }
 
     def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
         '''
@@ -228,7 +264,7 @@ class SumoCSE(BaseCSE):
         '''
 
         for i_rule in self._rules:
-            if i_rule.applies_to(vehicle, occupancy=self._median_occupancy()):
+            if i_rule.applies_to(vehicle, occupancy=self._median_occupancy(), dissatisfaction=self._median_dissatisfaction()):
                 vehicle.deny_otl_access(self._traci).vehicle_class = SUMORule.disallowed_class_name()
                 self._traci.vehicle.setVehicleClass(vehicle.sumo_id, vehicle.vehicle_class) if self._traci else None
                 return self

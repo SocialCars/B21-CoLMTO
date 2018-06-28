@@ -86,7 +86,13 @@ class Runtime(object):
 
     def run_traci(self, run_config: dict, cse: colmto.cse.cse.SumoCSE) -> typing.Dict[str, SUMOVehicle]:
         '''
-        Run provided scenario with TraCI by providing a ref to an optimisation entity.
+        Run provided scenario with TraCI by providing a ref to an optimisation entity and execute the CSE protocol.
+
+        *CSE protocol*
+
+            1. observe traffic
+            2. apply active policy, i.e. rules on vehicles:
+               Tell vehicles whether they are allowed to use OTL or not
 
         :param run_config: run configuration
         :param cse: central optimisation entity instance of colmto.cse.cse.SumoCSE
@@ -99,7 +105,7 @@ class Runtime(object):
 
         self._log.debug('starting sumo process')
         self._log.debug('CSE %s with rules %s', cse, cse.rules)
-        traci.start(
+        l_traci_start = traci.start(
             [
                 self._sumo_binary,
                 '-c', run_config.get('configfile'),
@@ -109,7 +115,7 @@ class Runtime(object):
             ]
         )
 
-        self._log.debug('connecting to TraCI instance on port %d', run_config.get('sumoport'))
+        self._log.debug('subscribing to TraCI')
 
         # subscribe to global simulation vars
         traci.simulation.subscribe(
@@ -177,26 +183,32 @@ class Runtime(object):
                         traci.constants.VAR_SPEED
                     )
                 )
-            # retrieve vehicle subscription results
-            l_vehicle_subscription_results = traci.vehicle.getSubscriptionResults().items()
 
-            # ITERATE CSE
-            # 1. let CSE observe traffic
-            cse.observe_traffic(traci.lane.getSubscriptionResults())
-            # 2. apply rule on vehicle, i.e. tell CSE to tell vehicle whether it can use OTL or not
-            # retrieve results, update vehicle objects, apply cse rules
-            for i_vehicle_id, i_results in l_vehicle_subscription_results:
-                # vehicle object corresponding to current vehicle fetched from traci
-                l_vehicle = run_config.get('vehicles').get(i_vehicle_id)
-                cse.apply_one(
-                    # update vehicle position, speed and pass timestep to let vehicle calculate statistics
-                    l_vehicle.update(
-                        i_results.get(traci.constants.VAR_POSITION),
-                        i_results.get(traci.constants.VAR_LANE_INDEX),
-                        i_results.get(traci.constants.VAR_SPEED),
-                        l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/10.**3
-                    )
+            # retrieve vehicle subscription results
+            l_vehicle_subscription_results = traci.vehicle.getSubscriptionResults()
+
+            # retrieve results and update vehicle objects
+            for i_vehicle_id, i_results in l_vehicle_subscription_results.items():
+                # update vehicle position, speed and pass timestep to let vehicle calculate statistics
+                run_config.get('vehicles').get(i_vehicle_id).update(
+                    i_results.get(traci.constants.VAR_POSITION),
+                    i_results.get(traci.constants.VAR_LANE_INDEX),
+                    i_results.get(traci.constants.VAR_SPEED),
+                    l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/10.**3
                 )
+
+            # BEGIN CSE protocol
+            # 1. CSE observes traffic
+            cse.observe_traffic(
+                traci.lane.getSubscriptionResults(),
+                l_vehicle_subscription_results,
+                run_config.get('vehicles')
+            )
+            # 2. apply active policy, i.e. rules on vehicles:
+            # Tell CSE to tell vehicles whether they are allowed to use OTL or not
+            for i_vehicle_id in l_vehicle_subscription_results:
+                cse.apply_one(run_config.get('vehicles').get(i_vehicle_id))
+            # END CSE protocol
 
             traci.simulationStep()
 

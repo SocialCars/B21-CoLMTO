@@ -410,9 +410,34 @@ class VehicleDisposition(enum.Enum):
 
         :param cooperation_probability: probability p=[0,1] (default: 0.5)
         :return: VehicleDisposition.COOPERATIVE | VehicleDisposition.UNCOOPERATIVE
+
         '''
 
         return VehicleDisposition._prng.value.choice(
             (VehicleDisposition.COOPERATIVE, VehicleDisposition.UNCOOPERATIVE),
             p=(cooperation_probability, 1-cooperation_probability)
         )
+
+
+class StatisticValue(namedtuple('StatisticValue', ('minimum', 'median', 'mean', 'maximum'))):
+    '''
+    Named tuple to represent a statistical value containing a minimum, median, mean and maximum.
+
+    '''
+
+    __slots__ = ()
+
+    @staticmethod
+    def nanof(values: typing.Union[None, typing.Iterable[float]]=None):
+        '''
+        Create nan-safe new StatisticValue from iterable by using numpy.nan*
+        :param values: iterable of floats
+        :return: StatisticValue
+        '''
+
+        return StatisticValue(
+            minimum=numpy.nanmin(values),
+            median=numpy.nanmedian(values),
+            mean=numpy.nanmean(values),
+            maximum=numpy.nanmax(values)
+        ) if values and not numpy.all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
