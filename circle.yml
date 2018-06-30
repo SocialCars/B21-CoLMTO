@@ -50,17 +50,8 @@ jobs:
                   name: Remove sphinx source and build files
                   command: rm -r docs/source && rm -r docs/build && rm docs/Makefile
             - run:
-                  name: Run Tests
-                  command: python3 setup.py test
-            - run:
-                  name: Run Simulation for Scenario NI-B210 (1/2)
-                  command: python3 -m colmto --fresh-configs --scenarios NI-B210 --runs 1 --debug
-            - run:
-                 name: Run Simulation for Scenario NI-B210 with CSE (2/2)
-                 command: python3 -m colmto --fresh-configs --cse --scenarios NI-B210 --runs 1 --only-one-otl-segment --debug
-            - run:
-                  name: Run Tests for Codecov/Codacy Coverage
-                  command: py.test tests --cov=colmto --cov-report=xml:coverage.xml
+                name: Run Tests and Create Codecov/Codacy Coverage Report
+                command: py.test tests --log-cli-level=DEBUG --cov=colmto --cov-report=xml:coverage.xml
             - run:
                   name: Upload Results to Codecov for masc (1/4)
                   command: bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
