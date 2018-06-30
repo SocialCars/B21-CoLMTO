@@ -497,10 +497,12 @@ class SUMOVehicle(BaseVehicle):
         self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, self._grid_position.x)] = self._travel_time
         # include, i.e. substract the start_position as SUMO tends to put vehicles at positions > 0 in their 0th time step.
         # round result of divison as SUMO reports positions with reduced (2 significant figures) accuracy to avoid underflows
-        self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] = time_step - self.start_time - numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2)
+        self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] \
+            = time_step - self.start_time - numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2)
         self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] \
-            = (time_step - self.start_time - numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2)) / numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2) \
-            if self._position.x - self.start_position.x > 0 else 0
+            = (time_step - self.start_time - numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2)) \
+              / numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2) \
+            if numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2) > 0 else 0
         self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[(Metric.LANE_INDEX.value, self._grid_position.x)] = self._lane
 
         return self
