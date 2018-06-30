@@ -92,6 +92,13 @@ class TestVehicle(unittest.TestCase):
         l_sumovehicle.position = numpy.array([42.0, 0])
         l_sumovehicle.normal_colour = (128, 64, 255, 255)
         l_sumovehicle.start_time = 13
+        self.assertTupleEqual(l_sumovehicle.start_position, (0.0, 0.0))
+        l_sumovehicle.start_position = (1.2, 3.4)
+        self.assertEqual(l_sumovehicle.start_position.x, 1.2)
+        self.assertEqual(l_sumovehicle.start_position.y, 3.4)
+        self.assertEqual(l_sumovehicle.start_position.gridified(2).x, 0)
+        self.assertEqual(l_sumovehicle.start_position.gridified(2).y, 1)
+        self.assertTupleEqual(l_sumovehicle.start_position, (1.2, 3.4))
 
         self.assertEqual(l_sumovehicle.speed_max, 27.777)
         self.assertEqual(l_sumovehicle.position, (42.0, 0))
