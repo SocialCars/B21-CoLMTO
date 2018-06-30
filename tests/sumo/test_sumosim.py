@@ -185,9 +185,6 @@ class TestSumoSim(unittest.TestCase):
     @unittest.skipUnless(
         Path(f"{os.environ.get('SUMO_HOME','sumo')}/tools/sumolib").is_dir(),
         f"can't find sumolib at {os.environ.get('SUMO_HOME','sumo')}/tools/")
-    @unittest.skipUnless(
-        not os.environ.get('CIRCLECI'),
-        f"Skipping test on CircleCI.")
     def test_sumosim_runscenarios_cse():
         '''
         Test SumoSim.runscenarios() with CSE
