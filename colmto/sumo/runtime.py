@@ -171,8 +171,7 @@ class Runtime(object):
             # and subscribe to parameters
             for i_vehicle_id in l_simulation_subscription_results.get(traci.constants.VAR_DEPARTED_VEHICLES_IDS):
                 # set TraCI -> vehicle.start_time
-                run_config.get('vehicles').get(i_vehicle_id).start_time = \
-                    l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/10.**3
+                run_config.get('vehicles').get(i_vehicle_id).start_time = l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/1000.
                 # subscribe to parameters
                 traci.vehicle.subscribe(
                     i_vehicle_id, (
@@ -183,6 +182,9 @@ class Runtime(object):
                         traci.constants.VAR_SPEED
                     )
                 )
+                # set TraCI -> vehicle.start_position
+                run_config.get('vehicles').get(i_vehicle_id).start_position = traci.vehicle.getSubscriptionResults(i_vehicle_id).get(traci.constants.VAR_POSITION)
+
 
             # retrieve vehicle subscription results
             l_vehicle_subscription_results = traci.vehicle.getSubscriptionResults()

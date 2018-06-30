@@ -32,7 +32,7 @@ from colmto.common.helper import StatisticSeries
 from colmto.common.helper import GridPosition
 from colmto.common.helper import Colour
 from colmto.common.helper import Metric
-
+import numpy
 from types import MappingProxyType
 import typing
 if typing.TYPE_CHECKING:
@@ -143,6 +143,7 @@ class SUMOVehicle(BaseVehicle):
                 'colour': Colour(red=255, green=255, blue=0, alpha=255),
                 'normal_colour': Colour(red=255, green=255, blue=0, alpha=255),
                 'start_time': 0.0,
+                'start_position': Position(x=0.0, y=0.0),
                 'speedDev': speed_deviation,
                 'sigma': sigma,
                 'maxSpeed': speed_max,
@@ -259,6 +260,24 @@ class SUMOVehicle(BaseVehicle):
         :param start_time: start time
         '''
         self._properties['start_time'] = float(start_time)
+
+    @property
+    def start_position(self) -> Position:
+        '''
+        Include the initial position in calculations, as SUMO tends to put vehicles at positions > 0 in their 0th time step.
+
+        :return: start position
+        '''
+        return Position(*self._properties.get('start_position'))
+
+    @start_position.setter
+    def start_position(self, start_position: Position):
+        '''
+        Include the initial position in calculations, as SUMO tends to put vehicles at positions > 0 in their 0th time step.
+
+        :param start_position_x: start position on x axis
+        '''
+        self._properties['start_position'] = Position(*start_position)
 
     @property
     def _travel_time(self) -> float:
@@ -476,8 +495,12 @@ class SUMOVehicle(BaseVehicle):
         self._grid_based_series_dict.get(Metric.GRID_POSITION_Y.value)[(Metric.GRID_POSITION_Y.value, self._grid_position.x)] = self._grid_position.y
         self._grid_based_series_dict.get(Metric.DISSATISFACTION.value)[(Metric.DISSATISFACTION.value, self._grid_position.x)] = self.dissatisfaction
         self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, self._grid_position.x)] = self._travel_time
-        self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] = time_step - self.start_time - self._position.x / self.speed_max
-        self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] = (time_step - self.start_time - self._position.x / self.speed_max) / (self._position.x / self.speed_max)
+        # include, i.e. substract the start_position as SUMO tends to put vehicles at positions > 0 in their 0th time step.
+        # round result of divison as SUMO reports positions with reduced (2 significant figures) accuracy to avoid underflows
+        self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] = time_step - self.start_time - numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2)
+        self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] \
+            = (time_step - self.start_time - numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2)) / numpy.round((self._position.x - self.start_position.x) / self.speed_max, 2) \
+            if self._position.x - self.start_position.x > 0 else 0
         self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[(Metric.LANE_INDEX.value, self._grid_position.x)] = self._lane
 
         return self
