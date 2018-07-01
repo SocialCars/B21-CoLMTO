@@ -101,7 +101,7 @@ Ubuntu
 
 .. code-block:: bash
 
-    sudo apt-get install libyaml-dev libxslt1-dev
+    sudo apt-get install libyaml-dev libxslt1-dev python3-tk
 
 
 .. _build_and_install_colmto:
