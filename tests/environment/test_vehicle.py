@@ -25,7 +25,6 @@
 colmto: Test module for environment.vehicle.
 '''
 import unittest
-import numpy
 import colmto.environment.vehicle
 from colmto.common.helper import Behaviour
 from colmto.common.helper import VehicleType
