@@ -130,5 +130,10 @@ a {
 }
 
 a:hover {
-	color: #404040;
+	color: #268bd2;
+}
+
+.wy-menu-vertical li.current a:hover {
+    background: #d6d6d6;
+    color: #268bd2;
 }
