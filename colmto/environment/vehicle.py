@@ -413,9 +413,9 @@ class SUMOVehicle(BaseVehicle):
         self._properties['travel_time'] = float(time_step) - self.start_time
         self._properties['lane_index'] = int(lane_index)
 
-        # vehicle/general optimal travel time: round positions of division as SUMO reports positions with reduced
+        # vehicle/generic optimal travel time: round positions of division as SUMO reports positions with reduced
         # accuracy (2 significant figures) to avoid negative travel time losses.
-        l_general_optimal_travel_time = round(self.position.x / self.speed_max, 2)
+        l_generic_optimal_travel_time = round(self.position.x / self.speed_max, 2)
 
         # Vehicle optimal travel time: include, i.e. substract the start_position as SUMO puts
         # vehicles at lane positions greater than 0 in their first active time step if they started
@@ -425,7 +425,7 @@ class SUMOVehicle(BaseVehicle):
 
         self._properties['dissatisfaction'] = colmto.common.model.dissatisfaction(
             time_loss=l_vehicle_time_loss,
-            optimal_travel_time=l_general_optimal_travel_time,
+            optimal_travel_time=l_generic_optimal_travel_time,
             time_loss_threshold=self.dsat_threshold
         )
 
