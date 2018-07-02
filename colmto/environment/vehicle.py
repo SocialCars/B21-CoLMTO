@@ -450,7 +450,7 @@ class SUMOVehicle(BaseVehicle):
         ] = l_vehicle_time_loss
         self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[
             (Metric.RELATIVE_TIME_LOSS.value, self.grid_position.x)
-        ] = l_vehicle_time_loss / l_general_optimal_travel_time if l_general_optimal_travel_time > 0 else 0
+        ] = l_vehicle_time_loss / l_generic_optimal_travel_time if l_generic_optimal_travel_time > 0 else 0
         self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[
             (Metric.LANE_INDEX.value, self.grid_position.x)
         ] = self.lane
