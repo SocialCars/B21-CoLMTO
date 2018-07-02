@@ -96,12 +96,12 @@ class TestCSE(unittest.TestCase):
         l_vehicles = [
             colmto.environment.vehicle.SUMOVehicle(
                 environment={'gridlength': 200, 'gridcellwidth': 4},
-                speed_max=random.randrange(0, 250)
+                speed_max=numpy.random.randint(0, 250)
             ) for _ in range(1000)
         ]
 
         for i_vehicle in l_vehicles:
-            i_vehicle._properties['position'] = Position(random.randrange(0, 120), random.randint(0, 1)) # pylint: disable=protected-access
+            i_vehicle._properties['position'] = Position(numpy.random.randint(0, 120), numpy.random.randint(0, 1)) # pylint: disable=protected-access
 
         l_sumo_cse.apply(l_vehicles)
 
@@ -194,7 +194,7 @@ class TestCSE(unittest.TestCase):
                 {'foo': {1: 1.2}},
                 {'foo': colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
-                    speed_max=random.randrange(0, 250))
+                    speed_max=numpy.random.randint(0, 250))
                 }
             )
 
@@ -208,7 +208,7 @@ class TestCSE(unittest.TestCase):
                 {'foo': {1: 1.2}},
                 {'foo': colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
-                    speed_max=random.randrange(0, 250))
+                    speed_max=numpy.random.randint(0, 250))
                 }
             ), l_cse)
         l_cse.observe_traffic(
@@ -216,7 +216,7 @@ class TestCSE(unittest.TestCase):
             {'foo': {1: 1.2}},
             {'foo': colmto.environment.vehicle.SUMOVehicle(
                 environment={'gridlength': 200, 'gridcellwidth': 4},
-                speed_max=random.randrange(0, 250))
+                speed_max=numpy.random.randint(0, 250))
             }
         )
         l_cse.observe_traffic(
@@ -224,7 +224,7 @@ class TestCSE(unittest.TestCase):
             {'foo': {1: 1.2}},
             {'foo': colmto.environment.vehicle.SUMOVehicle(
                 environment={'gridlength': 200, 'gridcellwidth': 4},
-                speed_max=random.randrange(0, 250))
+                speed_max=numpy.random.randint(0, 250))
             }
         )
         self.assertEqual(l_cse._median_occupancy().get('21edge_0'), 1.5)
@@ -233,7 +233,7 @@ class TestCSE(unittest.TestCase):
             {'foo': {1: 1.2}},
             {'foo': colmto.environment.vehicle.SUMOVehicle(
                 environment={'gridlength': 200, 'gridcellwidth': 4},
-                speed_max=random.randrange(0, 250))
+                speed_max=numpy.random.randint(0, 250))
             }
         )
         self.assertEqual(l_cse._median_occupancy().get('21edge_1'), 2.0)
@@ -244,7 +244,7 @@ class TestCSE(unittest.TestCase):
                 {'foo': {1: 1.2}},
                 {'foo': colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
-                    speed_max=random.randrange(0, 250))
+                    speed_max=numpy.random.randint(0, 250))
                 }
             )
         for i_vtype in VehicleType:
