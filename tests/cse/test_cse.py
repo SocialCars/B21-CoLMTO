@@ -35,6 +35,8 @@ import colmto.cse.rule
 import colmto.environment.vehicle
 from colmto.common.helper import VehicleType
 from colmto.common.helper import StatisticValue
+from colmto.common.helper import Position
+
 
 class TestCSE(unittest.TestCase):
     '''
@@ -99,7 +101,7 @@ class TestCSE(unittest.TestCase):
         ]
 
         for i_vehicle in l_vehicles:
-            i_vehicle.position = (random.randrange(0, 120), random.randint(0, 1))
+            i_vehicle._properties['position'] = Position(random.randrange(0, 120), random.randint(0, 1)) # pylint: disable=protected-access
 
         l_sumo_cse.apply(l_vehicles)
 
@@ -142,8 +144,6 @@ class TestCSE(unittest.TestCase):
         )
 
         self.assertIsInstance(tuple(l_sumo_cse.rules)[0], colmto.cse.rule.ExtendableSUMOPositionRule)
-
-        # self.assertIsInstance(tuple(tuple(l_sumo_cse.rules)[0].subrules)[0], colmto.cse.rule.SUMOMinimalSpeedRule)
 
         l_rule_speed = colmto.cse.rule.SUMOMinimalSpeedRule.from_configuration(
             {

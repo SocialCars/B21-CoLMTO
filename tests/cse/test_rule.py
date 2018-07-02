@@ -168,28 +168,28 @@ class TestRule(unittest.TestCase):
             vehicle_type='passenger'
         )
 
-        l_vehicle._position = (0, -2)       # pylint: disable=protected-access
+        l_vehicle._properties['position'] = colmto.common.helper.Position(0, -2)       # pylint: disable=protected-access
         self.assertFalse(
             l_evtrule.applies_to(
                 l_vehicle
             )
         )
 
-        l_vehicle._position = (0, -1)       # pylint: disable=protected-access
+        l_vehicle._properties['position'] = colmto.common.helper.Position(0, -1)       # pylint: disable=protected-access
         self.assertTrue(
             l_evtrule.applies_to(
                 l_vehicle
             )
         )
 
-        l_vehicle._position = (100, 1)      # pylint: disable=protected-access
+        l_vehicle._properties['position'] = colmto.common.helper.Position(100, 1)      # pylint: disable=protected-access
         self.assertTrue(
             l_evtrule.applies_to(
                 l_vehicle
             )
         )
 
-        l_vehicle._position = (101, 1)      # pylint: disable=protected-access
+        l_vehicle._properties['position'] = colmto.common.helper.Position(101, 1)      # pylint: disable=protected-access
         self.assertFalse(
             l_evtrule.applies_to(
                 l_vehicle
@@ -400,16 +400,16 @@ class TestRule(unittest.TestCase):
             vehicle_type='passenger'
         )
 
-        for i_pos in ((0, -1), (100, 1)):
+        for i_pos in (colmto.common.helper.Position(0, -1), colmto.common.helper.Position(100, 1)):
             with self.subTest(pattern=i_pos):
-                l_vehicle._position = i_pos         # pylint: disable=protected-access
+                l_vehicle._properties['position'] = i_pos         # pylint: disable=protected-access
                 self.assertTrue(
                     l_esmsr.applies_to(l_vehicle)
                 )
 
-        for i_pos in ((0, -2), (101, 1)):
+        for i_pos in (colmto.common.helper.Position(0, -2), colmto.common.helper.Position(101, 1)):
             with self.subTest(pattern=i_pos):
-                l_vehicle._position = i_pos         # pylint: disable=protected-access
+                l_vehicle._properties['position'] = i_pos         # pylint: disable=protected-access
                 self.assertFalse(
                     l_esmsr.applies_to(l_vehicle)
                 )
@@ -428,13 +428,13 @@ class TestRule(unittest.TestCase):
         ]
 
         for i_vehicle in l_vehicles:
-            i_vehicle.position = (random.randrange(0, 200), 0.)
+            i_vehicle._properties['position'] = colmto.common.helper.Position(random.randrange(0, 200), 0.) # pylint: disable=protected-access
 
         colmto.cse.cse.SumoCSE().add_rule(l_sumo_rule).apply(l_vehicles)
 
         for i, i_results in enumerate(l_vehicles):
             with self.subTest(pattern=(i, i_results.position)):
-                if 0. <= l_vehicles[i].position[0] <= 100.0:
+                if 0. <= l_vehicles[i].position.x <= 100.0:
                     self.assertTrue(
                         l_sumo_rule.applies_to(l_vehicles[i])
                     )
@@ -467,13 +467,16 @@ class TestRule(unittest.TestCase):
             bounding_box=((0., -1.), (100., 1.)),
         )
         # without a sub-rule, an extended rule should always evaluate False
-        for i_pos in ((0, -1), (100, 1), (50, -1.5)):
-            with self.subTest(pattern=colmto.common.helper.Position(*i_pos)):
+        for i_pos in (
+                colmto.common.helper.Position(0, -1),
+                colmto.common.helper.Position(100, 1),
+                colmto.common.helper.Position(50, -1.5)):
+            with self.subTest(pattern=i_pos):
                 l_vehicle = colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                 )
-                l_vehicle._position = i_pos                     # pylint: disable=protected-access
+                l_vehicle._properties['position'] = i_pos         # pylint: disable=protected-access
                 self.assertFalse(l_espr.applies_to(l_vehicle))
 
         l_espr.add_subrule(
@@ -486,24 +489,31 @@ class TestRule(unittest.TestCase):
             "<class 'colmto.cse.rule.ExtendableSUMOPositionRule'>: bounding_box = BoundingBox(p1=Position(x=0.0, y=-1.0), p2=Position(x=100.0, y=1.0)), subrule_operator: RuleOperator.ANY, subrules: <class 'colmto.cse.rule.SUMOMinimalSpeedRule'>"
         )
 
-        for i_pos, i_speed in zip(((0, -1), (100, 1)), (59, 20)):
-            with self.subTest(pattern=(colmto.common.helper.Position(*i_pos), i_speed)):
+        for i_pos, i_speed in zip(
+                (colmto.common.helper.Position(0, -1), colmto.common.helper.Position(100, 1)),
+                (59, 20)):
+            with self.subTest(pattern=(i_pos, i_speed)):
                 l_vehicle = colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                     speed_max=i_speed
                 )
-                l_vehicle._position = i_pos                     # pylint: disable=protected-access
+                l_vehicle._properties['position'] = i_pos         # pylint: disable=protected-access
                 self.assertTrue(l_espr.applies_to(l_vehicle))
 
-        for i_pos, i_speed in zip(((0, -2), (101, 1), (0, -1), (100, 1)), (60, 120, 60, 120)):
-            with self.subTest(pattern=(colmto.common.helper.Position(*i_pos), i_speed)):
+        for i_pos, i_speed in zip(
+                (colmto.common.helper.Position(0, -2),
+                 colmto.common.helper.Position(101, 1),
+                 colmto.common.helper.Position(0, -1),
+                 colmto.common.helper.Position(100, 1)),
+                (60, 120, 60, 120)):
+            with self.subTest(pattern=(i_pos, i_speed)):
                 l_vehicle = colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                     speed_max=i_speed
                 )
-                l_vehicle._position = i_pos                     # pylint: disable=protected-access
+                l_vehicle._properties['position'] = i_pos         # pylint: disable=protected-access
                 self.assertFalse(l_espr.applies_to(l_vehicle))
 
     def test_sumo_dissatisfaction_rule(self):

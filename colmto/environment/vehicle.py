@@ -60,20 +60,11 @@ class BaseVehicle(object):
         return MappingProxyType(self._properties)
 
     @property
-    def _speed(self) -> float:
+    def speed(self) -> float:
         '''
         :return: current speed at time step
         '''
         return self._properties.get('speed')
-
-    @_speed.setter
-    def _speed(self, speed: float):
-        '''
-        Set vehicle speed
-
-        :param speed: current position
-        '''
-        self._properties['speed'] = float(speed)
 
     @property
     def position(self) -> Position:
@@ -81,15 +72,6 @@ class BaseVehicle(object):
         :return: current position
         '''
         return self._properties.get('position')
-
-    @position.setter
-    def position(self, position: Position):
-        '''
-        Set vehicle position
-
-        :param position: current position
-        '''
-        self._properties['position'] = Position(*position)
 
 
 class SUMOVehicle(BaseVehicle):
@@ -166,52 +148,18 @@ class SUMOVehicle(BaseVehicle):
         }
 
     @property
-    def _position(self) -> Position:
-        '''
-        :return: current position
-        '''
-        return Position(*self._properties.get('position'))
-
-    @_position.setter
-    def _position(self, position: Position):
-        '''
-        Updates current position
-
-        :param position: current position
-        '''
-        self._properties['position'] = Position(*position)
-
-    @property
-    def _lane(self) -> int:
+    def lane(self) -> int:
         '''
         :return: current lane index
         '''
         return int(self._properties.get('lane_index'))
 
-    @_lane.setter
-    def _lane(self, lane_index: int):
-        '''
-        Updates current lane index
-
-        :param lane_index: current lane index
-        '''
-        self._properties['lane_index'] = int(lane_index)
-
     @property
-    def _grid_position(self) -> GridPosition:
+    def grid_position(self) -> GridPosition:
         '''
         :return: current grid position
         '''
         return GridPosition(*self._properties.get('grid_position'))
-
-    @_grid_position.setter
-    def _grid_position(self, position: GridPosition):
-        '''
-        Updates current position
-
-        :param position: current grid position
-        '''
-        self._properties['grid_position'] = GridPosition(*position)
 
     @property
     def sumo_id(self) -> str:
@@ -280,37 +228,19 @@ class SUMOVehicle(BaseVehicle):
         self._properties['start_position'] = Position(*start_position)
 
     @property
-    def _travel_time(self) -> float:
+    def travel_time(self) -> float:
         '''
         :return: current travel time
         '''
-        return float(self._properties['travel_time'])
-
-    @_travel_time.setter
-    def _travel_time(self, travel_time: float):
-        '''
-        Updates current travel time
-
-        :param travel_time: current travel time
-        '''
-        self._properties['travel_time'] = float(travel_time)
+        return float(self._properties.get('travel_time'))
 
     @property
-    def _time_step(self) -> float:
+    def time_step(self) -> float:
         '''
         Current time step
         :return: time step
         '''
-        return float(self._properties['time_step'])
-
-    @_time_step.setter
-    def _time_step(self, time_step: float):
-        '''
-        Updates current time step
-
-        :param time_step: time step
-        '''
-        self._properties['time_step'] = float(time_step)
+        return float(self._properties.get('time_step'))
 
     @property
     def colour(self) -> Colour:
@@ -476,33 +406,53 @@ class SUMOVehicle(BaseVehicle):
         '''
 
         # update current vehicle properties
-        self._position = Position(*position)
-        self._grid_position = Position(*position).gridified(width=self._environment.get('gridcellwidth'))
-        self._speed = float(speed)
-        self._time_step = float(time_step)
-        self._travel_time = float(time_step) - self.start_time
-        self._lane = int(lane_index)
+        self._properties['position'] = Position(*position)
+        self._properties['grid_position'] = Position(*position).gridified(width=self._environment.get('gridcellwidth'))
+        self._properties['speed']  = float(speed)
+        self._properties['time_step'] = float(time_step)
+        self._properties['travel_time'] = float(time_step) - self.start_time
+        self._properties['lane_index'] = int(lane_index)
 
-        # update data series based on grid cell
+        # vehicle/general optimal travel time: round positions of division as SUMO reports positions with reduced
+        # accuracy (2 significant figures) to avoid negative travel time losses.
+        l_general_optimal_travel_time = round(self.position.x / self.speed_max, 2)
+
+        # Vehicle optimal travel time: include, i.e. substract the start_position as SUMO puts
+        # vehicles at lane positions greater than 0 in their first active time step if they started
+        # between the previous and current global (runtime) time step.
+        l_vehicle_optimal_travel_time = round((self.position.x - self.start_position.x) / self.speed_max, 2)
+        l_vehicle_time_loss = self.travel_time - l_vehicle_optimal_travel_time
+
         self._properties['dissatisfaction'] = colmto.common.model.dissatisfaction(
-            time_step - self.start_time - self._position.x / self.speed_max,
-            self._position.x / self.speed_max,
-            self.dsat_threshold
+            time_loss=l_vehicle_time_loss,
+            optimal_travel_time=l_general_optimal_travel_time,
+            time_loss_threshold=self.dsat_threshold
         )
 
-        self._grid_based_series_dict.get(Metric.TIME_STEP.value)[(Metric.TIME_STEP.value, self._grid_position.x)] = float(time_step)
-        self._grid_based_series_dict.get(Metric.POSITION_Y.value)[(Metric.POSITION_Y.value, self._grid_position.x)] = self._position.y
-        self._grid_based_series_dict.get(Metric.GRID_POSITION_Y.value)[(Metric.GRID_POSITION_Y.value, self._grid_position.x)] = self._grid_position.y
-        self._grid_based_series_dict.get(Metric.DISSATISFACTION.value)[(Metric.DISSATISFACTION.value, self._grid_position.x)] = self.dissatisfaction
-        self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[(Metric.TRAVEL_TIME.value, self._grid_position.x)] = self._travel_time
-        # include, i.e. substract the start_position as SUMO tends to put vehicles at positions > 0 in their 0th time step.
-        # round result of divison as SUMO reports positions with reduced (2 significant figures) accuracy to avoid underflows
-        self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[(Metric.TIME_LOSS.value, self._grid_position.x)] \
-            = time_step - self.start_time - round((self._position.x - self.start_position.x) / self.speed_max, 2)
-        self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[(Metric.RELATIVE_TIME_LOSS.value, self._grid_position.x)] \
-            = (time_step - self.start_time - round((self._position.x - self.start_position.x) / self.speed_max, 2)) \
-              / round((self._position.x - self.start_position.x) / self.speed_max, 2) \
-            if round((self._position.x - self.start_position.x) / self.speed_max, 2) > 0 else 0
-        self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[(Metric.LANE_INDEX.value, self._grid_position.x)] = self._lane
+        # update data series based on grid cell
+        self._grid_based_series_dict.get(Metric.TIME_STEP.value)[
+            (Metric.TIME_STEP.value, self.grid_position.x)
+        ] = float(time_step)
+        self._grid_based_series_dict.get(Metric.POSITION_Y.value)[
+            (Metric.POSITION_Y.value, self.grid_position.x)
+        ] = self.position.y
+        self._grid_based_series_dict.get(Metric.GRID_POSITION_Y.value)[
+            (Metric.GRID_POSITION_Y.value, self.grid_position.x)
+        ] = self.grid_position.y
+        self._grid_based_series_dict.get(Metric.DISSATISFACTION.value)[
+            (Metric.DISSATISFACTION.value, self.grid_position.x)
+        ] = self.dissatisfaction
+        self._grid_based_series_dict.get(Metric.TRAVEL_TIME.value)[
+            (Metric.TRAVEL_TIME.value, self.grid_position.x)
+        ] = self.travel_time
+        self._grid_based_series_dict.get(Metric.TIME_LOSS.value)[
+            (Metric.TIME_LOSS.value, self.grid_position.x)
+        ] = l_vehicle_time_loss
+        self._grid_based_series_dict.get(Metric.RELATIVE_TIME_LOSS.value)[
+            (Metric.RELATIVE_TIME_LOSS.value, self.grid_position.x)
+        ] = l_vehicle_time_loss / l_general_optimal_travel_time if l_general_optimal_travel_time > 0 else 0
+        self._grid_based_series_dict.get(Metric.LANE_INDEX.value)[
+            (Metric.LANE_INDEX.value, self.grid_position.x)
+        ] = self.lane
 
         return self

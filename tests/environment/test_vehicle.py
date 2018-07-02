@@ -30,7 +30,7 @@ import colmto.environment.vehicle
 from colmto.common.helper import Behaviour
 from colmto.common.helper import VehicleType
 from colmto.common.helper import VehicleDisposition
-
+from colmto.common.helper import Position
 
 class TestVehicle(unittest.TestCase):
     '''
@@ -45,17 +45,17 @@ class TestVehicle(unittest.TestCase):
         # test default values
         l_basevehicle = colmto.environment.vehicle.BaseVehicle()
 
-        self.assertEqual(l_basevehicle._speed, 0.0)         # pylint: disable=protected-access
+        self.assertEqual(l_basevehicle.speed, 0.0)
         self.assertEqual(l_basevehicle.position, (0.0, 0))
 
         # test custom values
         l_basevehicle = colmto.environment.vehicle.BaseVehicle()
-        l_basevehicle.position = numpy.array([23.0, 0])
-        l_basevehicle._speed = 12.1                         # pylint: disable=protected-access
+        l_basevehicle._properties['position'] = Position(23.0, 0) # pylint: disable=protected-access
+        l_basevehicle._properties['speed'] = 12.1  # pylint: disable=protected-access
 
-        self.assertEqual(l_basevehicle._speed, 12.1)        # pylint: disable=protected-access
-        self.assertEqual(l_basevehicle.position, (23.0, 0))
-        self.assertEqual(l_basevehicle.properties.get('position'), (23.0, 0))
+        self.assertEqual(l_basevehicle.speed, 12.1)
+        self.assertTupleEqual(l_basevehicle.position, (23.0, 0))
+        self.assertTupleEqual(l_basevehicle.properties.get('position'), (23.0, 0))
         self.assertEqual(l_basevehicle.properties.get('speed'), 12.1)
 
 
@@ -69,13 +69,13 @@ class TestVehicle(unittest.TestCase):
             environment={'gridlength': 200, 'gridcellwidth': 4}
         )
         self.assertEqual(l_sumovehicle.speed_max, 0.0)
-        self.assertEqual(l_sumovehicle._speed, 0.0)         # pylint: disable=protected-access
+        self.assertEqual(l_sumovehicle.speed, 0.0)          # pylint: disable=protected-access
         self.assertEqual(l_sumovehicle.position, (0.0, 0))
         self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.UNDEFINED)
         self.assertEqual(l_sumovehicle.colour, (255, 255, 0, 255))
-        self.assertEqual(l_sumovehicle._time_step, 0.0)     # pylint: disable=protected-access
-        l_sumovehicle._time_step = 42.1                     # pylint: disable=protected-access
-        self.assertEqual(l_sumovehicle._time_step, 42.1)    # pylint: disable=protected-access
+        self.assertEqual(l_sumovehicle.time_step, 0.0)
+        l_sumovehicle._properties['time_step'] = 42.1       # pylint: disable=protected-access
+        self.assertEqual(l_sumovehicle.time_step, 42.1)
         self.assertIsInstance(l_sumovehicle.properties.get('cooperation_disposition'), VehicleDisposition)
         self.assertIs(l_sumovehicle.properties.get('cooperation_disposition'), VehicleDisposition.COOPERATIVE)
         # test custom values
@@ -89,7 +89,7 @@ class TestVehicle(unittest.TestCase):
                 'minGap': 2.50
             }
         )
-        l_sumovehicle.position = numpy.array([42.0, 0])
+        l_sumovehicle._properties['position'] = Position(42.0, 0)
         l_sumovehicle.normal_colour = (128, 64, 255, 255)
         l_sumovehicle.start_time = 13
         self.assertTupleEqual(l_sumovehicle.start_position, (0.0, 0.0))
@@ -101,17 +101,17 @@ class TestVehicle(unittest.TestCase):
         self.assertTupleEqual(l_sumovehicle.start_position, (1.2, 3.4))
 
         self.assertEqual(l_sumovehicle.speed_max, 27.777)
-        self.assertEqual(l_sumovehicle.position, (42.0, 0))
+        self.assertTupleEqual(l_sumovehicle.position, (42.0, 0))
         self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
-        self.assertEqual(l_sumovehicle.normal_colour, (128, 64, 255, 255))
+        self.assertTupleEqual(l_sumovehicle.normal_colour, (128, 64, 255, 255))
         self.assertEqual(l_sumovehicle.start_time, 13)
-        self.assertEqual(l_sumovehicle._grid_position, (0, 0))  # pylint: disable=protected-access
+        self.assertTupleEqual(l_sumovehicle.grid_position, (0, 0))
 
-        l_sumovehicle._grid_position = (1, 2)                   # pylint: disable=protected-access
+        l_sumovehicle._properties['grid_position'] = (1, 2) # pylint: disable=protected-access
 
-        self.assertEqual(l_sumovehicle._grid_position, (1, 2))  # pylint: disable=protected-access
-        self.assertEqual(l_sumovehicle.properties.get('grid_position'), (1, 2))
-        self.assertEqual(l_sumovehicle._travel_time, 0.0)       # pylint: disable=protected-access
+        self.assertTupleEqual(l_sumovehicle.grid_position, (1, 2))
+        self.assertTupleEqual(l_sumovehicle.properties.get('grid_position'), (1, 2))
+        self.assertEqual(l_sumovehicle.travel_time, 0.0)
 
     def test_disposition(self):
         '''Test disposition, i.e. cooperativity of vehicle'''
@@ -146,7 +146,7 @@ class TestVehicle(unittest.TestCase):
         self.assertEqual(l_sumovehicle.dsat_threshold, 0.2)
         self.assertEqual(l_sumovehicle.speed_max, 15)
         self.assertEqual(l_sumovehicle.dissatisfaction, 0.0)
-        l_sumovehicle.position = (0, 0)
+        l_sumovehicle._properties['position'] = (0, 0)
         l_sumovehicle.start_time = 0
 
         l_sumovehicle.update(
@@ -163,15 +163,15 @@ class TestVehicle(unittest.TestCase):
             (15000, 0)
         )
         self.assertEqual(
-            l_sumovehicle._speed,           # pylint: disable=protected-access
+            l_sumovehicle.speed,           # pylint: disable=protected-access
             15
         )
         self.assertEqual(
-            l_sumovehicle._grid_position,   # pylint: disable=protected-access
+            l_sumovehicle.grid_position,   # pylint: disable=protected-access
             (round(15000/4)-1, -1)
         )
         self.assertEqual(
-            l_sumovehicle._time_step,       # pylint: disable=protected-access
+            l_sumovehicle.time_step,       # pylint: disable=protected-access
             1000
         )
 
@@ -182,7 +182,7 @@ class TestVehicle(unittest.TestCase):
             time_step=1000
         )
 
-        self.assertAlmostEqual(l_sumovehicle.dissatisfaction, .5)
+        self.assertAlmostEqual(l_sumovehicle.dissatisfaction, .5, places=4)
 
 
 if __name__ == '__main__':
