@@ -430,7 +430,8 @@ class StatisticValue(namedtuple('StatisticValue', ('minimum', 'median', 'mean', 
     @staticmethod
     def nanof(values: typing.Union[None, typing.Iterable[float]]=None):
         '''
-        Create nan-safe new StatisticValue from iterable by using numpy.nan*
+        Create nan-safe new StatisticValue from iterable by using `numpy.nan*`.
+
         :param values: iterable of floats
         :return: StatisticValue
         '''

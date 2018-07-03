@@ -157,7 +157,7 @@ class SUMOVehicle(BaseVehicle):
     @property
     def grid_position(self) -> GridPosition:
         '''
-        :return: current grid position
+        :return: current GridPosition
         '''
         return GridPosition(*self._properties.get('grid_position'))
 
@@ -165,7 +165,8 @@ class SUMOVehicle(BaseVehicle):
     def sumo_id(self) -> str:
         '''
         Get assigned SUMO vehicle id
-        :return: vehicle id
+
+        :return: vehicle id as string
         '''
         return self._properties.get('sumo_id')
 
@@ -175,13 +176,16 @@ class SUMOVehicle(BaseVehicle):
         Set SUMO vehicle id
 
         :param sumo_id: vehicle id
+        :type sumo_id: str
         '''
         self._properties['sumo_id'] = str(sumo_id)
 
     @property
     def vehicle_type(self) -> VehicleType:
         '''
-        :return: vehicle type
+        Get vehicle type
+
+        :return: VehicleType
         '''
         return VehicleType[str(self._properties.get('vType')).upper()] \
             if self._properties.get('vType') else VehicleType.UNDEFINED
@@ -238,7 +242,8 @@ class SUMOVehicle(BaseVehicle):
     def time_step(self) -> float:
         '''
         Current time step
-        :return: time step
+
+        :return: time step as float
         '''
         return float(self._properties.get('time_step'))
 
