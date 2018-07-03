@@ -137,3 +137,8 @@ a:hover {
     background: #d6d6d6;
     color: #268bd2;
 }
+
+.wy-side-nav-search>a:hover, .wy-side-nav-search .wy-dropdown>a:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fcfcfc;
+}

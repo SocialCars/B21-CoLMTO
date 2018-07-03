@@ -291,11 +291,10 @@ class SUMONullRule(SUMORule, rule_name='SUMONullRule'):
 
     def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
-        Test whether this rule applies to given vehicle
+        Test whether this rule applies to given vehicle.
 
         :param vehicle: Vehicle
-        :return: boolean (always False)
-
+        :return: boolean
         '''
 
         return False
@@ -307,9 +306,10 @@ class SUMOVehicleRule(SUMORule, metaclass=ABCMeta, rule_name='SUMOVehicleRule'):
     @abstractmethod
     def applies_to(self, vehicle: 'SUMOVehicle', **kwargs) -> bool:
         '''
-        applies to
-        :param vehicle: vehicles
-        :return: bool (always False)
+        Test whether this rule applies to given vehicle.
+
+        :param vehicle: Vehicle
+        :return: boolean
         '''
         return False
 
@@ -389,6 +389,7 @@ class SUMOMinimalSpeedRule(SUMOVehicleRule, rule_name='SUMOMinimalSpeedRule'):
     def __init__(self, minimal_speed: float):
         '''
         Initialisation
+
         :param minimal_speed: minimal speed a vehicle has to undercut for this rule to apply
 
         '''
@@ -459,6 +460,7 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
     def __init__(self, bounding_box=BoundingBox(Position(0.0, 0), Position(100.0, 1)), outside=False):
         '''
         Initialisation.
+
         :param bounding_box: BoundingBox, can be represented as a tuple, i.e. ((x1,y1),(x2,y2))
         :param outside: True|False, apply to vehicles outside (or resp. inside) of the bounding box (default: False -> inside)
 
