@@ -411,11 +411,17 @@ class SUMOVehicle(BaseVehicle):
         '''
 
         # update current vehicle properties
-        self._properties['position'] = Position(*position)
-        self._properties['grid_position'] = Position(*position).gridified(width=self._environment.get('gridcellwidth'))
+        l_position = Position(*position)
+        assert l_position.x >= 0 and l_position.y >= 0
+        self._properties['position'] = l_position
+        self._properties['grid_position'] = l_position.gridified(width=self._environment.get('gridcellwidth'))
+        assert float(speed) > 0
         self._properties['speed']  = float(speed)
+        assert float(time_step) >= 0
         self._properties['time_step'] = float(time_step)
+        assert float(time_step) >= self.start_time
         self._properties['travel_time'] = float(time_step) - self.start_time
+        assert int(lane_index) in (0, 1)
         self._properties['lane_index'] = int(lane_index)
 
         # vehicle/generic optimal travel time: round positions of division as SUMO reports positions with reduced
@@ -427,12 +433,14 @@ class SUMOVehicle(BaseVehicle):
         # between the previous and current global (runtime) time step.
         l_vehicle_optimal_travel_time = round((self.position.x - self.start_position.x) / self.speed_max, 2)
         l_vehicle_time_loss = self.travel_time - l_vehicle_optimal_travel_time
+        assert l_vehicle_time_loss >= 0
 
         self._properties['dissatisfaction'] = colmto.common.model.dissatisfaction(
             time_loss=l_vehicle_time_loss,
             optimal_travel_time=l_generic_optimal_travel_time,
             time_loss_threshold=self.dsat_threshold
         )
+        assert 0 <= self.dissatisfaction <= 1
 
         # update data series based on grid cell
         self._grid_based_series_dict.get(Metric.TIME_STEP.value)[

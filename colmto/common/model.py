@@ -71,7 +71,7 @@ def unfairness(data: pandas.Series) -> numpy.float64:
     :return: Hinge of type numpy.float64
 
     '''
-
+    assert isinstance(data, pandas.Series)
     return numpy.subtract(*data.quantile([.75, .25])) if not data.empty else numpy.float64(0)
 
 
@@ -104,6 +104,10 @@ def dissatisfaction(
 
     '''
 
+    assert time_loss >= 0
+    assert time_loss_threshold >= 0
+    assert optimal_travel_time > 0
+
     # pylint: disable=no-member
     return numpy.divide(
         1.,
@@ -119,4 +123,5 @@ def inefficiency(data: pandas.Series) -> typing.Union[numpy.int64, numpy.float64
     :return: sum of data points
     '''
 
+    assert isinstance(data, pandas.Series)
     return data.sum()
