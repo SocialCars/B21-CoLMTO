@@ -415,7 +415,7 @@ class SUMOVehicle(BaseVehicle):
         assert l_position.x >= 0 and l_position.y >= 0
         self._properties['position'] = l_position
         self._properties['grid_position'] = l_position.gridified(width=self._environment.get('gridcellwidth'))
-        assert float(speed) > 0
+        assert float(speed) >= 0
         self._properties['speed']  = float(speed)
         assert float(time_step) >= 0
         self._properties['time_step'] = float(time_step)
