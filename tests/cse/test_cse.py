@@ -25,7 +25,6 @@
 colmto: Test module for environment.cse.
 '''
 import numpy
-import random
 from types import SimpleNamespace
 
 import unittest

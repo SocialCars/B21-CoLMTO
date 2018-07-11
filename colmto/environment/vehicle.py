@@ -32,7 +32,6 @@ from colmto.common.helper import StatisticSeries
 from colmto.common.helper import GridPosition
 from colmto.common.helper import Colour
 from colmto.common.helper import Metric
-import numpy
 from types import MappingProxyType
 import typing
 if typing.TYPE_CHECKING:
