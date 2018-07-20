@@ -83,7 +83,7 @@ class SumoCSE(BaseCSE):
             for i_lane in ('21edge_0', '21edge_1')
         }
         self._dissatisfaction = {
-            i_vtype: deque((StatisticValue.nanof(None) for _ in range(60)), maxlen=60)
+            i_vtype: deque((StatisticValue.nanof(None).as_tuple() for _ in range(60)), maxlen=60)
             for i_vtype in VehicleType
         }
 
@@ -133,7 +133,7 @@ class SumoCSE(BaseCSE):
             l_vehicle = vehicles.get(i_vehicle_id)
             l_dissatisfaction.get(l_vehicle.vehicle_type).append(l_vehicle.dissatisfaction)
         for i_vtype, i_values in l_dissatisfaction.items():
-            self._dissatisfaction.get(i_vtype).appendleft(StatisticValue.nanof(i_values))
+            self._dissatisfaction.get(i_vtype).appendleft(StatisticValue.nanof(i_values).as_tuple())
 
         return self
 
@@ -174,8 +174,8 @@ class SumoCSE(BaseCSE):
         '''
 
         return {
-            i_vtype: StatisticValue(*numpy.nanmedian(self._dissatisfaction.get(i_vtype), axis=0))
-            if not numpy.isnan(list(self._dissatisfaction.get(i_vtype))).all() else StatisticValue.nanof([])
+            i_vtype: StatisticValue(*numpy.nanmedian(self._dissatisfaction.get(i_vtype), axis=0)).as_tuple()
+            if not numpy.isnan(list(self._dissatisfaction.get(i_vtype))).all() else StatisticValue.nanof([]).as_tuple()
             for i_vtype in self._dissatisfaction
         }
 

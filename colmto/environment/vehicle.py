@@ -363,7 +363,7 @@ class SUMOVehicle(BaseVehicle):
 
         self._properties['colour'] = self.normal_colour
         if traci:
-            traci.vehicle.setColor(self.sumo_id, self.colour)
+            traci.vehicle.setColor(self.sumo_id, self.colour.as_tuple())
         return self
 
     def deny_otl_access(self, _traci: 'traci' = None) -> BaseVehicle:
@@ -382,14 +382,14 @@ class SUMOVehicle(BaseVehicle):
             # show that I'm cooperative by painting myself red
             self._properties['colour'] = Colour(255, 0, 0, 255)
             if _traci:
-                _traci.vehicle.setColor(self.sumo_id, self.colour)
+                _traci.vehicle.setColor(self.sumo_id, self.colour.as_tuple())
                 # as I'm cooperative, always keep to the right lane
                 _traci.vehicle.changeLane(self.sumo_id, 0, 1)
         else:
             # show that I'm uncooperative by painting myself gray
             self._properties['colour'] = Colour(127, 127, 127, 255)
             if _traci:
-                _traci.vehicle.setColor(self.sumo_id, self.colour)
+                _traci.vehicle.setColor(self.sumo_id, self.colour.as_tuple())
         return self
 
     def update(self, position: Position, lane_index: int, speed: float, time_step: float) -> BaseVehicle:

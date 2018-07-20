@@ -27,9 +27,11 @@ colmto: Test module for environment.vehicle.
 import unittest
 import colmto.environment.vehicle
 from colmto.common.helper import Behaviour
+from colmto.common.helper import Colour
 from colmto.common.helper import VehicleType
 from colmto.common.helper import VehicleDisposition
 from colmto.common.helper import Position
+from colmto.common.helper import GridPosition
 
 class TestVehicle(unittest.TestCase):
     '''
@@ -45,7 +47,7 @@ class TestVehicle(unittest.TestCase):
         l_basevehicle = colmto.environment.vehicle.BaseVehicle()
 
         self.assertEqual(l_basevehicle.speed, 0.0)
-        self.assertEqual(l_basevehicle.position, (0.0, 0))
+        self.assertEqual(l_basevehicle.position, Position(0.0, 0))
 
         # test custom values
         l_basevehicle = colmto.environment.vehicle.BaseVehicle()
@@ -53,8 +55,8 @@ class TestVehicle(unittest.TestCase):
         l_basevehicle._properties['speed'] = 12.1  # pylint: disable=protected-access
 
         self.assertEqual(l_basevehicle.speed, 12.1)
-        self.assertTupleEqual(l_basevehicle.position, (23.0, 0))
-        self.assertTupleEqual(l_basevehicle.properties.get('position'), (23.0, 0))
+        self.assertEqual(l_basevehicle.position, Position(23.0, 0))
+        self.assertEqual(l_basevehicle.properties.get('position'), Position(23.0, 0))
         self.assertEqual(l_basevehicle.properties.get('speed'), 12.1)
 
 
@@ -69,9 +71,9 @@ class TestVehicle(unittest.TestCase):
         )
         self.assertEqual(l_sumovehicle.speed_max, 0.0)
         self.assertEqual(l_sumovehicle.speed, 0.0)          # pylint: disable=protected-access
-        self.assertEqual(l_sumovehicle.position, (0.0, 0))
+        self.assertEqual(l_sumovehicle.position, Position(0.0, 0))
         self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.UNDEFINED)
-        self.assertEqual(l_sumovehicle.colour, (255, 255, 0, 255))
+        self.assertEqual(l_sumovehicle.colour, Colour(255, 255, 0, 255))
         self.assertEqual(l_sumovehicle.time_step, 0.0)
         l_sumovehicle._properties['time_step'] = 42.1       # pylint: disable=protected-access
         self.assertEqual(l_sumovehicle.time_step, 42.1)
@@ -91,25 +93,25 @@ class TestVehicle(unittest.TestCase):
         l_sumovehicle._properties['position'] = Position(42.0, 0)
         l_sumovehicle.normal_colour = (128, 64, 255, 255)
         l_sumovehicle.start_time = 13
-        self.assertTupleEqual(l_sumovehicle.start_position, (0.0, 0.0))
-        l_sumovehicle.start_position = (1.2, 3.4)
+        self.assertEqual(l_sumovehicle.start_position, Position(0.0, 0.0))
+        l_sumovehicle.start_position = Position(1.2, 3.4)
         self.assertEqual(l_sumovehicle.start_position.x, 1.2)
         self.assertEqual(l_sumovehicle.start_position.y, 3.4)
         self.assertEqual(l_sumovehicle.start_position.gridified(2).x, 0)
         self.assertEqual(l_sumovehicle.start_position.gridified(2).y, 1)
-        self.assertTupleEqual(l_sumovehicle.start_position, (1.2, 3.4))
+        self.assertEqual(l_sumovehicle.start_position, Position(1.2, 3.4))
 
         self.assertEqual(l_sumovehicle.speed_max, 27.777)
-        self.assertTupleEqual(l_sumovehicle.position, (42.0, 0))
+        self.assertEqual(l_sumovehicle.position, Position(42.0, 0))
         self.assertEqual(l_sumovehicle.vehicle_type, VehicleType.PASSENGER)
-        self.assertTupleEqual(l_sumovehicle.normal_colour, (128, 64, 255, 255))
+        self.assertEqual(l_sumovehicle.normal_colour, Colour(128, 64, 255, 255))
         self.assertEqual(l_sumovehicle.start_time, 13)
-        self.assertTupleEqual(l_sumovehicle.grid_position, (0, 0))
+        self.assertEqual(l_sumovehicle.grid_position, GridPosition(0, 0))
 
-        l_sumovehicle._properties['grid_position'] = (1, 2) # pylint: disable=protected-access
+        l_sumovehicle._properties['grid_position'] = GridPosition(1, 2) # pylint: disable=protected-access
 
-        self.assertTupleEqual(l_sumovehicle.grid_position, (1, 2))
-        self.assertTupleEqual(l_sumovehicle.properties.get('grid_position'), (1, 2))
+        self.assertEqual(l_sumovehicle.grid_position, GridPosition(1, 2))
+        self.assertEqual(l_sumovehicle.properties.get('grid_position'), GridPosition(1, 2))
         self.assertEqual(l_sumovehicle.travel_time, 0.0)
 
     def test_disposition(self):
@@ -130,7 +132,7 @@ class TestVehicle(unittest.TestCase):
         self.assertEqual(l_sumovehicle.vehicle_class, Behaviour.ALLOW.vclass)
         l_sumovehicle.deny_otl_access()
         self.assertEqual(l_sumovehicle.vehicle_class, Behaviour.ALLOW.vclass)
-        self.assertEqual(l_sumovehicle.colour, (127, 127, 127, 255))
+        self.assertEqual(l_sumovehicle.colour, Colour(127, 127, 127, 255))
 
 
 
@@ -149,7 +151,7 @@ class TestVehicle(unittest.TestCase):
         l_sumovehicle.start_time = 0
 
         l_sumovehicle.update(
-            position=colmto.environment.vehicle.Position(15000, 0),
+            position=Position(15000, 0),
             lane_index=1,
             speed=15,
             time_step=1000
@@ -159,7 +161,7 @@ class TestVehicle(unittest.TestCase):
 
         self.assertEqual(
             l_sumovehicle.position,
-            (15000, 0)
+            Position(15000, 0)
         )
         self.assertEqual(
             l_sumovehicle.speed,           # pylint: disable=protected-access
@@ -167,7 +169,7 @@ class TestVehicle(unittest.TestCase):
         )
         self.assertEqual(
             l_sumovehicle.grid_position,   # pylint: disable=protected-access
-            (round(15000/4)-1, -1)
+            GridPosition(round(15000/4)-1, -1)
         )
         self.assertEqual(
             l_sumovehicle.time_step,       # pylint: disable=protected-access
@@ -175,7 +177,7 @@ class TestVehicle(unittest.TestCase):
         )
 
         l_sumovehicle.update(
-            position=colmto.environment.vehicle.Position(12500, 0),
+            position=Position(12500, 0),
             lane_index=0,
             speed=12,
             time_step=1000

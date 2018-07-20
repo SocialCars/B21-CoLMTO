@@ -58,15 +58,16 @@ class HelperTests(unittest.TestCase):
 
         l_colour = helper.Colour(*self.colour_tuple)
 
-        self.assertTupleEqual(l_colour, self.colour_tuple)
+        self.assertTupleEqual(l_colour.as_tuple(), self.colour_tuple)
         self.assertEqual(l_colour.red, self.colour_tuple[0])
         self.assertEqual(l_colour.green, self.colour_tuple[1])
         self.assertEqual(l_colour.blue, self.colour_tuple[2])
         self.assertEqual(l_colour.alpha, self.colour_tuple[3])
         l_3colour = l_colour * 3
         self.assertTrue(isinstance(l_3colour, helper.Colour))
-        self.assertTupleEqual((69, 126, 36, 765), l_3colour)
-        self.assertTupleEqual(
+        self.assertTupleEqual((69, 126, 36, 765), l_3colour.as_tuple())
+        self.assertEqual(helper.Colour(69, 126, 36, 765), l_3colour)
+        self.assertEqual(
             helper.Colour.map('plasma', 255, 127),
             helper.Colour(red=0.798216, green=0.280197, blue=0.469538, alpha=1.0)
         )
@@ -287,7 +288,7 @@ class HelperTests(unittest.TestCase):
 
         l_statisticvalue = helper.StatisticValue(1., 2., 3., 4.)
 
-        self.assertTupleEqual(l_statisticvalue, (1., 2., 3., 4.))
+        self.assertTupleEqual(l_statisticvalue.as_tuple(), (1., 2., 3., 4.))
         self.assertEqual(l_statisticvalue.minimum, 1.)
         self.assertEqual(l_statisticvalue.median, 2.)
         self.assertEqual(l_statisticvalue.mean, 3.)
@@ -299,11 +300,11 @@ class HelperTests(unittest.TestCase):
         self.assertEqual(l_statisticvalue.mean, 3.2)
         self.assertEqual(l_statisticvalue.median, 3)
 
-        self.assertTupleEqual(helper.StatisticValue.nanof(None), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
-        self.assertTupleEqual(helper.StatisticValue.nanof(), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+        self.assertEqual(helper.StatisticValue.nanof(None), helper.StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+        self.assertEqual(helper.StatisticValue.nanof(), helper.StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan))
         self.assertTrue(
             numpy.isnan(
-                helper.StatisticValue.nanof((numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+                helper.StatisticValue.nanof((numpy.nan, numpy.nan, numpy.nan, numpy.nan)).as_tuple()
             ).all()
         )
 

@@ -451,11 +451,11 @@ class TestRule(unittest.TestCase):
                         colmto.cse.rule.SUMORule.allowed_class_name()
                     )
 
-        self.assertTupleEqual(
+        self.assertEqual(
             colmto.cse.rule.SUMOPositionRule(
                 bounding_box=((0., -1.), (100., 1.)),
             ).bounding_box,
-            ((0., -1.), (100., 1.))
+            colmto.common.helper.BoundingBox((0., -1.), (100., 1.))
         )
 
     def test_extendable_position_rule(self):
@@ -520,9 +520,9 @@ class TestRule(unittest.TestCase):
         '''
         Test SUMOVehicleDissatisfactionRule
         '''
-        for i_thr in ((0.1, 0.5), (0.25, 0.75)):
-            with self.subTest(pattern=colmto.common.helper.DissatisfactionRange(*i_thr)):
-                self.assertTupleEqual(
+        for i_thr in (colmto.common.helper.DissatisfactionRange(0.1, 0.5), colmto.common.helper.DissatisfactionRange(0.25, 0.75)):
+            with self.subTest(pattern=i_thr):
+                self.assertEqual(
                     colmto.cse.rule.SUMOVehicleDissatisfactionRule(dissatisfaction_range=i_thr).threshold_range,
                     i_thr
                 )
@@ -600,9 +600,9 @@ class TestRule(unittest.TestCase):
         '''
         test SUMOOccupancyRule
         '''
-        for i_dr in ((0.1, 0.5), (0.25, 0.75)):
-            with self.subTest(pattern=colmto.common.helper.OccupancyRange(*i_dr)):
-                self.assertTupleEqual(
+        for i_dr in (colmto.common.helper.OccupancyRange(0.1, 0.5), colmto.common.helper.OccupancyRange(0.25, 0.75)):
+            with self.subTest(pattern=i_dr):
+                self.assertEqual(
                     colmto.cse.rule.SUMOOccupancyRule(occupancy_range=i_dr)._occupancy_range, # pylint: disable=protected-access
                     i_dr
                 )

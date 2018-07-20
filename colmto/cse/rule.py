@@ -468,8 +468,8 @@ class SUMOPositionRule(SUMOVehicleRule, rule_name='SUMOPositionRule'):
         '''
 
         super().__init__()
-        assert bounding_box[0][0] <= bounding_box[1][0]
-        assert bounding_box[0][1] <= bounding_box[1][1]
+        assert BoundingBox(*bounding_box).p1.x <= BoundingBox(*bounding_box).p2.x
+        assert BoundingBox(*bounding_box).p1.y <= BoundingBox(*bounding_box).p2.y
         self._bounding_box = BoundingBox(*bounding_box)
         self._outside = bool(outside)
 
@@ -554,7 +554,7 @@ class SUMOVehicleDissatisfactionRule(SUMOVehicleRule, rule_name='SUMOVehicleDiss
         '''
 
         super().__init__()
-        assert dissatisfaction_range[0] <= dissatisfaction_range[1]
+        assert DissatisfactionRange(*dissatisfaction_range).min <= DissatisfactionRange(*dissatisfaction_range).max
         self._dissatisfaction_range = DissatisfactionRange(*dissatisfaction_range)
         self._outside = bool(outside)
 
@@ -728,7 +728,7 @@ class SUMOOccupancyRule(SUMOVehicleRule, rule_name='SUMOOccupancyRule'):
         '''
 
         super().__init__()
-        assert occupancy_range[0] <= occupancy_range[1]
+        assert OccupancyRange(*occupancy_range).min <= OccupancyRange(*occupancy_range).max
         self._occupancy_range = OccupancyRange(*occupancy_range)
         self._outside = bool(outside)
 

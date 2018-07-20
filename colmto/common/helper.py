@@ -23,28 +23,39 @@
 # @endcond
 '''Classes and functions to realise property structures, e.g. Position, Colour, ...'''
 
-from collections import namedtuple
+from dataclasses import dataclass
 import typing
 import enum
 import matplotlib.pyplot as plt
 import numpy
 import pandas
 
-
-class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
+@dataclass(frozen=True)
+class Colour:
     '''
-    Named tuple to represent RGBa values.
+    Data class to represent RGBa values.
 
     '''
 
-    __slots__ = ()
+    __slots__ = ('red', 'green', 'blue', 'alpha')
+    red: float
+    green: float
+    blue: float
+    alpha: float
+
+    def __iter__(self) -> typing.Iterable[float]:
+        '''
+        Make Colour iterable for unpacking
+        :return: iterable over colour channels
+        '''
+        return iter((self.red, self.green, self.blue, self.alpha))
 
     def __mul__(self, value):
         '''
         Scalars can be attribute-wise multiplied to a Colour.
 
         :param value: scalar
-        :return: new Colour with attrubutes multiplied with scalar
+        :return: new Colour with attributes multiplied with scalar
 
         '''
 
@@ -68,14 +79,34 @@ class Colour(namedtuple('Colour', ('red', 'green', 'blue', 'alpha'))):
         '''
         return Colour(*plt.get_cmap(name=name, lut=int(max_value))(int(value)))
 
+    def as_tuple(self) -> typing.Tuple[float, float, float, float]:
+        '''
+        Return indexable tuple for passing it via TraCI to SUMO.
 
-class Position(namedtuple('Position', ('x', 'y'))):
+        :return: tuple of colour channels
+
+        '''
+
+        return (self.red, self.green, self.blue, self.alpha)
+
+
+@dataclass
+class Position:
     '''
-    Named tuple to represent the vehicle position.
+    Data class to represent the vehicle position.
 
     '''
 
-    __slots__ = ()
+    __slots__ = ('x', 'y')
+    x: float
+    y: float
+
+    def __iter__(self):
+        '''
+        Make Position iterable for unpacking
+        :return: iterable over (x, y)
+        '''
+        return iter((self.x, self.y))
 
     def gridified(self, width: float) -> 'GridPosition':
         '''
@@ -89,85 +120,126 @@ class Position(namedtuple('Position', ('x', 'y'))):
         return GridPosition(x=int(round(self.x/width)-1), y=int(round(self.y/width)-1))
 
 
+@dataclass
 class GridPosition(Position):
     '''
-    Named tuple to represent the vehicle position on a grid.
+    Data class to represent the vehicle position on a grid.
 
     '''
 
-    __slots__ = ()
+    x: int
+    y: int
 
 
-class BoundingBox(namedtuple('BoundingBox', ('p1', 'p2'))):
+@dataclass
+class BoundingBox:
     '''
-    Named tuple to represent a bounding box, consisting of Position p1 and Position p2.
+    Data class to represent a bounding box, consisting of Position p1 and Position p2.
 
     '''
 
-    __slots__ = ()
+    __slots__ = ('p1', 'p2')
+    p1: Position
+    p2: Position
 
-    def __new__(cls, p1, p2):
-        '''Override to ensure Position named tuples.'''
-        # noinspection PyArgumentList
-        return super(cls, BoundingBox).__new__(cls, p1=Position(*p1), p2=Position(*p2))
+    def __iter__(self) -> typing.Iterable[Position]:
+        '''
+        Make BoundingBox iterable for unpacking
+        :return: iterable over Positions
+        '''
+        return iter((self.p1, self.p2))
+
+    def __post_init__(self):
+        '''
+        Ensure p1 and p2 are Position data classes.
+
+        '''
+
+        self.p1=Position(*self.p1)
+        self.p2=Position(*self.p2)
 
     def contains(self, position: Position) -> bool:
-        '''checks whether position is inside bounding box'''
+        '''
+        Checks whether position is inside bounding box.
+
+        :param position: Position data class
+        :type position: Position
+        :return: True if position is inside BoundingBox, False otherwise.
+
+        '''
+
+        assert isinstance(position, Position)
         return self.p1.x <= position.x <= self.p2.x and self.p1.y <= position.y <= self.p2.y
 
 
-class Range(namedtuple('Range', ('min', 'max'))):
+@dataclass(frozen=True)
+class Range:
     '''
-    Named tuple to represent a range.
+    Data class to represent a range.
     '''
 
-    __slots__ = ()
+    __slots__ = ('min', 'max')
+    min: float
+    max: float
 
-    def contains(self, value: float):
-        '''checks whether value lies between min and max (including)'''
+    def __iter__(self) -> typing.Iterable[float]:
+        '''
+        Make Range iterable for unpacking
+        :return: iterable over range (min, max)
+        '''
+        return iter((self.min, self.max))
+
+    def contains(self, value: float) -> bool:
+        '''
+        Checks whether value lies between min and max (including).
+
+        :param value: value to check
+        :type value: float
+        :return: True if position is inside BoundingBox, False otherwise.
+        '''
         return self.min <= value <= self.max
 
 
+@dataclass(frozen=True)
 class SpeedRange(Range):
     '''
-    Named tuple to represent allowed speed range.
+    Data class to represent allowed speed range.
     '''
 
-    __slots__ = ()
-
-    def __new__(cls, rmin, rmax):
-        if rmin > rmax:
+    def __post_init__(self):
+        '''
+        Check whether min <= max
+        '''
+        if self.min > self.max:
             raise ValueError(f'SpeedRange minumium is larger than maximum.')
-        # noinspection PyArgumentList
-        return super(cls, SpeedRange).__new__(cls, rmin, rmax)
 
 
+@dataclass(frozen=True)
 class OccupancyRange(Range):
     '''
-    Named tuple to represent allowed occupancy range.
+    Data class to represent allowed occupancy range.
     '''
 
-    __slots__ = ()
-
-    def __new__(cls, dmin, dmax):
-        if dmin > dmax:
+    def __post_init__(self):
+        '''
+        Check whether min <= max
+        '''
+        if self.min > self.max:
             raise ValueError(f'OccupancyRange minumium is larger than maximum.')
-        # noinspection PyArgumentList
-        return super(cls, OccupancyRange).__new__(cls, dmin, dmax)
 
 
+@dataclass(frozen=True)
 class DissatisfactionRange(Range):
     '''
-    Named tuple to represent allowed speed range.
+    Data class to represent allowed speed range.
     '''
 
-    __slots__ = ()
-
-    def __new__(cls, rmin, rmax):
-        if rmin > rmax:
+    def __post_init__(self):
+        '''
+        Check whether min <= max
+        '''
+        if self.min > self.max:
             raise ValueError(f'DissatisfactionRange minumium is larger than maximum.')
-        # noinspection PyArgumentList
-        return super(cls, DissatisfactionRange).__new__(cls, rmin, rmax)
 
 
 @enum.unique
@@ -192,8 +264,11 @@ class Distribution(enum.Enum):
         prev_start_time.
 
         :param lamb: lambda
+        :type lamb: float
         :param prev_start_time: start time
+        :type prev_start_time: float
         :param distribution: distribution, i.e. Distribution.POISSON or Distribution.LINEAR
+        :type distribution: Distribution
         :return: next start time
 
         '''
@@ -201,6 +276,7 @@ class Distribution(enum.Enum):
         if self is Distribution.POISSON:
             return prev_start_time + self._prng.value.exponential(scale=1/lamb)
 
+        assert self is Distribution.LINEAR
         return prev_start_time + 1 / lamb # i.e. Distribution.LINEAR
 
 
@@ -229,10 +305,11 @@ class InitialSorting(enum.Enum):
             vehicles.sort(key=lambda i_v: i_v.speed_max, reverse=True)
         elif self is InitialSorting.RANDOM:
             self._prng.value.shuffle(vehicles)
-        elif self is InitialSorting.WORST:
-            vehicles.sort(key=lambda i_v: i_v.speed_max)
+        elif self is InitialSorting._prng:
+            raise KeyError('Can\'t order vehicles on prng')
         else:
-            raise KeyError('Valid orderings are BEST|RANDOM|WORST')
+            assert self is InitialSorting.WORST
+            vehicles.sort(key=lambda i_v: i_v.speed_max)
 
 
 @enum.unique
@@ -419,13 +496,19 @@ class VehicleDisposition(enum.Enum):
         )
 
 
-class StatisticValue(namedtuple('StatisticValue', ('minimum', 'median', 'mean', 'maximum'))):
+@dataclass(frozen=True)
+class StatisticValue:
     '''
-    Named tuple to represent a statistical value containing a minimum, median, mean and maximum.
+    Data class to represent a statistical value containing a minimum, median, mean and maximum.
 
+    # todo: figure out how to apply objects to numpy w/o as_tuple() calls
     '''
 
-    __slots__ = ()
+    __slots__ = ('minimum', 'median', 'mean', 'maximum')
+    minimum: float
+    median: float
+    mean: float
+    maximum: float
 
     @staticmethod
     def nanof(values: typing.Union[None, typing.Iterable[float]]=None):
@@ -442,3 +525,13 @@ class StatisticValue(namedtuple('StatisticValue', ('minimum', 'median', 'mean', 
             mean=numpy.nanmean(values),
             maximum=numpy.nanmax(values)
         ) if values and not numpy.all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
+
+    def as_tuple(self) -> typing.Tuple[float, float, float, float]:
+        '''
+        Return indexable tuple.
+
+        :return: tuple of statistic values, i.e. (minimum, median, mean, maximum)
+
+        '''
+
+        return (self.minimum, self.median, self.mean, self.maximum)
