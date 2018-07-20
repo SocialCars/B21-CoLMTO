@@ -6,13 +6,13 @@ pytest-cov==2.5.1
 h5py==2.8.0
 lxml==4.2.3
 matplotlib==2.2.2
-numexpr==2.6.5
+numexpr==2.6.6
 numpy==1.14.5
 bottleneck==1.2.1
 pandas==0.23.3
 PyYAML==3.13
 pygments-style-solarized==0.1.1
 sh==1.12.14
-Sphinx==1.7.5
+Sphinx==1.7.6
 versioneer==0.18
 git+https://github.com/rtfd/sphinx_rtd_theme.git
