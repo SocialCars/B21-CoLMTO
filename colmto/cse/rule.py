@@ -564,7 +564,7 @@ class SUMOVehicleDissatisfactionRule(SUMOVehicleRule, rule_name='SUMOVehicleDiss
                f'outside = {self._outside}'
 
     @property
-    def threshold_range(self) -> float:
+    def threshold_range(self) -> DissatisfactionRange:
         '''
         :return: dissatisfaction threshold range
 
@@ -650,7 +650,7 @@ class SUMOGlobalDissatisfactionRule(SUMOVehicleRule, rule_name='SUMOGlobalDissat
                f'outside = {self._outside}'
 
     @property
-    def threshold_range(self) -> float:
+    def threshold_range(self) -> DissatisfactionRange:
         '''
         :return: dissatisfaction threshold range
 

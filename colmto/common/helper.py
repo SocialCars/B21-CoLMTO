@@ -23,6 +23,7 @@
 # @endcond
 '''Classes and functions to realise property structures, e.g. Position, Colour, ...'''
 
+from collections import namedtuple
 from dataclasses import dataclass
 import typing
 import enum
@@ -496,19 +497,13 @@ class VehicleDisposition(enum.Enum):
         )
 
 
-@dataclass(frozen=True)
-class StatisticValue:
+class StatisticValue(namedtuple('StatisticValue', ('minimum', 'median', 'mean', 'maximum'))):
     '''
-    Data class to represent a statistical value containing a minimum, median, mean and maximum.
-
-    # todo: figure out how to apply objects to numpy w/o as_tuple() calls
+    Named tuple to represent a statistical value containing a minimum, median, mean and maximum.
+    Using named tuple instead of data class as we can pass it directly into numpy ufuncs.
     '''
 
-    minimum: numpy.ndarray
-    median: numpy.ndarray
-    mean: numpy.ndarray
-    maximum: numpy.ndarray
-    __slots__ = ('minimum', 'median', 'mean', 'maximum')
+    __slots__ = ()
 
     @staticmethod
     def nanof(values: typing.Union[None, typing.Iterable[float]]=None):
@@ -525,13 +520,3 @@ class StatisticValue:
             mean=numpy.nanmean(values),
             maximum=numpy.nanmax(values)
         ) if values and not numpy.all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
-
-    def as_tuple(self) -> typing.Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]:
-        '''
-        Return indexable tuple.
-
-        :return: tuple of statistic values, i.e. (minimum, median, mean, maximum)
-
-        '''
-
-        return (self.minimum, self.median, self.mean, self.maximum)

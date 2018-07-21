@@ -288,7 +288,7 @@ class HelperTests(unittest.TestCase):
 
         l_statisticvalue = helper.StatisticValue(1., 2., 3., 4.)
 
-        self.assertTupleEqual(l_statisticvalue.as_tuple(), (1., 2., 3., 4.))
+        self.assertTupleEqual(l_statisticvalue, (1., 2., 3., 4.))
         self.assertEqual(l_statisticvalue.minimum, 1.)
         self.assertEqual(l_statisticvalue.median, 2.)
         self.assertEqual(l_statisticvalue.mean, 3.)
@@ -300,11 +300,11 @@ class HelperTests(unittest.TestCase):
         self.assertEqual(l_statisticvalue.mean, 3.2)
         self.assertEqual(l_statisticvalue.median, 3)
 
-        self.assertEqual(helper.StatisticValue.nanof(None), helper.StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan))
-        self.assertEqual(helper.StatisticValue.nanof(), helper.StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+        self.assertTupleEqual(helper.StatisticValue.nanof(None), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
+        self.assertTupleEqual(helper.StatisticValue.nanof(), (numpy.nan, numpy.nan, numpy.nan, numpy.nan))
         self.assertTrue(
             numpy.isnan(
-                helper.StatisticValue.nanof((numpy.nan, numpy.nan, numpy.nan, numpy.nan)).as_tuple()
+                helper.StatisticValue.nanof((numpy.nan, numpy.nan, numpy.nan, numpy.nan))
             ).all()
         )
 
