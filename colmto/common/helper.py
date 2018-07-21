@@ -504,10 +504,10 @@ class StatisticValue:
     # todo: figure out how to apply objects to numpy w/o as_tuple() calls
     '''
 
-    minimum: float
-    median: float
-    mean: float
-    maximum: float
+    minimum: numpy.ndarray
+    median: numpy.ndarray
+    mean: numpy.ndarray
+    maximum: numpy.ndarray
     __slots__ = ('minimum', 'median', 'mean', 'maximum')
 
     @staticmethod
@@ -526,7 +526,7 @@ class StatisticValue:
             maximum=numpy.nanmax(values)
         ) if values and not numpy.all(numpy.isnan(values)) else StatisticValue(numpy.nan, numpy.nan, numpy.nan, numpy.nan)
 
-    def as_tuple(self) -> typing.Tuple[float, float, float, float]:
+    def as_tuple(self) -> typing.Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]:
         '''
         Return indexable tuple.
 
