@@ -37,11 +37,11 @@ class Colour:
 
     '''
 
-    __slots__ = ('red', 'green', 'blue', 'alpha')
     red: float
     green: float
     blue: float
     alpha: float
+    __slots__ = ('red', 'green', 'blue', 'alpha')
 
     def __iter__(self) -> typing.Iterable[float]:
         '''
@@ -97,9 +97,9 @@ class Position:
 
     '''
 
-    __slots__ = ('x', 'y')
     x: float
     y: float
+    __slots__ = ('x', 'y')
 
     def __iter__(self):
         '''
@@ -138,9 +138,9 @@ class BoundingBox:
 
     '''
 
-    __slots__ = ('p1', 'p2')
     p1: Position
     p2: Position
+    __slots__ = ('p1', 'p2')
 
     def __iter__(self) -> typing.Iterable[Position]:
         '''
@@ -178,9 +178,9 @@ class Range:
     Data class to represent a range.
     '''
 
-    __slots__ = ('min', 'max')
     min: float
     max: float
+    __slots__ = ('min', 'max')
 
     def __iter__(self) -> typing.Iterable[float]:
         '''
@@ -504,11 +504,11 @@ class StatisticValue:
     # todo: figure out how to apply objects to numpy w/o as_tuple() calls
     '''
 
-    __slots__ = ('minimum', 'median', 'mean', 'maximum')
     minimum: float
     median: float
     mean: float
     maximum: float
+    __slots__ = ('minimum', 'median', 'mean', 'maximum')
 
     @staticmethod
     def nanof(values: typing.Union[None, typing.Iterable[float]]=None):
