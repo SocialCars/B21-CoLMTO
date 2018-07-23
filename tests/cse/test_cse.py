@@ -248,7 +248,7 @@ class TestCSE(unittest.TestCase):
             )
         for i_vtype in VehicleType:
             for _ in range(50):
-                l_cse._dissatisfaction.get(i_vtype).appendleft(StatisticValue.nanof((2, 3, 4, 5, 2)).as_tuple())
+                l_cse._dissatisfaction.get(i_vtype).appendleft(StatisticValue.nanof((2, 3, 4, 5, 2)))
             self.assertTupleEqual(l_cse._median_dissatisfaction().get(i_vtype), (2.0, 3.0, 3.2, 5.0))
 
 if __name__ == '__main__':
