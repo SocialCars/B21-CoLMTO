@@ -131,6 +131,9 @@ jobs:
                   name: gh-pages is not a jekyll page
                   command: touch .nojekyll
             - run:
+                  name: Create index.html
+                  command: echo -e "<html><head><meta http-equiv="refresh" content="0; url=https://socialcars.github.io/colmto/docs/sources/"><link rel="canonical" href="https://socialcars.github.io/colmto/docs/sources/" /></head></html>" > index.html
+            - run:
                   name: Git Add All
                   command: git add --all .
             - run:
