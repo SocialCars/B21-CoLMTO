@@ -232,6 +232,7 @@ class SumoConfig(colmto.common.configuration.Configuration):
                        initial_sorting.name.lower() /
                        str(run_number) /
                        f'{l_scenarioname}.fcd-output.xml' if not self.run_config.get('cse-enabled') else None,
+            'initialsorting': initial_sorting.name.lower(),
             'scenario_config': self.scenario_config.get(l_scenarioname)
         }
 

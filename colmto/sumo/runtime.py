@@ -226,10 +226,13 @@ class Runtime(object):
         )
         self._log.info(
             'Writing occupancy stats to %s',
-            self._sumo_config.resultsdir/"occupancy.json"
+            self._sumo_config.resultsdir/f'occupancy-{run_config.get("runnumber")}-{run_config.get("initialsorting")}.json'
         )
         l_occupancy = dict(cse.occupancy())
-        colmto.common.io.Writer().write_json(l_occupancy, self._sumo_config.resultsdir/"occupancy.json")
+        colmto.common.io.Writer().write_json(
+            l_occupancy,
+            self._sumo_config.resultsdir/f'occupancy-{run_config.get("runnumber")}-{run_config.get("initialsorting")}.json'
+        )
 
         return run_config.get('vehicles')
 
