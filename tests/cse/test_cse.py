@@ -171,7 +171,7 @@ class TestCSE(unittest.TestCase):
                     numpy.isnan(
                         colmto.cse.cse.SumoCSE(
                             SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
-                        )._occupancy.get(i_lane)
+                        )._occupancy_window.get(i_lane)
                     ).all()
                 )
 

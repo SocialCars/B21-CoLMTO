@@ -29,6 +29,7 @@ if typing.TYPE_CHECKING:
     import traci
 
 from collections import deque
+from types import MappingProxyType
 import numpy
 import colmto.common.log
 from colmto.common.helper import VehicleType
@@ -78,14 +79,19 @@ class SumoCSE(BaseCSE):
         '''
         super().__init__(args)
         self._traci = None
-        self._occupancy = {
+        self._occupancy_window = {  # record occupancy of previous 60 time steps (i.e. seconds) for both lanes
             i_lane: deque((float('NaN') for _ in range(60)), maxlen=60)
+            for i_lane in ('21edge_0', '21edge_1')
+        }
+        self._occupancy_full = {  # record full occupancy for both lanes for statistical purposes
+            i_lane: []
             for i_lane in ('21edge_0', '21edge_1')
         }
         self._dissatisfaction = {
             i_vtype: deque((StatisticValue.nanof(None) for _ in range(60)), maxlen=60)
             for i_vtype in VehicleType
         }
+
 
     def traci(self, _traci: 'traci') -> 'SumoCSE':
         '''
@@ -120,9 +126,11 @@ class SumoCSE(BaseCSE):
 
         # record occupancy
         for i_key, i_value in lane_subscription_results.items():
-            if not i_key in self._occupancy:
-                raise KeyError(f'Unexpected key (\'{i_key}\') of subcription results. Expected one of {list(self._occupancy.keys())}.')
-            self._occupancy.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
+            if not i_key in self._occupancy_window:
+                raise KeyError(
+                    f'Unexpected key (\'{i_key}\') of subcription results. Expected one of {list(self._occupancy_window.keys())}.')
+            self._occupancy_window.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
+            self._occupancy_full.get(i_key).append(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
 
         # record dissatisfaction
         l_dissatisfaction = {
@@ -137,10 +145,20 @@ class SumoCSE(BaseCSE):
 
         return self
 
+    def occupancy(self) -> typing.Mapping[str, tuple]:
+        '''
+        Return full occupancy stats over the past.
+        :return: occupancy dictionary with lane IDs as keys ('21edge_0', '21edge_1')
+        '''
+
+        return MappingProxyType(
+            { i_key: tuple(self._occupancy_full.get(i_key)) for i_key in self._occupancy_full }
+        )
+
     def _median_occupancy(self) -> typing.Dict[str, float]:
         '''
         Calculate median (ignoring NaN values) occupancy for all lanes.
-        Result can be NaN, iff observation window (self._occupancy) only contains NaN values.
+        Result can be NaN, iff observation window (self._occupancy_window) only contains NaN values.
 
         Example:
 
@@ -153,11 +171,11 @@ class SumoCSE(BaseCSE):
 
         return {
             i_lane: float(
-                numpy.nanmedian(list(self._occupancy.get(i_lane)))
-                if not numpy.isnan(list(self._occupancy.get(i_lane))).all()
+                numpy.nanmedian(list(self._occupancy_window.get(i_lane)))
+                if not numpy.isnan(list(self._occupancy_window.get(i_lane))).all()
                 else 'nan'
             )
-            for i_lane in self._occupancy
+            for i_lane in self._occupancy_window
         }
 
     def _median_dissatisfaction(self) -> typing.Dict[VehicleType, float]:

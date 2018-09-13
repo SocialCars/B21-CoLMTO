@@ -31,6 +31,7 @@ import typing
 
 from colmto.environment.vehicle import SUMOVehicle
 
+import colmto.common.io
 import colmto.common.log
 import colmto.cse.cse
 import colmto.cse.rule
@@ -223,6 +224,12 @@ class Runtime(object):
             'TraCI run of scenario %s, run %d completed.',
             run_config.get('scenarioname'), run_config.get('runnumber')
         )
+        self._log.info(
+            'Writing occupancy stats to %s',
+            self._sumo_config.resultsdir/"occupancy.json"
+        )
+        l_occupancy = dict(cse.occupancy())
+        colmto.common.io.Writer().write_json(l_occupancy, self._sumo_config.resultsdir/"occupancy.json")
 
         return run_config.get('vehicles')
 
