@@ -99,7 +99,7 @@ for i_policy in g_policies:
         plt.xticks(range(0, len(g_aadt) * 2, 2), g_aadt)
         plt.xlim(-2, len(g_aadt)*2)
         plt.ylim(-0.005, g_ylim)
-        plt.title(f'Occupancy of {g_lane_labels[i_lane]} vs. demand')
+        plt.title(f'{i_policy} policy: Occupancy of {g_lane_labels[i_lane]} vs. demand')
         plt.ylabel('Occupancy')
         plt.xlabel('Demand as annual average daily traffic (AADT)')
         plt.tight_layout()
@@ -128,7 +128,7 @@ for i_policy in g_policies:
                 }
 
             plt.legend()
-            plt.title(f'Lane occupancy for {i_aadt} AADT and {i_ordering} ordering')
+            plt.title(f'{i_policy} policy: Lane occupancy for {i_aadt} AADT and {i_ordering} ordering')
             plt.ylabel('Occupancy')
             plt.ylim(-0.005, g_ylim)
             plt.xlabel('Simulation steps, i.e. seconds')
