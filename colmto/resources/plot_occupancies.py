@@ -53,14 +53,6 @@ if g_min < 0:
                  for i_lane in g_lane_labels:
                     g_data[i_policy][i_aadt][i_ordering][i_lane] = [v-g_min for v in g_data[i_policy][i_aadt][i_ordering][i_lane]]
 
-g_newmin = min(
-        [min(g_data[i_policy][i_aadt][i_ordering][i_lane])
-         for i_lane in g_lane_labels
-         for i_ordering in g_orderings
-         for i_aadt in g_aadt
-         for i_policy in g_policies]
-    )
-
 g_stats = {
     i_policy: {
         i_ordering: {
@@ -72,12 +64,14 @@ g_stats = {
     } for i_policy in g_policies
 }
 
-g_ylim = np.max(
-    [np.max(g_data[i_policy][i_aadt][i_ordering][i_lane])
-     for i_policy in g_policies
-     for i_aadt in g_aadt
-     for i_ordering in g_orderings
-     for i_lane in g_lane_labels]
+g_ylim = max(
+    flatten(
+        [g_data[i_policy][i_aadt][i_ordering][i_lane]
+         for i_policy in g_policies
+         for i_aadt in g_aadt
+         for i_ordering in g_orderings
+         for i_lane in g_lane_labels]
+    )
 )
 
 for i_policy in g_policies:
@@ -98,7 +92,7 @@ for i_policy in g_policies:
             plt.setp(bp['medians'], color=g_ordering_colors[i_ordering[0]])
 
         for i_color, i_label in g_ordering_color_labels.items():
-            plt.plot([], c=i_color, label=f'{i_label} (median: {round(np.median(list(flatten((g_data[i_policy][i_aadt][i_label][i_lane] for i_aadt in g_aadt)))), 2)}, max: {round(max([max(g_data[i_policy][i_aadt][i_label][i_lane]) for i_aadt in g_aadt]), 2)})')
+            plt.plot([], c=i_color, label=f'{i_label} (median: {np.round(np.median(list(flatten((g_data[i_policy][i_aadt][i_label][i_lane] for i_aadt in g_aadt)))), 2)}, max: {round(max(flatten([g_data[i_policy][i_aadt][i_label][i_lane] for i_aadt in g_aadt])), 2)})')
 
         plt.legend(title='Initial ordering of vehicles')
         plt.xticks(rotation=70)
@@ -118,14 +112,21 @@ for i_policy in g_policies:
             plt.figure()
             plt.grid(b=True, which='both', color='lightgray', axis='y', linestyle='--')
             for i_lane in g_lane_labels:
+                l_min = round(min(g_data[i_policy][i_aadt][i_ordering][i_lane]), 12)
+                l_median = np.round(np.median(g_data[i_policy][i_aadt][i_ordering][i_lane]), 12)
+                l_max = round(max(g_data[i_policy][i_aadt][i_ordering][i_lane]), 12)
                 lp = plt.plot(g_data[i_policy][i_aadt][i_ordering][i_lane])
                 plt.setp(lp, color=g_lane_colors[i_lane])
-                plt.plot([], c=g_lane_colors[i_lane], label=f'{g_lane_labels[i_lane]} (median: {round(np.median(g_data[i_policy][i_aadt][i_ordering][i_lane]), 2)}, max: {round(max(g_data[i_policy][i_aadt][i_ordering][i_lane]), 2)})')
+                plt.plot([], c=g_lane_colors[i_lane], label=f'{g_lane_labels[i_lane]} (max: {round(l_max, 2)})')
+                lp = plt.plot([l_median]*len(g_data[i_policy][i_aadt][i_ordering][i_lane]))
+                plt.setp(lp, color=g_lane_colors[i_lane], linestyle='--')
+                plt.plot([], c=g_lane_colors[i_lane], label=f'{g_lane_labels[i_lane]} median ({round(l_median, 2)})')
                 g_stats[i_policy][i_ordering][i_aadt][i_lane] = {
-                    'median': round(np.median(list(flatten((g_data[i_policy][i_aadt][i_ordering][i_lane] for i_aadt in g_aadt)))), 12),
-                    'max': round(max([max(g_data[i_policy][i_aadt][i_ordering][i_lane]) for i_aadt in g_aadt]), 12),
-                    'min': round(min([min(g_data[i_policy][i_aadt][i_ordering][i_lane]) for i_aadt in g_aadt]), 12)
+                    'min': l_min,
+                    'median': l_median,
+                    'max': l_max
                 }
+
             plt.legend()
             plt.title(f'Lane occupancy for {i_aadt} AADT and {i_ordering} ordering')
             plt.ylabel('Occupancy')
