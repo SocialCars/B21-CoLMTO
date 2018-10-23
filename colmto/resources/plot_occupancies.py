@@ -120,7 +120,7 @@ for i_policy in g_policies:
                 plt.plot([], c=g_lane_colors[i_lane], label=f'{g_lane_labels[i_lane]} (max: {round(l_max, 2)})')
                 lp = plt.plot([l_median]*len(g_data[i_policy][i_aadt][i_ordering][i_lane]))
                 plt.setp(lp, color=g_lane_colors[i_lane], linestyle='--')
-                plt.plot([], c=g_lane_colors[i_lane], label=f'{g_lane_labels[i_lane]} median ({round(l_median, 2)})')
+                plt.plot([], c=g_lane_colors[i_lane], label=f'{g_lane_labels[i_lane]} median ({round(l_median, 2)})', linestyle='--')
                 g_stats[i_policy][i_ordering][i_aadt][i_lane] = {
                     'min': l_min,
                     'median': l_median,
