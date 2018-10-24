@@ -36,7 +36,13 @@ g_data = {
     } for i_policy in g_policies
 }
 
-# adjust data
+# adjust data inaccuracies, i.e. round to 12 decimal points
+for i_policy in g_policies:
+    for i_aadt in g_aadt:
+         for i_ordering in g_orderings:
+             for i_lane in g_lane_labels:
+                g_data[i_policy][i_aadt][i_ordering][i_lane] = np.round(g_data[i_policy][i_aadt][i_ordering][i_lane], 12)
+
 g_min = min(
     flatten(
         [g_data[i_policy][i_aadt][i_ordering][i_lane]
@@ -46,12 +52,6 @@ g_min = min(
          for i_policy in g_policies]
     )
 )
-if g_min < 0:
-    for i_policy in g_policies:
-        for i_aadt in g_aadt:
-             for i_ordering in g_orderings:
-                 for i_lane in g_lane_labels:
-                    g_data[i_policy][i_aadt][i_ordering][i_lane] = [v-g_min for v in g_data[i_policy][i_aadt][i_ordering][i_lane]]
 
 g_stats = {
     i_policy: {
