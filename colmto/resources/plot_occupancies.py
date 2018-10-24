@@ -27,6 +27,7 @@ g_ordering_colors = dict(zip(g_orderings, ('#1b9e77','#7570b3','#d95f02')))
 g_ordering_color_labels = dict(zip(('#1b9e77','#7570b3','#d95f02'), g_orderings))
 g_lane_colors = dict(zip(('21edge_0', '21edge_1'), ('#fdae61','#2c7bb6')))
 g_lane_labels = dict(zip(g_lane_colors, ('right lane', 'overtaking lane')))
+
 g_data = {
     i_policy: {
         i_aadt: {
@@ -42,16 +43,6 @@ for i_policy in g_policies:
          for i_ordering in g_orderings:
              for i_lane in g_lane_labels:
                 g_data[i_policy][i_aadt][i_ordering][i_lane] = np.round(g_data[i_policy][i_aadt][i_ordering][i_lane], 12)
-
-g_min = min(
-    flatten(
-        [g_data[i_policy][i_aadt][i_ordering][i_lane]
-         for i_lane in g_lane_labels
-         for i_ordering in g_orderings
-         for i_aadt in g_aadt
-         for i_policy in g_policies]
-    )
-)
 
 g_stats = {
     i_policy: {
