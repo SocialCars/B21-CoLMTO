@@ -611,20 +611,20 @@ class TestRule(unittest.TestCase):
             '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: occupancy_range = OccupancyRange(min=0.0, max=1.0), outside = False'
         )
         self.assertEqual(
-            str(colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(1.0, 2.0), outside=True)),
-            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: occupancy_range = OccupancyRange(min=1.0, max=2.0), outside = True'
+            str(colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(0.01, 0.02), outside=True)),
+            '<class \'colmto.cse.rule.SUMOOccupancyRule\'>: occupancy_range = OccupancyRange(min=0.01, max=0.02), outside = True'
         )
-        l_occupancy_rule = colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(0, 50))
-        for i_occupancy in range(100):
-            with self.subTest(pattern=(l_occupancy_rule._occupancy_range, i_occupancy)):
+        l_occupancy_rule = colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(0, 0.8))
+        for i_occupancy in range(10):
+            with self.subTest(pattern=(l_occupancy_rule._occupancy_range, i_occupancy/10)):
                 l_vehicle = colmto.environment.vehicle.SUMOVehicle(
                     environment={'gridlength': 200, 'gridcellwidth': 4},
                     vehicle_type='passenger',
                 )
-                if i_occupancy <= 50:
-                    self.assertTrue(l_occupancy_rule.applies_to(l_vehicle, occupancy={'21edge_1': i_occupancy}))
+                if i_occupancy/10 <= 0.8:
+                    self.assertTrue(l_occupancy_rule.applies_to(l_vehicle, occupancy={'21edge_0': i_occupancy/10}))
                 else:
-                    self.assertFalse(l_occupancy_rule.applies_to(l_vehicle, occupancy={'21edge_1': i_occupancy}))
+                    self.assertFalse(l_occupancy_rule.applies_to(l_vehicle, occupancy={'21edge_0': i_occupancy/10}))
 
         self.assertFalse(l_occupancy_rule.applies_to(l_vehicle))
 
