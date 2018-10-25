@@ -57,7 +57,7 @@ class BaseRule(metaclass=ABCMeta):
         pass
 
     @classmethod
-    def rule_cls(cls, rule_name: str) -> 'BaseRule':
+    def rule_cls(cls, rule_name: str) -> BaseRule:
         '''
         Return a class object for instantiating a valid rule.
 
@@ -68,7 +68,7 @@ class BaseRule(metaclass=ABCMeta):
         return cls._valid_rules[rule_name]
 
     @classmethod
-    def from_configuration(cls, rule_config: dict) -> 'BaseRule':
+    def from_configuration(cls, rule_config: dict) -> BaseRule:
         '''
         Create a rule from a dictionary configuration
 
@@ -223,7 +223,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
             raise ValueError
         self._subrule_operator = rule_operator
 
-    def add_subrule(self, subrule: BaseRule) -> 'BaseRule':
+    def add_subrule(self, subrule: BaseRule) -> BaseRule:
         '''
         Adds a sub-rule.
 
