@@ -627,6 +627,9 @@ class TestRule(unittest.TestCase):
                     self.assertFalse(l_occupancy_rule.applies_to(l_vehicle, occupancy={'21edge_0': i_occupancy/10}))
 
         self.assertFalse(l_occupancy_rule.applies_to(l_vehicle))
+        with self.assertRaises(AssertionError):
+            colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(0, 1.1))
+            colmto.cse.rule.SUMOOccupancyRule(occupancy_range=(-1, 0.8))
 
 if __name__ == '__main__':
     unittest.main()
