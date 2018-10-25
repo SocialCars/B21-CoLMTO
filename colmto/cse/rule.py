@@ -23,6 +23,7 @@
 # @endcond
 '''Rule related classes'''
 
+from __future__ import annotations
 import typing
 
 from abc import ABCMeta
