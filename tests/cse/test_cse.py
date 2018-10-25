@@ -50,7 +50,10 @@ class TestCSE(unittest.TestCase):
         self.assertIsInstance(
             colmto.cse.cse.BaseCSE(
                 SimpleNamespace(
-                    loglevel='debug', quiet=False, logfile='foo.log'
+                    loglevel='debug',
+                    quiet=False,
+                    logfile='foo.log',
+                    writefulloccupancies=False
                 )
             ),
             colmto.cse.cse.BaseCSE
@@ -64,7 +67,10 @@ class TestCSE(unittest.TestCase):
         self.assertIsInstance(
             colmto.cse.cse.SumoCSE(
                 SimpleNamespace(
-                    loglevel='debug', quiet=False, logfile='foo.log'
+                    loglevel='debug',
+                    quiet=False,
+                    logfile='foo.log',
+                    writefulloccupancies=False
                 )
             ),
             colmto.cse.cse.SumoCSE
@@ -170,7 +176,12 @@ class TestCSE(unittest.TestCase):
                 self.assertTrue(
                     numpy.isnan(
                         colmto.cse.cse.SumoCSE(
-                            SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+                            SimpleNamespace(
+                                loglevel='debug',
+                                quiet=False,
+                                logfile='foo.log',
+                                writefulloccupancies=False
+                            )
                         )._occupancy_window.get(i_lane)
                     ).all()
                 )
@@ -180,14 +191,24 @@ class TestCSE(unittest.TestCase):
                 self.assertTrue(
                     numpy.isnan(
                         colmto.cse.cse.SumoCSE(
-                            SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+                            SimpleNamespace(
+                                loglevel='debug',
+                                quiet=False,
+                                logfile='foo.log',
+                                writefulloccupancies=False
+                            )
                         )._dissatisfaction.get(i_vtype)
                     ).all()
                 )
 
         with self.assertRaises(ValueError):
             colmto.cse.cse.SumoCSE(
-                SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+                SimpleNamespace(
+                    loglevel='debug',
+                    quiet=False,
+                    logfile='foo.log',
+                    writefulloccupancies=False
+                )
             ).observe_traffic(
                 {'foo': {1: 1.2}},
                 {'foo': {1: 1.2}},
@@ -198,7 +219,12 @@ class TestCSE(unittest.TestCase):
             )
 
         l_cse = colmto.cse.cse.SumoCSE(
-            SimpleNamespace(loglevel='debug', quiet=False, logfile='foo.log')
+            SimpleNamespace(
+                loglevel='debug',
+                quiet=False,
+                logfile='foo.log',
+                writefulloccupancies=False
+            )
         )
         l_cse.traci(SimpleNamespace(constants=SimpleNamespace(LAST_STEP_OCCUPANCY=13)))
         self.assertEqual(
