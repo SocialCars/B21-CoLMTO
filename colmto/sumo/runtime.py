@@ -197,7 +197,7 @@ class Runtime(object):
                     i_results.get(traci.constants.VAR_POSITION),
                     i_results.get(traci.constants.VAR_LANE_INDEX),
                     i_results.get(traci.constants.VAR_SPEED),
-                    l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/10.**3
+                    l_simulation_subscription_results.get(traci.constants.VAR_TIME_STEP)/1000.
                 )
 
             # BEGIN CSE protocol
@@ -224,15 +224,15 @@ class Runtime(object):
             'TraCI run of scenario %s, run %d completed.',
             run_config.get('scenarioname'), run_config.get('runnumber')
         )
-        self._log.info(
-            'Writing occupancy stats to %s',
-            self._sumo_config.resultsdir/f'occupancy-{run_config.get("runnumber")}-{run_config.get("initialsorting")}.json'
-        )
-        l_occupancy = dict(cse.occupancy())
-        colmto.common.io.Writer().write_json(
-            l_occupancy,
-            self._sumo_config.resultsdir/f'occupancy-{run_config.get("runnumber")}-{run_config.get("initialsorting")}.json'
-        )
+        if self._args is not None and self._args.writefulloccupancies:
+            self._log.info(
+                'Writing occupancy stats to %s',
+                self._sumo_config.resultsdir/f'occupancy-{run_config.get("runnumber")}-{run_config.get("initialsorting")}.json'
+            )
+            colmto.common.io.Writer().write_json(
+                dict(cse.occupancy()),
+                self._sumo_config.resultsdir/f'occupancy-{run_config.get("runnumber")}-{run_config.get("initialsorting")}.json'
+            )
 
         return run_config.get('vehicles')
 

@@ -80,7 +80,8 @@ class TestSumoSim(unittest.TestCase):
                 run_prefix='foo',
                 forcerebuildscenarios=True,
                 initialsortings=['random'],
-                cooperation_probability=None
+                cooperation_probability=None,
+                writefulloccupancies=False
             )
             self.assertEqual(colmto.sumo.sumosim.SumoSim(l_args)._args, l_args)  # pylint: disable=protected-access
 
@@ -112,7 +113,8 @@ class TestSumoSim(unittest.TestCase):
                     run_prefix='foo',
                     forcerebuildscenarios=True,
                     initialsortings=['random'],
-                    cooperation_probability=0.5
+                    cooperation_probability=0.5,
+                    writefulloccupancies=False
                 )
             ).run_scenarios()
 
@@ -144,7 +146,8 @@ class TestSumoSim(unittest.TestCase):
                     run_prefix='foo',
                     forcerebuildscenarios=True,
                     initialsortings=['random'],
-                    cooperation_probability=0.5
+                    cooperation_probability=0.5,
+                    writefulloccupancies=False
                 )
             ).run_scenarios()
 
@@ -177,7 +180,8 @@ class TestSumoSim(unittest.TestCase):
                         forcerebuildscenarios=True,
                         results_hdf5_file=Path(f_tmp_hdf5.name),
                         initialsortings=['random'],
-                        cooperation_probability=None
+                        cooperation_probability=None,
+                        writefulloccupancies=False
                     )
                 ).run_scenario(None)
 
@@ -210,7 +214,8 @@ class TestSumoSim(unittest.TestCase):
                     forcerebuildscenarios=True,
                     results_hdf5_file=Path(f_tmp_hdf5.name),
                     initialsortings=['random'],
-                    cooperation_probability=0.5
+                    cooperation_probability=0.5,
+                    writefulloccupancies=False
                 )
             ).run_scenarios()
 
