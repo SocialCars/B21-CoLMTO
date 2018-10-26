@@ -40,7 +40,7 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
 
 ### Prerequisites
 
-* [Python 3.6](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
+* [Python 3.7](https://python.org), with the following packages (will be installed during the [install process](#build-and-install-colmto)):
   * [defusedxml](https://pypi.python.org/pypi/defusedxml)
   * [h5py](https://pypi.python.org/pypi/h5py)
   * [lxml](https://pypi.python.org/pypi/lxml)
@@ -107,7 +107,7 @@ make -j $(getconf NPROCESSORS_CONF)
 #### FreeBSD
 
 ```sh
-sudo portmaster devel/py-pip@py36 math/py-numpy@py36 science/py-h5py@py36 math/py-matplotlib@py36 textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2 
+sudo portmaster devel/py-pip@py36 math/py-numpy@py36 science/py-h5py@py36 math/py-matplotlib@py36 textproc/libyaml lang/gcc math/openblas math/atlas math/lapack science/hdf5 print/freetype2
 ```
 
 #### MacOS
@@ -132,22 +132,22 @@ export CPPFLAGS="-I/usr/local/include"
 
 Install dependencies via pip3 (append `--prefix=` on MacOS)
 ```sh
-pip3.6 install -r requirements.txt --user
+pip3.7 install -r requirements.txt --user
 ```
 
 Build package
 ```sh
-python3.6 setup.py build
+python3.7 setup.py build
 ```
 
 Run unit tests
 ```sh
-python3.6 setup.py test
+python3.7 setup.py test
 ```
 
 Install (local)
 ```sh
-python3.6 setup.py install --user
+python3.7 setup.py install --user
 ```
 
 ## Run CoLMTO
@@ -163,7 +163,7 @@ colmto --runs 1
 If you have not installed CoLMTO in the previous section, run it inside the project directory as module.
 ```sh
 cd colmto
-python3.6 -m colmto --runs 1
+python3.7 -m colmto --runs 1
 ```
 
 Upon first start CoLMTO creates [YAML](https://en.wikipedia.org/wiki/YAML) formatted default configurations and its log file in `~/.colmto/`:
@@ -184,5 +184,5 @@ colmto --help
 
 ## Copyright & License
 
-  * Copyright 2017, Malte Aschermann
-  * [License: LGPL](http://socialcars.github.io/colmto/LICENSE.md)
+  * Copyright 2018, Malte Aschermann
+  * [License: LGPL](http://socialcars.github.io/colmto/license.md)
