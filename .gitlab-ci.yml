@@ -16,7 +16,6 @@ run:
       - dist/*.whl
   only:
   - master
-  - develop
 
 pages:
   script:
