@@ -7,8 +7,6 @@ cache:
   paths:
     - .cache/pip
     - venv/
-  only:
-    - master
 
 before_script:
   - python -V
