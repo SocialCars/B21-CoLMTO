@@ -13,9 +13,6 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  only:
-  - master
-  - develop
 
 test:
   script:
@@ -26,8 +23,8 @@ test:
 
 run:
   script:
-    - python setup.py bdist_wheel
-    # run the command here
+  - python setup.py bdist_wheel
+  # run the command here
   artifacts:
     paths:
       - dist/*.whl
