@@ -1,0 +1,38 @@
+image: python:3.7.1
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+  only:
+  - master
+
+before_script:
+  - python -V
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  only:
+  - master
+  - develop
+
+test:
+  script:
+  - python setup.py test
+  only:
+  - master
+  - develop
+
+run:
+  script:
+  - python setup.py bdist_wheel
+  # run the command here
+  artifacts:
+    paths:
+    - dist/*.whl
+  only:
+  - master
+  - develop
