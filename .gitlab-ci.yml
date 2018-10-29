@@ -1,13 +1,5 @@
 image: socialcars/docker:colmto
 
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
-
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
 test:
   script:
   - python setup.py test
