@@ -19,7 +19,7 @@ run:
 
 pages:
   script:
-  - pip3 install sphinx sphinx-rtd-theme
+  # - pip3 install sphinx sphinx-rtd-theme
   - cd docs ; make html
   - mv build/html/ ../public/
   artifacts:
