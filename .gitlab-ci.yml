@@ -1,5 +1,10 @@
 image: socialcars/docker:colmto
 
+stages:
+  - build
+  - test
+  - deploy
+
 devtest:
   stage: test
   script:
@@ -19,7 +24,7 @@ coverage:
   - master
   
 run:
-  stage: test
+  stage: build
   script:
   - pip3 install wheel
   - python3 setup.py bdist_wheel
