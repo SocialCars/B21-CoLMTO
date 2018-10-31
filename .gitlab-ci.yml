@@ -25,6 +25,7 @@ coverage:
   
 run:
   stage: build
+  image: python:3.7.1-alpine
   script:
   - pip3 install wheel
   - python3 setup.py bdist_wheel
@@ -36,6 +37,7 @@ run:
 
 pages:
   stage: deploy
+  image: python:3.7.1-alpine
   script:
   - pip3 install sphinx sphinx-rtd-theme
   - cd docs ; make html; make latexpdf
