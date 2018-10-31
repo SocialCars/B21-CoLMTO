@@ -5,6 +5,16 @@ stages:
   - test
   - deploy
 
+run:
+  stage: build
+  script:
+  - python3 setup.py bdist_wheel
+  artifacts:
+    paths:
+      - dist/*.whl
+  only:
+  - master
+
 devtest:
   stage: test
   script:
@@ -20,16 +30,6 @@ coverage:
   artifacts:
     reports:
       junit: report.xml
-  only:
-  - master
-  
-run:
-  stage: build
-  script:
-  - python3 setup.py bdist_wheel
-  artifacts:
-    paths:
-      - dist/*.whl
   only:
   - master
 
