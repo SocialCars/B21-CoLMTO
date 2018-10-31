@@ -13,7 +13,7 @@ Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
         :alt: Build Status
         :target: https://gitlab.com/ascm/colmto/pipelines
 
-    .. image:: https://gitlab.com/ascm/colmto/badges/master/coverage.svg
+    .. image:: https://codecov.io/gl/ascm/colmto/branch/master/graph/badge.svg
         :alt: Codecov
         :target: https://codecov.io/gl/ascm/colmto
 
