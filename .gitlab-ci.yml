@@ -1,13 +1,25 @@
 image: socialcars/docker:colmto
 
-test:
+devtest:
+  stage: test
   script:
   - python3 setup.py test
   only:
-  - master
   - develop
 
+coverage:
+  stage: test
+  script:
+  - pytest tests --cov=colmto --junitxml=report.xml
+  - codecov
+  artifacts:
+    reports:
+      junit: report.xml
+  only:
+  - master
+  
 run:
+  stage: test
   script:
   - pip3 install wheel
   - python3 setup.py bdist_wheel
