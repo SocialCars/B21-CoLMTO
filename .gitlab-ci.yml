@@ -23,6 +23,7 @@ devtest:
   image: socialcars/docker:colmto
   stage: test
   script:
+  - pip3 install -r requirements.txt
   - python3 setup.py test
   only:
   - develop
@@ -31,6 +32,7 @@ coverage:
   image: socialcars/docker:colmto
   stage: test
   script:
+  - pip3 install -r requirements.txt
   - pytest tests --cov=colmto --junitxml=report.xml
   - codecov
   artifacts:
@@ -54,7 +56,7 @@ pages:
   image: socialcars/docker:colmto
   stage: deploy
   script:
-  - pip3 install sphinx sphinx-rtd-theme
+  - pip3 install -r requirements.txt
   - cd docs ; make html; make latexpdf
   - mv build/html ../public
   - mv build/latex/CoLMTO-doc.pdf ../public/
