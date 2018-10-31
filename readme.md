@@ -17,12 +17,12 @@
 
 # Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
 
-[![license](https://img.shields.io/github/license/SocialCars/colmto.svg)](https://github.com/SocialCars/colmto/blob/master/license.md)
-[![CircleCI](https://img.shields.io/circleci/project/github/SocialCars/colmto.svg)](https://circleci.com/gh/SocialCars/colmto)
-[![Codecov](https://img.shields.io/codecov/c/github/SocialCars/colmto.svg)](https://codecov.io/gh/SocialCars/colmto)
-[![Codacy](https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg)](https://www.codacy.com/app/masc/socialcars_colmto)
+[![license](https://img.shields.io/badge/license-LGPLv3-red.svg)](https://gitlab.com/ascm/colmto/blob/master/license.md)
+[![Build Status](https://gitlab.com/ascm/colmto/badges/master/build.svg)](https://gitlab.com/ascm/colmto/pipelines)
+[![Codacy Report](https://img.shields.io/codacy/b5da4f1e4f554b459c84859107452974.svg)](https://www.codacy.com/app/masc/colmto_gitlab)
+[![Coverage Report](https://gitlab.com/ascm/colmto/badges/master/coverage.svg)](https://codecov.io/gl/ascm/colmto)
 
-[![html documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://socialcars.github.io/colmto/docs/sources/index.html)
+[![html documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://ascm.gitlab.io/colmto)
 
 ## Execution Model
 
