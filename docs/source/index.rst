@@ -17,9 +17,9 @@ Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
         :alt: Codecov
         :target: https://codecov.io/gl/ascm/colmto
 
-    .. image:: https://img.shields.io/codacy/b5da4f1e4f554b459c84859107452974.svg
+    .. image:: https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg
         :alt: Codacy
-        :target: https://www.codacy.com/app/masc/colmto_gitlab
+        :target: https://www.codacy.com/app/masc/colmto
 
     .. image:: https://img.shields.io/badge/documentation-PDF-blue.svg
         :alt: PDF documentation
