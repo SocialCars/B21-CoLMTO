@@ -59,5 +59,5 @@ Copyright & License
 ===================
 
 * Copyright 2018, Malte Aschermann
-* `LGPL-3.0 <http://socialcars.github.io/colmto/LICENSE.md>`_ (code)
+* `LGPL-3.0 <https://gitlab.com/ascm/colmto/blob/master/license.md>`_ (code)
 * `Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>`_ (documentation)

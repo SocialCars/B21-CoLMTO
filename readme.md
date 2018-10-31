@@ -35,7 +35,7 @@ The execution model of CoLMTO, developed to conduct my simulation studies, is de
 
 ![CoLMTO Architecture](architecture.png)
 
-The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/SocialCars/colmto/releases/tag/v0.1.1)
+The CoLMTO Simulation Architecture as of release [v0.1.1](https://gitlab.com/ascm/colmto/tags/v0.1.1)
 
 ## Build Instructions
 
@@ -59,7 +59,7 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
 ### Checkout CoLMTO
 
 ```sh
-git clone --recursive https://github.com/SocialCars/colmto.git
+git clone --recursive https://gitlab.com/ascm/colmto.git
 ```
 
 ### Build SUMO Submodule (optional)
@@ -186,4 +186,4 @@ colmto --help
 ## Copyright & License
 
   * Copyright 2018, Malte Aschermann
-  * [License: LGPL](http://socialcars.github.io/colmto/license.md)
+  * [License: LGPL](https://gitlab.com/ascm/colmto/blob/master/license.md)
