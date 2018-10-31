@@ -7,6 +7,16 @@ test:
   - master
   - develop
 
+run:
+  script:
+  - pip3 install wheel
+  - python3 setup.py bdist_wheel
+  artifacts:
+    paths:
+      - dist/*.whl
+  only:
+  - master
+
 pages:
   script:
   - pip3 install sphinx sphinx-rtd-theme
