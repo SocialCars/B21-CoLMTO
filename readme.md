@@ -22,7 +22,7 @@
 [![Codacy Report](https://img.shields.io/codacy/b5da4f1e4f554b459c84859107452974.svg)](https://www.codacy.com/app/masc/colmto_gitlab)
 [![Coverage Report](https://gitlab.com/ascm/colmto/badges/master/coverage.svg)](https://codecov.io/gl/ascm/colmto)
 
-[![html documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://masc.gitlab.io/colmto)
+[![html documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://ascm.gitlab.io/colmto)
 
 ## Execution Model
 
