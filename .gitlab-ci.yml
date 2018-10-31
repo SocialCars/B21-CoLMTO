@@ -55,6 +55,7 @@ pages:
   stage: deploy
   script:
   - pip3 install sphinx sphinx-rtd-theme
+  - cp versioneer.py docs/
   - cd docs ; make html; make latexpdf
   - mv build/html ../public
   - mv build/latex/CoLMTO-doc.pdf ../public/
