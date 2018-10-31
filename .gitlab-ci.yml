@@ -1,18 +1,4 @@
-image: python:3.7.1-alpine
-
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
-
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
-before_script:
-  - python -V
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
+image: socialcars/docker:colmto
 
 stages:
   - build
@@ -20,7 +6,6 @@ stages:
   - deploy
 
 devtest:
-  image: socialcars/docker:colmto
   stage: test
   script:
   - python3 setup.py test
@@ -28,7 +13,6 @@ devtest:
   - develop
 
 coverage:
-  image: socialcars/docker:colmto
   stage: test
   script:
   - pytest tests --cov=colmto --junitxml=report.xml
@@ -41,6 +25,7 @@ coverage:
   
 run:
   stage: build
+  image: python:3.7.1-alpine
   script:
   - pip3 install wheel sphinx
   - python3 setup.py bdist_wheel
@@ -53,9 +38,8 @@ run:
 pages:
   stage: deploy
   script:
-  - apk add build-base
-  - pip3 install -r https://gitlab.com/ascm/colmto/raw/master/requirements.txt
-  - cd docs; make html; make latexpdf
+  - pip3 install sphinx sphinx-rtd-theme
+  - cd docs ; make html; make latexpdf
   - mv build/html ../public
   - mv build/latex/CoLMTO-doc.pdf ../public/
   artifacts:
