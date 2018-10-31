@@ -18,10 +18,11 @@ run:
   - master
 
 pages:
+  stage: deploy
   script:
   - pip3 install sphinx sphinx-rtd-theme
   - cd docs ; make html ; make latexpdf
-  - mv build/html/ ../public/
+  - mv build/html ../public
   - mv build/latex/CoLMTO-doc.pdf ../public/
   artifacts:
     paths:
