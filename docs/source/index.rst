@@ -23,7 +23,7 @@ Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
 
     .. image:: https://img.shields.io/badge/documentation-PDF-blue.svg
         :alt: PDF documentation
-        :target: ../CoLMTO-doc.pdf
+        :target: https://ascm.gitlab.io/colmto/CoLMTO-doc.pdf
 
     Where to start
     --------------
