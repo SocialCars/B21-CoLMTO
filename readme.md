@@ -17,10 +17,14 @@
 
 # Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
 
-[![license](https://img.shields.io/github/license/SocialCars/colmto.svg)](https://github.com/SocialCars/colmto/blob/master/license.md)
+[![license](https://img.shields.io/github/license/masc/colmto.svg)](https://github.com/masc/colmto/blob/master/license.md)
 [![CircleCI](https://img.shields.io/circleci/project/github/SocialCars/colmto.svg)](https://circleci.com/gh/SocialCars/colmto)
 [![Codecov](https://img.shields.io/codecov/c/github/SocialCars/colmto.svg)](https://codecov.io/gh/SocialCars/colmto)
 [![Codacy](https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg)](https://www.codacy.com/app/masc/socialcars_colmto)
+
+![Build Status](https://gitlab.com/ascm/colmto/badges/master/build.svg)
+![Test Coverage](https://gitlab.com/ascm/colmto/badges/master/coverage.svg?job=coverage)
+
 
 [![html documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://socialcars.github.io/colmto/docs/sources/index.html)
 
