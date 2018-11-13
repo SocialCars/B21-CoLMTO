@@ -24,6 +24,8 @@
 '''Configuration super class.'''
 
 
+import argparse
+from contextlib import ExitStack
 import os
 import sys
 import h5py
@@ -190,83 +192,112 @@ def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
     return l_aggregated
 
 
-def main(argv):
+def main(args):
     '''
     Main function
-    :param argv: cmdline arguments
+    :param args: cmdline arguments
     '''
     l_writer = colmto.common.io.Writer()
 
-    if len(argv) < 3:
-        print('Usage: aggregate_runs_in_hdf5.py [hdf5-input-file ...] [hdf5-output-file]')
-        return
+    print('opening input/output HDF5s')
+    with ExitStack() as f_stack:
+        print(' input:', '\n\t'.join(args.input_files), sep=' ')
+        print(f'output: {args.output_file}')
+        l_input = [f_stack.enter_context(h5py.File(i_fname, 'r')) for i_fname in args.input_files]
+        f_output = f_stack.enter_context(h5py.File(args.output_file, 'a', libver='latest'))
 
-    print('reading input HDF5s ({})'.format(argv[:-1]))
-    f_hdf5_input = {
-        i_filename: h5py.File(i_filename, 'r') for i_filename in argv[1:-1]
-    }
+        print('aggregating data...')
 
-    if len(list(f_hdf5_input.values())[0].keys()) == 0:
-        print('No scenario dirs found!')
-        return
+        for i_scenario in l_input[0].keys():
+            print(f'|-- {i_scenario}')
 
-    print('aggregating data...')
+            l_aadts = [i_aadt for i_input in l_input for i_aadt in i_input[i_scenario].keys()]
+            if not l_aadts:
+                print('No aadt dirs found!')
+                return
 
-    for i_scenario in list(f_hdf5_input.values())[0].keys():
-        print('|-- {}'.format(i_scenario))
-
-        l_aadts = list(f_hdf5_input.values())[0][i_scenario].keys()
-        if len(l_aadts) == 0:
-            print('No aadt dirs found!')
-            return
-
-        for i_aadt in l_aadts:
-            print('|   |-- {}'.format(i_aadt))
-
-            l_orderings = list(f_hdf5_input.values())[0][os.path.join(i_scenario, i_aadt)].keys()
-            if len(l_orderings) == 0:
+            l_orderings = list(l_input[0][f'{i_scenario}/{l_aadts[0]}'].keys())
+            if not l_orderings:
                 print('No ordering dirs found!')
                 return
 
-            for i_ordering in l_orderings:
-                l_runs = list(f_hdf5_input.values())[0][
-                    os.path.join(i_scenario, i_aadt, i_ordering)
-                ].keys()
-                l_intervals = list(f_hdf5_input.values())[0][os.path.join(
-                    i_scenario,
-                    i_aadt,
-                    i_ordering,
-                    l_runs[0],
-                    'intervals'
-                )].keys()
-                l_detector_positions = sorted(
-                    set(
-                        [
-                            e for tupl in [
-                                (int(i.split('-')[0]), int(i.split('-')[1])) for i in l_intervals
-                            ] for e in tupl
-                        ]
-                    )
-                )
-                print('|   |   |-- {} {}'.format(i_ordering, l_detector_positions))
+            l_runs = list(l_input[0][f'{i_scenario}/{l_aadts[0]}'].keys())
 
-                l_writer.write_hdf5(
-                    aggregate_run_stats_to_hdf5(
-                        [
-                            i_hdf5_input[os.path.join(i_scenario, i_aadt, i_ordering)]
-                            for i_hdf5_input in f_hdf5_input.values()
-                        ],
-                        l_detector_positions
-                    ),
-                    hdf5_file=argv[-1],
-                    hdf5_base_path=os.path.join(i_scenario, str(i_aadt), i_ordering),
-                    compression='gzip',
-                    compression_opts=9,
-                    fletcher32=True
-                )
+            for i_aadt in l_aadts:
+                print(f'|   |-- {i_aadt}')
 
-    for i_hdf5_input in list(f_hdf5_input.values()):
-        i_hdf5_input.close()
+                for i_ordering in l_orderings:
+                    print(f'|   |   |-- {i_ordering}')
+
+                    
+
+        #             l_runs = list(f_hdf5_input.values())[0][
+        #                 os.path.join(i_scenario, i_aadt, i_ordering)
+        #             ].keys()
+        #             l_intervals = list(f_hdf5_input.values())[0][os.path.join(
+        #                 i_scenario,
+        #                 i_aadt,
+        #                 i_ordering,
+        #                 l_runs[0],
+        #                 'intervals'
+        #             )].keys()
+        #             l_detector_positions = sorted(
+        #                 set(
+        #                     [
+        #                         e for tupl in [
+        #                             (int(i.split('-')[0]), int(i.split('-')[1])) for i in l_intervals
+        #                         ] for e in tupl
+        #                     ]
+        #                 )
+        #             )
+        #             print('|   |   |-- {} {}'.format(i_ordering, l_detector_positions))
+
+        #             l_writer.write_hdf5(
+        #                 aggregate_run_stats_to_hdf5(
+        #                     [
+        #                         i_hdf5_input[os.path.join(i_scenario, i_aadt, i_ordering)]
+        #                         for i_hdf5_input in f_hdf5_input.values()
+        #                     ],
+        #                     l_detector_positions
+        #                 ),
+        #                 hdf5_file=args[-1],
+        #                 hdf5_base_path=os.path.join(i_scenario, str(i_aadt), i_ordering),
+        #                 compression='gzip',
+        #                 compression_opts=9,
+        #                 fletcher32=True
+        #             )
 
 if __name__ == '__main__':
-    main(sys.argv)
+    l_parser = argparse.ArgumentParser(
+        prog='aggregate_runs_in_hdf5.py',
+        description='Aggregate runs from multiple CoLMTO result HDF5s with different AADTs.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    l_parser.add_argument(
+        '-i',
+        dest='input_files',
+        type=str,
+        nargs='*',
+        default=None
+    )
+    l_parser.add_argument(
+        '-o',
+        dest='output_file',
+        type=str,
+        default=None
+    )
+    l_parser.add_argument(
+        '-root',
+        dest='root',
+        type=str,
+        default='NI-B210',
+        help='Root dir element.'
+    )
+    l_parser.add_argument(
+        '-d',
+        dest='dryrun',
+        action='store_true',
+        default=False
+    )
+
+    main(l_parser.parse_args())
