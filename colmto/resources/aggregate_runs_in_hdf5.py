@@ -274,27 +274,27 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     l_parser.add_argument(
-        '-i',
+        '-i', '--input',
         dest='input_files',
         type=str,
         nargs='*',
-        default=None
+        required=True
     )
     l_parser.add_argument(
-        '-o',
+        '-o', '--output',
         dest='output_file',
         type=str,
-        default=None
+        required=True
     )
     l_parser.add_argument(
-        '-root',
+        '--root',
         dest='root',
         type=str,
         default='NI-B210',
         help='Root dir element.'
     )
     l_parser.add_argument(
-        '-d',
+        '-d', '--dry-run',
         dest='dryrun',
         action='store_true',
         default=False
