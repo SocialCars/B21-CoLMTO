@@ -17,12 +17,13 @@
 
 # Cooperative Lane Management and Traffic flow Optimisation (CoLMTO)
 
-[![license](https://img.shields.io/github/license/SocialCars/colmto.svg)](https://github.com/SocialCars/colmto/blob/master/license.md)
-[![CircleCI](https://img.shields.io/circleci/project/github/SocialCars/colmto.svg)](https://circleci.com/gh/SocialCars/colmto)
-[![Codecov](https://img.shields.io/codecov/c/github/SocialCars/colmto.svg)](https://codecov.io/gh/SocialCars/colmto)
-[![Codacy](https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg)](https://www.codacy.com/app/masc/socialcars_colmto)
+[![license](https://img.shields.io/badge/license-LGPLv3-red.svg)](https://gitlab.com/ascm/colmto/blob/master/license.md)
+[![Build Status](https://gitlab.com/ascm/colmto/badges/master/build.svg)](https://gitlab.com/ascm/colmto/pipelines)
+[![Codacy Report](https://img.shields.io/codacy/7219fdeb9df44627bf66e4966e02dafd.svg)](https://www.codacy.com/app/masc/colmto)
+[![Coverage Report](https://codecov.io/gl/ascm/colmto/branch/master/graph/badge.svg)](https://codecov.io/gl/ascm/colmto)
 
-[![html documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://socialcars.github.io/colmto/docs/sources/index.html)
+[![HTML documentation](https://img.shields.io/badge/documentation-HTML-blue.svg)](http://ascm.gitlab.io/colmto)
+[![PDF documentation](https://img.shields.io/badge/documentation-PDF-blue.svg)](https://ascm.gitlab.io/colmto/CoLMTO-doc.pdf)
 
 ## Execution Model
 
@@ -34,7 +35,7 @@ The execution model of CoLMTO, developed to conduct my simulation studies, is de
 
 ![CoLMTO Architecture](architecture.png)
 
-The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/SocialCars/colmto/releases/tag/v0.1.1)
+The CoLMTO Simulation Architecture as of release [v0.1.1](https://gitlab.com/ascm/colmto/tags/v0.1.1)
 
 ## Build Instructions
 
@@ -58,7 +59,7 @@ The CoLMTO Simulation Architecture as of release [v0.1.1](https://github.com/Soc
 ### Checkout CoLMTO
 
 ```sh
-git clone --recursive https://github.com/SocialCars/colmto.git
+git clone --recursive https://gitlab.com/ascm/colmto.git
 ```
 
 ### Build SUMO Submodule (optional)
@@ -185,4 +186,4 @@ colmto --help
 ## Copyright & License
 
   * Copyright 2018, Malte Aschermann
-  * [License: LGPL](http://socialcars.github.io/colmto/license.md)
+  * [License: LGPL](https://gitlab.com/ascm/colmto/blob/master/license.md)

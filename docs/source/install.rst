@@ -31,7 +31,7 @@ Checkout Code
 
 .. code-block:: bash
 
-    git clone --recursive https://github.com/SocialCars/colmto.git
+    git clone --recursive https://gitlab.com/ascm/colmto.git
 
 
 Build SUMO Submodule (optional)
