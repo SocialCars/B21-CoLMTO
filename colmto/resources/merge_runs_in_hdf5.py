@@ -38,7 +38,6 @@ def main(args):
     Main function
     :param args: cmdline arguments
     '''
-    l_writer = colmto.common.io.Writer()
 
     print('opening input/output HDF5s')
     with ExitStack() as f_stack:
