@@ -74,7 +74,16 @@ def main(args):
 
                             for i_metric in l_metrics:
                                 print(f'|   |   |   |   |-- {i_metric}')
-                                l_output[f'{i_scenario}/{i_aadt}/{i_ordering}/{i_vtype}/{i_metric}'] = numpy.array([i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/{i_run}/{StatisticSeries.GRID.value}/{i_vtype}/{i_metric}'] for i_run in l_runs])
+                                l_output.create_dataset(
+                                    f'{i_scenario}/{i_aadt}/{i_ordering}/{i_vtype}/{i_metric}',
+                                    data=numpy.array([i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/{i_run}/{StatisticSeries.GRID.value}/{i_vtype}/{i_metric}'] for i_run in l_runs]),
+                                    compression='gzip',
+                                    compression_opts=9,
+                                    fletcher32=True,
+                                    shuffle=True,
+                                    chunks=True,
+                                    track_times=True
+                                    )
 
 if __name__ == '__main__':
     l_parser = argparse.ArgumentParser(
