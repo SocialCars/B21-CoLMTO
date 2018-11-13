@@ -32,6 +32,8 @@ def main(args):
     main
     :param args: cmdline args
     '''
+    if not args.input_files or not args.output_file:
+        raise ValueError('input and output argument must be provided.')
 
     with ExitStack() as f_stack:
         print('input :', args.input_files)
@@ -49,7 +51,8 @@ def main(args):
 if __name__ == '__main__':
     l_parser = argparse.ArgumentParser(
         prog='merge_aadt_results.py',
-        description='Merge CoLMTO results from different AADTs.'
+        description='Merge CoLMTO results from different AADTs.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     l_parser.add_argument(
         '-i',
@@ -69,7 +72,7 @@ if __name__ == '__main__':
         dest='root',
         type=str,
         default='NI-B210',
-        help='Root dir element. DEFAULT: \'NI-B210\''
+        help='Root dir element.'
     )
     l_parser.add_argument(
         '-d',

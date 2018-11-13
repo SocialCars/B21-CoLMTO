@@ -83,22 +83,18 @@ class Colmto(object):
             '--output-hdf5-file', dest='results_hdf5_file', type=Path,
             default=None, help='target HDF5 file results will be written to'
         )
-
         l_parser.add_argument(
             '--scenarios', dest='scenarios', type=str, nargs='*',
             default=None
         )
-
         l_parser.add_argument(
             '--initialsortings', dest='initialsortings', type=str, nargs='*',
             default=None
         )
-
         l_parser.add_argument(
             '--cooperation-probability', dest='cooperation_probability', type=float,
             default=None
         )
-
         l_parser.add_argument(
             '--runs', dest='runs', type=int,
             default=None
@@ -126,20 +122,23 @@ class Colmto(object):
             const='DEBUG',
             help='Equivalent to \'--loglevel DEBUG\''
         )
-
+        l_parser.add_argument(
+            '--write-full-occupancies',
+            dest='writefulloccupancies',
+            action='store_true',
+            default=False,
+            help='Write full occupancy stats of lanes into results dir.'
+        )
         l_mutex_group_run_choice = l_parser.add_mutually_exclusive_group(required=False)
         l_mutex_group_run_choice.add_argument(
             '--sumo', dest='runsumo', action='store_true',
             default=False, help='run SUMO simulation'
         )
-
         l_sumo_group = l_parser.add_argument_group('SUMO')
-
         l_sumo_group.add_argument(
             '--cse', dest='cse_enabled', action='store_true',
             default=None, help='run SUMO simulation with central optimisation entity (CSE)'
         )
-
         l_mutex_sumo_group = l_sumo_group.add_mutually_exclusive_group(required=False)
         l_mutex_sumo_group.add_argument(
             '--headless', dest='headless', action='store_true',

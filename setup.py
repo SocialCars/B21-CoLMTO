@@ -52,14 +52,14 @@ setup(
     # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3 :: Only',
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)'
     ],
     keywords='',  # Separate with spaces
     author='Malte Aschermann',
     author_email='masc@tu-clausthal.de',
-    url='https://github.com/SocialCars/colmto',
+    url='https://gitlab.com/ascm/colmto',
     license='LGPL',
     packages=find_packages(exclude=['examples', 'tests', 'sumo']),
     include_package_data=True,

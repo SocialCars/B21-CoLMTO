@@ -23,6 +23,7 @@
 # @endcond
 '''Classes and functions to realise property structures, e.g. Position, Colour, ...'''
 
+from __future__ import annotations
 from collections import namedtuple
 from dataclasses import dataclass
 import typing
@@ -109,7 +110,7 @@ class Position:
         '''
         return iter((self.x, self.y))
 
-    def gridified(self, width: float) -> 'GridPosition':
+    def gridified(self, width: float) -> GridPosition:
         '''
         Round position to grid depending on `width` of grid cells and return new Position object.
 
@@ -413,7 +414,7 @@ class Behaviour(enum.Enum):
         return self.value
 
     @staticmethod
-    def behaviour_from_string(behaviour: str) -> 'Behaviour':
+    def behaviour_from_string(behaviour: str) -> Behaviour:
         '''
         Transforms string argument of behaviour, i.e. 'allow', 'deny' case insensitive to
         Behaviour enum value. Otherwise raises KeyError.
@@ -454,7 +455,7 @@ class RuleOperator(enum.Enum):
         return self.value(args)  # pylint: disable=too-many-function-args
 
     @staticmethod
-    def ruleoperator_from_string(rule_operator: str) -> 'RuleOperator':
+    def ruleoperator_from_string(rule_operator: str) -> RuleOperator:
         '''
         Transforms string argument of rule operator, i.e. 'any', 'all' case insensitive to
         RuleOperator enum value. Otherwise raises KeyError.
@@ -482,7 +483,7 @@ class VehicleDisposition(enum.Enum):
     _prng = numpy.random.RandomState()  # pylint: disable=no-member
 
     @staticmethod
-    def choose(cooperation_probability: float = 0.5) -> 'VehicleDisposition':
+    def choose(cooperation_probability: float = 0.5) -> VehicleDisposition:
         '''
         Pick a random disposition by given probability (default 50/50)
 

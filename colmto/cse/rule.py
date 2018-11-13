@@ -23,6 +23,7 @@
 # @endcond
 '''Rule related classes'''
 
+from __future__ import annotations
 import typing
 
 from abc import ABCMeta
@@ -57,7 +58,7 @@ class BaseRule(metaclass=ABCMeta):
         pass
 
     @classmethod
-    def rule_cls(cls, rule_name: str) -> 'BaseRule':
+    def rule_cls(cls, rule_name: str) -> BaseRule:
         '''
         Return a class object for instantiating a valid rule.
 
@@ -68,7 +69,7 @@ class BaseRule(metaclass=ABCMeta):
         return cls._valid_rules[rule_name]
 
     @classmethod
-    def from_configuration(cls, rule_config: dict) -> 'BaseRule':
+    def from_configuration(cls, rule_config: dict) -> BaseRule:
         '''
         Create a rule from a dictionary configuration
 
@@ -223,7 +224,7 @@ class ExtendableRule(BaseRule, metaclass=ABCMeta):
             raise ValueError
         self._subrule_operator = rule_operator
 
-    def add_subrule(self, subrule: BaseRule) -> 'BaseRule':
+    def add_subrule(self, subrule: BaseRule) -> BaseRule:
         '''
         Adds a sub-rule.
 
@@ -716,21 +717,28 @@ class SUMOOccupancyRule(SUMOVehicleRule, rule_name='SUMOOccupancyRule'):
     Occupancy-based rule
     '''
 
-    def __init__(self, occupancy_range: typing.Union[typing.Tuple[float, float], OccupancyRange] = (0., 1.), outside=False):
+    def __init__(
+            self,
+            occupancy_range: typing.Union[typing.Tuple[float, float], OccupancyRange] = (0., 1.),
+            lane_id: str = '21edge_0',
+            outside: bool = False):
         '''
         Initialisation
 
         :type occupancy_range: OccupancyRange
         :param occupancy_range: occupancy has to be in- or outside for this rule to apply, default: [0, 1]
+        :type lane_id: str
+        :param lane_id: lane id to cover with this rule
         :type outside: bool
         :param outside: controls whether this rules applies to vehicles inside (default) or outside of range
 
         '''
 
         super().__init__()
-        assert OccupancyRange(*occupancy_range).min <= OccupancyRange(*occupancy_range).max
+        assert 0 <= OccupancyRange(*occupancy_range).min <= OccupancyRange(*occupancy_range).max <= 1
         self._occupancy_range = OccupancyRange(*occupancy_range)
         self._outside = bool(outside)
+        self._lane_id = str(lane_id)
 
     def __str__(self):
         return f'{self.__class__}: ' \
@@ -745,5 +753,4 @@ class SUMOOccupancyRule(SUMOVehicleRule, rule_name='SUMOOccupancyRule'):
         :return: boolean
 
         '''
-
-        return self._outside ^ self._occupancy_range.contains(kwargs.get('occupancy', {}).get('21edge_1', float('NaN')))
+        return self._outside ^ self._occupancy_range.contains(kwargs.get('occupancy', {}).get(self._lane_id, float('NaN')))

@@ -43,6 +43,7 @@ _DEFAULT_CONFIG_RUN = {
         'enabled': False,
         'value': 30
     },
+    'writefulloccupancies': False,
     'onlyoneotlsegment': False,
     'entrylanepercent': 5,
     'runs': 1000,
@@ -373,6 +374,8 @@ class Configuration(object):
             self._run_config['initialsortings'] = self._args.initialsortings
         if self._args.cooperation_probability is not None:
             self._run_config['cooperation_probability'] = self._args.cooperation_probability
+        if self._args.writefulloccupancies:
+            self._run_config['writefulloccupancies'] = True
 
     @property
     def run_config(self) -> MappingProxyType:

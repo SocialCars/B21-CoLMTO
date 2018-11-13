@@ -24,11 +24,13 @@
 
 '''CSE classes'''
 
+from __future__ import annotations
 import typing
 if typing.TYPE_CHECKING:
     import traci
 
 from collections import deque
+from types import MappingProxyType
 import numpy
 import colmto.common.log
 from colmto.common.helper import VehicleType
@@ -54,6 +56,7 @@ class BaseCSE(object):
         self._log = colmto.common.log.logger(__name__)
         self._vehicles = set()
         self._rules = set()
+        self._args = args
 
     @property
     def rules(self) -> frozenset:
@@ -78,16 +81,22 @@ class SumoCSE(BaseCSE):
         '''
         super().__init__(args)
         self._traci = None
-        self._occupancy = {
+        self._occupancy_window = {  # record occupancy of previous 60 time steps (i.e. seconds) for both lanes
             i_lane: deque((float('NaN') for _ in range(60)), maxlen=60)
             for i_lane in ('21edge_0', '21edge_1')
         }
+        if self._args is not None and self._args.writefulloccupancies:
+            self._occupancy_full = {  # record full occupancy for both lanes for statistical purposes
+                i_lane: []
+                for i_lane in ('21edge_0', '21edge_1')
+            }
         self._dissatisfaction = {
             i_vtype: deque((StatisticValue.nanof(None) for _ in range(60)), maxlen=60)
             for i_vtype in VehicleType
         }
 
-    def traci(self, _traci: 'traci') -> 'SumoCSE':
+
+    def traci(self, _traci: 'traci') -> SumoCSE:
         '''
         Set TraCI reference
 
@@ -101,7 +110,7 @@ class SumoCSE(BaseCSE):
     def observe_traffic(self,
                         lane_subscription_results: typing.Dict[str, typing.Dict[int, float]],
                         vehicle_subscription_results: typing.Dict[str, typing.Dict[int, float]],
-                        vehicles: typing.Dict[str, SUMOVehicle]) -> 'SumoCSE':
+                        vehicles: typing.Dict[str, SUMOVehicle]) -> SumoCSE:
         '''
         Observe traffic, i.e. collect data about traffic via TraCI (if provided) to base future rule decisions on
 
@@ -120,9 +129,12 @@ class SumoCSE(BaseCSE):
 
         # record occupancy
         for i_key, i_value in lane_subscription_results.items():
-            if not i_key in self._occupancy:
-                raise KeyError(f'Unexpected key (\'{i_key}\') of subcription results. Expected one of {list(self._occupancy.keys())}.')
-            self._occupancy.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
+            if not i_key in self._occupancy_window:
+                raise KeyError(
+                    f'Unexpected key (\'{i_key}\') of subcription results. Expected one of {list(self._occupancy_window.keys())}.')
+            self._occupancy_window.get(i_key).appendleft(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
+        if self._args is not None and self._args.writefulloccupancies:
+            self._occupancy_full.get(i_key).append(i_value.get(self._traci.constants.LAST_STEP_OCCUPANCY))
 
         # record dissatisfaction
         l_dissatisfaction = {
@@ -137,10 +149,24 @@ class SumoCSE(BaseCSE):
 
         return self
 
+    def occupancy(self) -> typing.Mapping[str, tuple]:
+        '''
+        Return full occupancy stats over the past, if enables via `--write-full-occupancies`.
+        Otherwise return empty dict.
+
+        :return: occupancy dictionary with lane IDs as keys ('21edge_0', '21edge_1')
+
+        '''
+
+        return MappingProxyType(
+            { i_key: tuple(self._occupancy_full.get(i_key)) for i_key in self._occupancy_full }
+            if self._args is not None and self._args.writefulloccupancies else {}
+        )
+
     def _median_occupancy(self) -> typing.Dict[str, float]:
         '''
         Calculate median (ignoring NaN values) occupancy for all lanes.
-        Result can be NaN, iff observation window (self._occupancy) only contains NaN values.
+        Result can be NaN, iff observation window (self._occupancy_window) only contains NaN values.
 
         Example:
 
@@ -153,11 +179,11 @@ class SumoCSE(BaseCSE):
 
         return {
             i_lane: float(
-                numpy.nanmedian(list(self._occupancy.get(i_lane)))
-                if not numpy.isnan(list(self._occupancy.get(i_lane))).all()
+                numpy.nanmedian(list(self._occupancy_window.get(i_lane)))
+                if not numpy.isnan(list(self._occupancy_window.get(i_lane))).all()
                 else 'nan'
             )
-            for i_lane in self._occupancy
+            for i_lane in self._occupancy_window
         }
 
     def _median_dissatisfaction(self) -> typing.Dict[VehicleType, float]:
@@ -179,7 +205,7 @@ class SumoCSE(BaseCSE):
             for i_vtype in self._dissatisfaction
         }
 
-    def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> 'SumoCSE':
+    def add_rules_from_cfg(self, rules_cfg: typing.Iterable[dict]) -> SumoCSE:
         '''
         Create `Rules` from dict-based config and add them to SumoCSE.
 
@@ -207,7 +233,7 @@ class SumoCSE(BaseCSE):
 
         return self
 
-    def add_rule(self, rule: SUMORule) -> 'SumoCSE':
+    def add_rule(self, rule: SUMORule) -> SumoCSE:
         '''
         Add rule to SumoCSE.
 
@@ -224,7 +250,7 @@ class SumoCSE(BaseCSE):
 
         return self
 
-    def add_rules(self, rules: typing.Iterable[SUMORule]) -> 'SumoCSE':
+    def add_rules(self, rules: typing.Iterable[SUMORule]) -> SumoCSE:
         '''
         Add iterable of rules to SumoCSE.
 
@@ -239,7 +265,7 @@ class SumoCSE(BaseCSE):
 
         return self
 
-    def apply(self, vehicles: typing.Union[typing.Iterable[SUMOVehicle], typing.Dict[str, SUMOVehicle]]) -> 'SumoCSE':
+    def apply(self, vehicles: typing.Union[typing.Iterable[SUMOVehicle], typing.Dict[str, SUMOVehicle]]) -> SumoCSE:
         '''
         Apply rules to vehicles
 
@@ -253,7 +279,7 @@ class SumoCSE(BaseCSE):
             self.apply_one(i_vehicle)
         return self
 
-    def apply_one(self, vehicle: SUMOVehicle) -> 'SumoCSE':
+    def apply_one(self, vehicle: SUMOVehicle) -> SumoCSE:
         '''
         Apply rules to one vehicle
 

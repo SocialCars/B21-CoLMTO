@@ -66,7 +66,8 @@ class TestConfiguration(unittest.TestCase):
                 runs=1,
                 scenarios=None,
                 initialsortings=['random'],
-                cooperation_probability=None
+                cooperation_probability=None,
+                writefulloccupancies=False
             )
             self.assertEqual(colmto.common.configuration.Configuration(l_args)._args, l_args)  # pylint: disable=protected-access
 
@@ -86,7 +87,8 @@ class TestConfiguration(unittest.TestCase):
                     runs=None,
                     scenarios=['all'],
                     initialsortings=['random'],
-                    cooperation_probability=None
+                    cooperation_probability=None,
+                    writefulloccupancies=False
                 )
             )
             colmto.common.configuration.Configuration(
@@ -105,7 +107,8 @@ class TestConfiguration(unittest.TestCase):
                     runs=None,
                     scenarios='foo',
                     initialsortings=['random'],
-                    cooperation_probability=None
+                    cooperation_probability=None,
+                    writefulloccupancies=False
                 )
             )
 
@@ -131,7 +134,8 @@ class TestConfiguration(unittest.TestCase):
                         runs=1,
                         scenarios=None,
                         initialsortings=['random'],
-                        cooperation_probability=None
+                        cooperation_probability=None,
+                        writefulloccupancies=False
                     )
                 )
             with self.assertRaises(BaseException):
@@ -151,7 +155,8 @@ class TestConfiguration(unittest.TestCase):
                         runs=1,
                         scenarios=None,
                         initialsortings=['random'],
-                        cooperation_probability=None
+                        cooperation_probability=None,
+                        writefulloccupancies=False
                     )
                 )
 
@@ -180,7 +185,8 @@ class TestConfiguration(unittest.TestCase):
                     output_dir=Path(f_tmp.name),
                     run_prefix='foo',
                     initialsortings=['random'],
-                    cooperation_probability=None
+                    cooperation_probability=None,
+                    writefulloccupancies=False
                 )
             )
             self.assertIsInstance(l_config.run_config, MappingProxyType)
