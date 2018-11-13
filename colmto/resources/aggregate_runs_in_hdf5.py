@@ -31,6 +31,7 @@ import sys
 import h5py
 import numpy
 import colmto.common.io
+from colmto.common.helper import StatisticSeries
 
 
 def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
@@ -61,7 +62,7 @@ def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
                             'columns': '{} of {} {}'.format(i_view, i_vtype, i_stat)
                         }
                     } for i_stat in [
-                        'dissatisfaction_start',
+                        'dissatisfaction',
                         'dissatisfaction_end',
                         'dissatisfaction_delta',
                         'time_loss_start',
@@ -202,34 +203,40 @@ def main(args):
     print('opening input/output HDF5s')
     with ExitStack() as f_stack:
         print(' input:', '\n\t'.join(args.input_files), sep=' ')
-        print(f'output: {args.output_file}')
-        l_input = [f_stack.enter_context(h5py.File(i_fname, 'r')) for i_fname in args.input_files]
-        f_output = f_stack.enter_context(h5py.File(args.output_file, 'a', libver='latest'))
+        print('output:', args.output_file)
+        l_inputs = [f_stack.enter_context(h5py.File(i_fname, 'r')) for i_fname in args.input_files]
+        l_output = f_stack.enter_context(h5py.File(args.output_file, 'a', libver='latest'))
 
         print('aggregating data...')
+        for i_input in l_inputs:
+            for i_scenario in i_input.keys():
+                print(f'|-- {i_scenario}')
 
-        for i_scenario in l_input[0].keys():
-            print(f'|-- {i_scenario}')
+                l_aadts = [i_aadt for i_aadt in i_input[i_scenario].keys()]
+                if not l_aadts:
+                    print('No aadt dirs found!')
+                    return
 
-            l_aadts = [i_aadt for i_input in l_input for i_aadt in i_input[i_scenario].keys()]
-            if not l_aadts:
-                print('No aadt dirs found!')
-                return
+                for i_aadt in l_aadts:
+                    print(f'|   |-- {i_aadt}')
+                    l_orderings = list(i_input[f'{i_scenario}/{i_aadt}'].keys())
+                    if not l_orderings:
+                        print('No ordering dirs found!')
+                        return
 
-            l_orderings = list(l_input[0][f'{i_scenario}/{l_aadts[0]}'].keys())
-            if not l_orderings:
-                print('No ordering dirs found!')
-                return
+                    for i_ordering in l_orderings:
+                        l_runs = list(i_input[f'{i_scenario}/{i_aadt}/{i_ordering}'].keys())
 
-            l_runs = list(l_input[0][f'{i_scenario}/{l_aadts[0]}'].keys())
+                        print(f'|   |   |-- {i_ordering} ({len(l_runs)} runs)')
+                        l_vtypes = list(i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/0/{StatisticSeries.GRID.value}'].keys())
+                        for i_vtype in l_vtypes:
+                            print(f'|   |   |   |-- {i_vtype}')
+                            l_metrics = list(i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/0/{StatisticSeries.GRID.value}/{i_vtype}'].keys())
 
-            for i_aadt in l_aadts:
-                print(f'|   |-- {i_aadt}')
+                            for i_metric in l_metrics:
+                                print(f'|   |   |   |   |-- {i_metric}')
+                                l_output[f'{i_scenario}/{i_aadt}/{i_ordering}/{i_vtype}/{i_metric}'] = numpy.array([i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/{i_run}/{StatisticSeries.GRID.value}/{i_vtype}/{i_metric}'] for i_run in l_runs])
 
-                for i_ordering in l_orderings:
-                    print(f'|   |   |-- {i_ordering}')
-
-                    
 
         #             l_runs = list(f_hdf5_input.values())[0][
         #                 os.path.join(i_scenario, i_aadt, i_ordering)
