@@ -24,11 +24,14 @@
 '''Configuration super class.'''
 
 
+import argparse
+from contextlib import ExitStack
 import os
 import sys
 import h5py
 import numpy
 import colmto.common.io
+from colmto.common.helper import StatisticSeries
 
 
 def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
@@ -59,7 +62,7 @@ def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
                             'columns': '{} of {} {}'.format(i_view, i_vtype, i_stat)
                         }
                     } for i_stat in [
-                        'dissatisfaction_start',
+                        'dissatisfaction',
                         'dissatisfaction_end',
                         'dissatisfaction_delta',
                         'time_loss_start',
@@ -190,83 +193,118 @@ def aggregate_run_stats_to_hdf5(hdf5_stats, detector_positions):
     return l_aggregated
 
 
-def main(argv):
+def main(args):
     '''
     Main function
-    :param argv: cmdline arguments
+    :param args: cmdline arguments
     '''
     l_writer = colmto.common.io.Writer()
 
-    if len(argv) < 3:
-        print('Usage: aggregate_runs_in_hdf5.py [hdf5-input-file ...] [hdf5-output-file]')
-        return
+    print('opening input/output HDF5s')
+    with ExitStack() as f_stack:
+        print(' input:', '\n\t'.join(args.input_files), sep=' ')
+        print('output:', args.output_file)
+        l_inputs = [f_stack.enter_context(h5py.File(i_fname, 'r')) for i_fname in args.input_files]
+        l_output = f_stack.enter_context(h5py.File(args.output_file, 'a', libver='latest'))
 
-    print('reading input HDF5s ({})'.format(argv[:-1]))
-    f_hdf5_input = {
-        i_filename: h5py.File(i_filename, 'r') for i_filename in argv[1:-1]
-    }
+        print('aggregating data...')
+        for i_input in l_inputs:
+            for i_scenario in i_input.keys():
+                print(f'|-- {i_scenario}')
 
-    if len(list(f_hdf5_input.values())[0].keys()) == 0:
-        print('No scenario dirs found!')
-        return
+                l_aadts = [i_aadt for i_aadt in i_input[i_scenario].keys()]
+                if not l_aadts:
+                    print('No aadt dirs found!')
+                    return
 
-    print('aggregating data...')
+                for i_aadt in l_aadts:
+                    print(f'|   |-- {i_aadt}')
+                    l_orderings = list(i_input[f'{i_scenario}/{i_aadt}'].keys())
+                    if not l_orderings:
+                        print('No ordering dirs found!')
+                        return
 
-    for i_scenario in list(f_hdf5_input.values())[0].keys():
-        print('|-- {}'.format(i_scenario))
+                    for i_ordering in l_orderings:
+                        l_runs = list(i_input[f'{i_scenario}/{i_aadt}/{i_ordering}'].keys())
 
-        l_aadts = list(f_hdf5_input.values())[0][i_scenario].keys()
-        if len(l_aadts) == 0:
-            print('No aadt dirs found!')
-            return
+                        print(f'|   |   |-- {i_ordering} ({len(l_runs)} runs)')
+                        l_vtypes = list(i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/0/{StatisticSeries.GRID.value}'].keys())
+                        for i_vtype in l_vtypes:
+                            print(f'|   |   |   |-- {i_vtype}')
+                            l_metrics = list(i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/0/{StatisticSeries.GRID.value}/{i_vtype}'].keys())
 
-        for i_aadt in l_aadts:
-            print('|   |-- {}'.format(i_aadt))
+                            for i_metric in l_metrics:
+                                print(f'|   |   |   |   |-- {i_metric}')
+                                l_output[f'{i_scenario}/{i_aadt}/{i_ordering}/{i_vtype}/{i_metric}'] = numpy.array([i_input[f'{i_scenario}/{i_aadt}/{i_ordering}/{i_run}/{StatisticSeries.GRID.value}/{i_vtype}/{i_metric}'] for i_run in l_runs])
 
-            l_orderings = list(f_hdf5_input.values())[0][os.path.join(i_scenario, i_aadt)].keys()
-            if len(l_orderings) == 0:
-                print('No ordering dirs found!')
-                return
 
-            for i_ordering in l_orderings:
-                l_runs = list(f_hdf5_input.values())[0][
-                    os.path.join(i_scenario, i_aadt, i_ordering)
-                ].keys()
-                l_intervals = list(f_hdf5_input.values())[0][os.path.join(
-                    i_scenario,
-                    i_aadt,
-                    i_ordering,
-                    l_runs[0],
-                    'intervals'
-                )].keys()
-                l_detector_positions = sorted(
-                    set(
-                        [
-                            e for tupl in [
-                                (int(i.split('-')[0]), int(i.split('-')[1])) for i in l_intervals
-                            ] for e in tupl
-                        ]
-                    )
-                )
-                print('|   |   |-- {} {}'.format(i_ordering, l_detector_positions))
+        #             l_runs = list(f_hdf5_input.values())[0][
+        #                 os.path.join(i_scenario, i_aadt, i_ordering)
+        #             ].keys()
+        #             l_intervals = list(f_hdf5_input.values())[0][os.path.join(
+        #                 i_scenario,
+        #                 i_aadt,
+        #                 i_ordering,
+        #                 l_runs[0],
+        #                 'intervals'
+        #             )].keys()
+        #             l_detector_positions = sorted(
+        #                 set(
+        #                     [
+        #                         e for tupl in [
+        #                             (int(i.split('-')[0]), int(i.split('-')[1])) for i in l_intervals
+        #                         ] for e in tupl
+        #                     ]
+        #                 )
+        #             )
+        #             print('|   |   |-- {} {}'.format(i_ordering, l_detector_positions))
 
-                l_writer.write_hdf5(
-                    aggregate_run_stats_to_hdf5(
-                        [
-                            i_hdf5_input[os.path.join(i_scenario, i_aadt, i_ordering)]
-                            for i_hdf5_input in f_hdf5_input.values()
-                        ],
-                        l_detector_positions
-                    ),
-                    hdf5_file=argv[-1],
-                    hdf5_base_path=os.path.join(i_scenario, str(i_aadt), i_ordering),
-                    compression='gzip',
-                    compression_opts=9,
-                    fletcher32=True
-                )
-
-    for i_hdf5_input in list(f_hdf5_input.values()):
-        i_hdf5_input.close()
+        #             l_writer.write_hdf5(
+        #                 aggregate_run_stats_to_hdf5(
+        #                     [
+        #                         i_hdf5_input[os.path.join(i_scenario, i_aadt, i_ordering)]
+        #                         for i_hdf5_input in f_hdf5_input.values()
+        #                     ],
+        #                     l_detector_positions
+        #                 ),
+        #                 hdf5_file=args[-1],
+        #                 hdf5_base_path=os.path.join(i_scenario, str(i_aadt), i_ordering),
+        #                 compression='gzip',
+        #                 compression_opts=9,
+        #                 fletcher32=True
+        #             )
 
 if __name__ == '__main__':
-    main(sys.argv)
+    l_parser = argparse.ArgumentParser(
+        prog='aggregate_runs_in_hdf5.py',
+        description='Aggregate runs from multiple CoLMTO result HDF5s with different AADTs.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    l_parser.add_argument(
+        '-i', '--input',
+        dest='input_files',
+        type=str,
+        nargs='*',
+        required=True
+    )
+    l_parser.add_argument(
+        '-o', '--output',
+        dest='output_file',
+        type=str,
+        required=True
+    )
+    l_parser.add_argument(
+        '--root',
+        dest='root',
+        type=str,
+        default='NI-B210',
+        help='Root dir element.'
+    )
+    l_parser.add_argument(
+        '-d', '--dry-run',
+        dest='dryrun',
+        action='store_true',
+        default=False
+    )
+
+    main(l_parser.parse_args())
